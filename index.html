@@ -14,6 +14,7 @@
     <div class="bar">
       <div class="logo">三 宝 殿</div>
       <div class="auth-area" id="authArea"></div>
+      <button class="gear" title="配置大模型" onclick="openAIConfig()">⚙ 大模型</button>
     </div>
     <div class="slogan">八字 · 六爻 · 神算子攀谈 — 观命盘、卜卦象、参心事</div>
   </header>
@@ -59,7 +60,7 @@
     <h2>神算子攀谈</h2>
     <div class="card">
       <p>神算子不急于断你何事。他先观你八字、再卜一卦，略陈观感（含<strong>白话解卦</strong>），便循循善诱，与你攀谈数语，终而点出<strong>你此来心中所悬之事</strong>。</p>
-      <p class="muted">玩法：先完成上方「八字推演」与「六爻起卦」，再请神算子入局攀谈。<strong>神算子须登录后使用</strong>（免费演示账号，仅存本机浏览器）。</p>
+      <p class="muted">玩法：先完成上方「八字推演」与「六爻起卦」，再请神算子入局攀谈。<strong>神算子须登录后使用</strong>（免费演示账号，仅存本机浏览器）。若已配置大模型，神算子解惑将由大模型实时生成，更贴合你这一局。</p>
       <button class="ghost" onclick="startShen()">请神算子参详</button>
       <div id="shen-box"></div>
     </div>
@@ -70,6 +71,27 @@
     本站为静态站点，可部署于任意静态托管（含 Cloudflare Pages）。
   </div>
 
+</div>
+
+<!-- ============ 大模型配置弹窗 ============ -->
+<div id="aiModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-h">三宝殿 · 大模型配置</div>
+    <p class="muted">配置后，神算子解惑将由大模型实时生成（结合你的八字、卦象与所问之事）。配置仅存于本机浏览器，<strong>不会上传到本站任何服务器</strong>。</p>
+    <p class="muted warn">密钥在浏览器端调用属于演示用法；<strong>正式部署请把 endpoint 指向你的后端代理（如 Cloudflare Worker），由后端持有密钥</strong>，切勿把密钥写进仓库或暴露在前端代码。</p>
+    <label>API 端点（Chat Completions）</label>
+    <input id="aiEndpoint" placeholder="https://api.openai.com/v1/chat/completions">
+    <label>API 密钥（Bearer）</label>
+    <input id="aiKey" type="password" placeholder="sk-...">
+    <label>模型名</label>
+    <input id="aiModel" placeholder="如 gpt-4o-mini / deepseek-chat">
+    <div id="aiMsg" class="lg-msg"></div>
+    <div class="modal-btns">
+      <button onclick="saveAIConfig()">保存配置</button>
+      <button class="ghost" onclick="clearAIConfig()">清除</button>
+      <button class="ghost" onclick="closeAIConfig()">取消</button>
+    </div>
+  </div>
 </div>
 
 <!-- ============ 登录弹窗 ============ -->
@@ -92,6 +114,7 @@
 <script src="./assets/js/liuyao.js"></script>
 <script src="./assets/js/auth.js"></script>
 <script src="./assets/js/shensuan.js"></script>
+<script src="./assets/js/ai.js"></script>
 <script src="./assets/js/app.js"></script>
 </body>
 </html>

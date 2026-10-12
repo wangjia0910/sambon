@@ -77,3 +77,24 @@ header .logo{font-size:32px;font-weight:600;letter-spacing:8px;color:var(--accen
 .lg-msg{font-size:13px;color:var(--warn);min-height:18px;margin:8px 0 0}
 .modal-btns{margin-top:14px}
 .modal-btns button{margin:6px 6px 0 0}
+
+/* 大模型配置齿轮按钮 */
+.gear{background:#fff;color:var(--accent2);border:1px solid var(--accent2);
+  padding:7px 12px;font-size:13px;margin:0}
+.gear:hover{background:var(--accent2);color:#fff}
+
+/* 大模型解答区 */
+.ai-note{font-size:12px;color:var(--mut);margin-top:8px}
+#aiText br{line-height:1.9}
+
+/* 传统五步推演折叠 */
+.solution{margin-top:14px;background:#fff;border:1px solid var(--accent2);border-radius:12px;
+  padding:14px 16px}
+.solution summary{cursor:pointer;font-weight:700;color:var(--accent2);font-size:15px;
+  letter-spacing:.5px;outline:none}
+.solution summary::-webkit-details-marker{color:var(--accent2)}
+.solution .sol-item{display:flex;gap:10px;padding:8px 0;border-top:1px dashed #e8d9c2}
+.solution[open] .sol-item{border-top:1px dashed #e8d9c2;margin-top:8px}
+.solution .sol-item:first-of-type{border-top:none}
+.solution .sol-item b{flex:0 0 92px;color:var(--ink);font-weight:600}
+.solution .sol-item span{flex:1;line-height:1.85;color:#6b5a44}

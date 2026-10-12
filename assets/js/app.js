@@ -34,6 +34,29 @@
   }
   function doLogout() { Auth.logout(); renderAuth(); }
 
+  // ---- 大模型配置（存本机浏览器 localStorage）----
+  function openAIConfig() {
+    var c = AI.loadCfg();
+    $('aiEndpoint').value = c.endpoint || '';
+    $('aiKey').value = c.apiKey || '';
+    $('aiModel').value = c.model || '';
+    $('aiMsg').textContent = AI.isConfigured() ? '已配置，可重新保存或清除。' : '';
+    $('aiModal').classList.remove('hidden');
+    var ep = $('aiEndpoint'); if (ep) ep.focus();
+  }
+  function closeAIConfig() { $('aiModal').classList.add('hidden'); }
+  function saveAIConfig() {
+    var ep = $('aiEndpoint').value.trim(), key = $('aiKey').value.trim(), model = $('aiModel').value.trim();
+    if (!ep || !key || !model) { $('aiMsg').textContent = '三项均需填写'; return; }
+    AI.configure({ endpoint: ep, apiKey: key, model: model });
+    $('aiMsg').textContent = '已保存（仅存本机浏览器）';
+    setTimeout(closeAIConfig, 700);
+  }
+  function clearAIConfig() {
+    AI.configure({ endpoint: '', apiKey: '', model: '' });
+    $('aiMsg').textContent = '已清除配置';
+  }
+
   // ---- 八字 ----
   function doBazi() {
     var name = $('name').value.trim();
@@ -130,6 +153,7 @@
   }
 
   function shenPickSub(sub) {
+    shenState.sub = sub;
     var c = Shensuan.conclude(currentBz, currentGua, shenState.domain, sub, '');
     renderConclusion(c);
   }
@@ -147,27 +171,70 @@
   function shenFreeSubmit() {
     var t = $('freeText').value.trim();
     if (!t) { alert('请先说说你的心事'); return; }
+    shenState.free = t;
+    shenState.sub = '';
     var c = Shensuan.conclude(currentBz, currentGua, 'other', '', t);
     renderConclusion(c);
   }
 
+  function problemText() {
+    var key = shenState.domain, sub = shenState.sub, free = shenState.free;
+    if (free) return free;
+    var w = Shensuan.fieldName(key) + '·' + Shensuan.subLabel(key, sub);
+    return w || '心中所忧';
+  }
+
+  function formatAI(txt) {
+    return (txt || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>');
+  }
+
+  // 大模型异步解惑：成功渲染，失败/未配置则降级提示，保留本地五步
+  async function aiResolve() {
+    var box = $('aiText'); if (!box) return;
+    try {
+      var txt = await AI.resolve(currentBz, currentGua, problemText());
+      box.innerHTML = formatAI(txt);
+      var note = $('aiNote'); if (note) note.textContent = '（由大模型实时生成，结合你这一局的八字、卦象与所问之事）';
+    } catch (e) {
+      var msg = (e && e.code === 'NOT_CONFIGURED') ? '尚未配置大模型' :
+        ('调用失败：' + ((e && e.message) || e));
+      box.innerHTML = '（大模型解惑暂不可用：' + msg + '。已为你保留下方本地传统推演方案。）';
+    }
+  }
+
   function renderConclusion(c) {
+    var aiOn = (typeof AI !== 'undefined') && AI.isConfigured();
+    var aiBlock = aiOn
+      ? '<div class="shen-box fade" id="aiBox" style="border-color:var(--accent2)">' +
+          '<div class="say" style="font-weight:600;color:var(--accent2)">◈ 神算子大模型解惑（实时生成）</div>' +
+          '<div class="say" id="aiText">神算子正在凝神参详，请稍候……（大模型推理中）</div>' +
+          '<div class="ai-note" id="aiNote"></div>' +
+        '</div>'
+      : '<div class="shen-box fade" style="border-color:var(--accent2)">' +
+          '<div class="say" style="font-weight:600;color:var(--accent2)">◈ 神算子大模型解惑（未启用）</div>' +
+          '<div class="say">尚未配置大模型。点击右上角「⚙ 大模型」填入你的 API 端点与密钥，神算子便能以大模型实时参详你这一局，给出更贴合现实的指引。</div>' +
+        '</div>';
+
+    var detailsOpen = aiOn ? '' : ' open';
     var solutionHtml = c.solution
-      ? '<div class="solution"><div class="sol-title">◈ 神算子解惑方案</div>' +
+      ? '<details class="solution"' + detailsOpen + '><summary>◈ 传统五步推演（离线可用）</summary>' +
         c.solution.split('\n\n').map(function (p) {
           var idx = p.indexOf('　');
           var head = idx > 0 ? p.slice(0, idx) : '';
           var body = idx > 0 ? p.slice(idx + 1) : p;
           return '<div class="sol-item"><b>' + head + '</b><span>' + body + '</span></div>';
-        }).join('') + '</div>'
+        }).join('') + '</details>'
       : '';
+
     $('shen-box').innerHTML +=
       '<div class="shen-box fade" style="border-color:var(--accent)">' +
         '<div class="say" style="font-weight:600;color:var(--accent)">' + c.summary + '</div>' +
         '<div class="say" style="margin-top:10px">' + c.reading + '</div>' +
-        solutionHtml +
-      '</div>';
+      '</div>' +
+      aiBlock + solutionHtml;
     $('shen-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (aiOn) aiResolve();
   }
 
   // 暴露给内联 onclick
@@ -184,6 +251,10 @@
   window.doRegister = doRegister;
   window.doLogout = doLogout;
   window.renderAuth = renderAuth;
+  window.openAIConfig = openAIConfig;
+  window.closeAIConfig = closeAIConfig;
+  window.saveAIConfig = saveAIConfig;
+  window.clearAIConfig = clearAIConfig;
 
   // 初始化
   renderAuth();
