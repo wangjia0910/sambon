@@ -177,14 +177,42 @@ pre{white-space:pre-wrap;font-family:"Menlo","Consolas",monospace;font-size:13.5
 .modal-btns{margin-top:16px}
 .modal-btns button{margin:6px 6px 0 0}
 
-/* ---------- 大模型齿轮按钮 ---------- */
-.gear{background:transparent;color:var(--gold);border:1px solid var(--gold);
-  padding:7px 13px;font-size:13px;letter-spacing:1px;margin:0;border-radius:999px}
-.gear:hover{background:rgba(201,168,90,.14)}
+/* ---------- 中英双语切换 ---------- */
+.en{display:none}
+html.lang-en .zh{display:none}
+html.lang-en .en{display:inline}
 
-/* ---------- 大模型解答区 ---------- */
+/* ---------- 匾额副标 / 天地人标签 ---------- */
+.plaque-sub{color:var(--gold);font-size:13px;letter-spacing:2px;margin:10px 0 0;opacity:.92}
+.hall-label .env-tag{width:auto;height:auto;line-height:1.5;border-radius:999px;
+  padding:2px 12px;margin-left:10px;font-size:12.5px;font-family:"Microsoft YaHei",sans-serif;
+  color:var(--gold);box-shadow:0 0 12px rgba(201,168,90,.18);vertical-align:middle}
+
+/* ---------- 顶栏胶囊按钮（神算模型 / 语言） ---------- */
+.pill-btn{background:transparent;color:var(--gold);border:1px solid var(--gold);
+  padding:6px 13px;font-size:13px;letter-spacing:1px;margin:0;border-radius:999px;cursor:pointer;transition:.2s}
+.pill-btn:hover{background:rgba(201,168,90,.14)}
+.lang-btn{min-width:52px}
+.growth-pill{font-size:12px;color:var(--jade);border:1px solid rgba(95,174,154,.4);
+  background:rgba(95,174,154,.08);border-radius:999px;padding:3px 11px;white-space:nowrap}
+
+/* ---------- 内嵌神算模型：反馈条 / 文本 ---------- */
 .ai-note{font-size:12px;color:var(--mut);margin-top:8px}
-#aiText br{line-height:1.95}
+.oracle-title{font-family:"KaiTi","STKaiti","楷体",serif;color:var(--gold-bright);font-weight:700;letter-spacing:1px}
+.oracle-text{white-space:pre-wrap;line-height:1.95}
+.oracle.off{opacity:.86}
+.fb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;
+  padding-top:10px;border-top:1px dashed var(--line-soft)}
+.fb .muted{font-size:12.5px;margin-right:2px}
+
+/* ---------- 神算模型面板 ---------- */
+.om-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin-top:14px;font-size:13.5px}
+.om-k{color:var(--mut)}
+.om-grid>div:nth-child(even){color:var(--ink)}
+.om-io{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.om-io input[type=file]{font-size:12px;color:var(--mut)}
+.om-io textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;
+  background:rgba(10,8,16,.6);color:var(--ink);font-size:12px;resize:vertical}
 
 /* ---------- 科普页微调 ---------- */
 .kepu p{color:var(--ink)}

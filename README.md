@@ -1,155 +1,127 @@
 # 三宝殿 · 八字六爻神算子
-
-纯静态 Web 项目，融合**八字推演**与**六爻起卦**，并以「神算子」人设，通过命盘与卦象与客户攀谈，逐步揭示其心中所悬之事。
+## Hall of the Three Treasures · BaZi · LiuYao · Oracle
 
 > 域名：`sambon.net`
-> 定位：中国传统民俗文化（八字 / 六爻）的了解与休闲娱乐工具。
+> 定位：以「**天 · 地 · 人**」为三宝、以「**天人合一**」为基本原理的中国传统民俗文化休闲工具（八字推演 / 六爻起卦 / 内嵌神算模型）。
+> A folklore &amp; culture tool built on the **Three Treasures — Heaven, Earth, Human** — and the principle of **“Heaven-and-Human as One.”**
 
 ---
 
-## 功能
+## 理念 · Philosophy
 
-1. **八字推演**：根据公历生辰排出四柱（年/月/日/时干支），给出五行分布、日主强弱、喜用神、十神格局（逐柱释义）、大运走势，并附**分章节详实解读**。
-   - 新增 **【同八字之众】**：按 518,400 种合法八字组合，估算全球/中国同八字人数（约 1.5 万人 / 约 2700 人）。
-   - 新增 **八字指纹**：以四柱串（如 `庚午·辛巳·乙酉·辛巳`）作为"命纹指纹"，为**后期关联同八字用户 / 同八字社群**预留匹配键。
-   - 新增 **【七 · 人生推论】**：基于日主五行、十神与强弱，自动给出 **性格 / 命运总论 / 事业 / 财运 / 感情人际** 五段推论总结。
-   - 新增 **【八 · 大运详批】**：将八步大运逐运解析，每运给出干支五行、干支十神、〔喜〕/〔忌〕判定，并结合日主强弱给出"当把握 / 宜守成"之详析。
-2. **六爻起卦**：随机成卦，得到六十四卦之一，含卦名、上下卦五行、卦辞；偶有动爻则给出变卦。**展示区附"白话解卦"**，把卦象翻成大白话。
-3. **神算子攀谈**（核心特色，需登录后使用）：神算子先观八字、再卜一卦，略陈观感（含**白话解卦**），随后依据命局十神、五行、卦象**推断客户心事领域**，经两轮引导追问，最终归纳输出
-   **「客官此来三宝殿，心中所悬者，归根结底乃是：XXX 之困。」**；
-   - 升级：**结合八字（强弱 / 喜用 / 十神）+ 大运（逐运喜忌）+ 卦象（白话解卦）**，输出 **「神算子解惑方案」五步法**——① 现状参断 ② 时机·大运（标注喜用大运年龄窗口）③ 趋避之法（按喜用五行给方位 / 行业 / 行为指引）④ 卦象印证 ⑤ 神算子一言，真正帮客户解惑。
-   - **大模型解惑（神算子点睛）**：若用户在「⚙ 大模型」中配置了自己的 API 端点 / 密钥 / 模型，神算子会将上述**全部信息（八字命盘、十神、人生推论、逐运大运、六爻卦象与白话解卦、客户所问之事）**打包成提示词，调用大模型（OpenAI 兼容 Chat Completions 接口）实时生成**「神算子大模型解惑」**——以神算子人设给出**贴合现实、可落地**的指引，而非固定套话。未配置时自动降级到本地五步方案，不影响使用。
-4. **基础科普（独立页面 `kepu.html`）**：用通俗语言详实讲解八字（天干地支 / 排盘 / 五行生克 / 十神 / 日主强弱喜用 / 大运流年 / 同八字人数）与六爻（起卦 / 动爻变卦 / 卦辞白话），含客观定位与免责声明。
+三宝者，**天、地、人**也。本站三殿正对应三才：
+
+| 殿 Hall | 三才 | 所指 |
+|---|---|---|
+| 八字殿 · Hall of BaZi | **天** Heaven | 出生那一刻的干支节律（天时） |
+| 六爻殿 · Hall of LiuYao | **地** Earth | 阴阳爻变之卦（地理 / 事态流转） |
+| 神算子殿 · Hall of the Oracle | **人** Human | 来客心中的疑问（人这一才） |
+
+三才相参，即是「**天人合一**」：借天之时、地之象，去体贴人之问。
 
 ---
 
-## 技术
+## 功能 · Features
 
-- 纯静态站点：**HTML + CSS + 原生 JS**，无构建步骤、无后端、无第三方依赖。
-- 算法模块以 UMD 封装，浏览器与 Node 双端可用（便于测试）：
-  - `assets/js/bazi.js` —— 八字核心（四柱 / 十神 / 五行 / 日主强弱 / 大运 / 解读 / 同八字人数 / 八字指纹 / 人生推论 / 大运详批）
-  - `assets/js/liuyao.js` —— 六爻核心（随机成卦 / 64 卦名 / 卦辞 / 动爻变卦 / 白话解卦）
-  - `assets/js/shensuan.js` —— 神算子攀谈引擎（领域打分 / 细化追问 / 归纳结论 / 白话解卦 / 五步解惑方案）
-  - `assets/js/ai.js` —— 大模型解惑模块（汇总命盘/卦象/问题为提示词，调用 OpenAI 兼容接口；支持 JSON 与 SSE 流式解析；未配置/失败自动降级）
-  - `assets/js/auth.js` —— 登录系统（本地演示版：注册 / 登录 / 退出 / 八字档案）
-  - `assets/js/app.js` —— 交互编排（含登录闸门）
-- 已用 Node 对核心算法与端到端交互做验证（四柱、十神、大运、卦名映射、同八字人数、白话解卦、登录闸门、攀谈链路均通过）。
-- **关于登录的安全性**：`auth.js` 为**纯前端演示**，账号与八字档案仅存于浏览器 `localStorage`，密码仅做轻量编码，**不具备任何真实安全性**。生产环境请改用 **Cloudflare Access（零信任）** 或 **Cloudflare Workers + KV** 做真实验证，并可在后端按"八字指纹"聚合同八字用户。
+1. **八字推演（天）**：按公历生辰排四柱，输出五行分布、日主强弱、喜用神、十神逐柱、大运详批、同八字人数估算、八字指纹、人生五段推论。
+2. **六爻起卦（地）**：随机成卦，得六十四卦之一，含卦名、上下卦五行、卦辞、动爻变卦与白话解卦。
+3. **神算子攀谈（人）**：神算子先观八字、再卜一卦，循循善诱，归纳出「心中所悬之事」，并由**内嵌神算模型**给出解惑（见下）。
+4. **基础科普（`kepu.html`）**：中英双语、通俗讲解八字与六爻，并阐明三宝与天人合一的基本原理，含客观定位与免责声明。
 
 ---
 
-## 本地运行
+## 内嵌神算模型 · Embedded Oracle（核心特色）
 
-直接用浏览器打开 `index.html` 即可；或起一个静态服务器：
+**摒弃任何外部大模型 API。** 神算解惑由内嵌于本站的模型 `assets/js/oracle.js` 生成——**纯本地、零网络、零第三方依赖**，并会**依据用户互动自动进化**。
+
+**它怎么进化（How it evolves）：**
+- **多臂老虎机（措辞/计策选择）**：每段指引（共情 / 症结 / 时机 / 现实之计 / 收束）都有多个变体，按你的 👍 / 👎 更新各变体“命中率”，越受共鸣的说法越常被选中。
+- **关键词 → 心事域学习**：从自由描述里抽取“心事词”，建立 词→心事域 权重，越问越懂你所忧。
+- **复访关注追踪**：同一心事反复出现，权重自然抬升（未说出口的牵挂也被记下）。
+- **语气倾向**：暖言 / 直断两系措辞，按共鸣自动靠拢。
+
+**互动即教学（Interaction = training）：**
+- 解惑下方提供 **👍 有共鸣 / 👎 不太对 / 换一种说法** 三个按钮；
+- 选择心事域、自由描述、复访等**隐式互动**同样会喂给模型；
+- 顶栏「🌱 成长胶囊」实时显示境界（初启→渐入→通透→洞明）与进化次数。
+
+**隐私与便携（Privacy &amp; portability）：**
+- 所有学习状态**仅存浏览器 `localStorage`**，绝不上传；
+- 点顶栏「**神算模型**」可查看成长面板（境界 / 对谈 / 进化 / 共鸣率 / 常念之事 / 学过的心事词）；
+- 支持**导出 / 导入 / 重置**模型（JSON），可随身携带或归零重来。
+
+---
+
+## 国际化 · Internationalization (i18n)
+
+全站支持**中 / 英一键切换**（顶栏 `EN / 中文`，或科普页右上角）。切换通过给 `<html>` 加 `lang-en` 类、配合 `.zh / .en` 元素显隐实现；语言选择存 `localStorage`。神算解惑也会按当前界面语言输出中文或英文。
+
+---
+
+## 技术 · Tech
+
+纯静态站点：**HTML + CSS + 原生 JS**，无构建、无后端、无外部 API、无第三方依赖。
+
+算法 / 引擎模块（UMD，浏览器挂全局、Node 可 `require` 测试）：
+- `assets/js/bazi.js` —— 八字核心（四柱 / 十神 / 五行 / 强弱 / 大运 / 解读 / 同八字人数 / 指纹 / 人生推论 / 大运详批）
+- `assets/js/liuyao.js` —— 六爻核心（随机成卦 / 64 卦 / 卦辞 / 动爻变卦 / 白话解卦）
+- `assets/js/shensuan.js` —— 神算子攀谈引擎（领域打分 / 追问 / 归纳 / 白话解卦 / 五步方案）
+- `assets/js/oracle.js` —— **内嵌自进化神算模型**（多臂老虎机 + 关键词/复访学习 + 反馈闭环；导出/导入/重置）
+- `assets/js/auth.js` —— 登录系统（本地演示版）
+- `assets/js/app.js` —— 交互编排（`data-action` 事件委托、中英切换、模型面板）
+
+交互全部走 `app.js` 的 `data-action` 事件委托，HTML 无内联 `onclick`。核心算法与端到端交互已用 Node 验证通过。
+
+> 关于登录：`auth.js` 为**纯前端演示**，仅存 `localStorage`，**无真实安全性**；生产请改用 Cloudflare Access 等零信任方案。
+
+---
+
+## 本地运行 · Run Locally
+
+直接用浏览器打开 `index.html`，或起静态服务器：
 
 ```bash
 cd sambon
-python -m http.server 8080      # 然后访问 http://localhost:8080
+python -m http.server 8080      # 访问 http://localhost:8080
 # 或： npx serve
 ```
 
 ---
 
-## 配置大模型（神算子实时解惑）
+## 推送到 GitHub · Push to GitHub
 
-神算子的大模型解惑由你自己的 API 驱动。两种方式：
-
-### 方式 1：浏览器端直接配置（演示用）
-1. 点击页面右上角 **「⚙ 大模型」**，填入：
-   - **API 端点**：任意 OpenAI 兼容的 Chat Completions 地址，例如 `https://api.openai.com/v1/chat/completions`、DeepSeek `https://api.deepseek.com/v1/chat/completions`、或你自建网关。
-   - **API 密钥**：`Bearer` 令牌。
-   - **模型名**：如 `gpt-4o-mini` / `deepseek-chat`。
-2. 保存后，神算子结论区会出现「神算子大模型解惑（实时生成）」块，结合你这一局的八字、卦象与所问之事实时作答。
-3. 配置仅存于**本机浏览器 `localStorage`**，不会上传到本站任何服务器。
-
-> ⚠️ 浏览器端持有密钥属于演示用法，密钥会出现在前端请求中，**切勿用于生产或暴露给他人**。
-
-### 方式 2：Cloudflare Worker 代理（生产推荐，密钥不落前端）
-把密钥放在 Worker 后端，`ai.js` 的端点指向 Worker。示例 Worker（`wrangler.toml` + `src/index.js`）：
-
-```js
-// src/index.js —— Cloudflare Worker，替前端持有 API 密钥
-export default {
-  async fetch(request) {
-    const url = new URL(request.url);
-    if (request.method === 'POST' && url.pathname === '/v1/chat/completions') {
-      const upstream = 'https://api.openai.com/v1/chat/completions'; // 或 deepseek 等
-      const auth = 'Bearer ' + env.AI_API_KEY;                        // 在 Workers 变量/密钥中配置
-      const body = await request.text();                              // 透传模型与 messages
-      const r = await fetch(upstream, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': auth },
-        body
-      });
-      return new Response(await r.text(), {
-        status: r.status,
-        headers: { 'Content-Type': r.headers.get('Content-Type') || 'application/json',
-                   'Access-Control-Allow-Origin': '*' }
-      });
-    }
-    return new Response('Not found', { status: 404 });
-  }
-}
-```
-
-配套 `wrangler.toml`：
-
-```toml
-name = "sambon-ai-proxy"
-main = "src/index.js"
-compatibility_date = "2024-09-23"
-[vars]
-# 密钥请用：wrangler secret put AI_API_KEY
-```
-
-然后在前端「⚙ 大模型」把端点填成 `https://<你的worker子域>.workers.dev/v1/chat/completions`，密钥留空即可——密钥只在 Worker 侧，前端完全不接触。
-
-> 兼容说明：`ai.js` 按 OpenAI Chat Completions 格式发送 `{ model, messages, temperature }`，并兼容非流式（JSON）与流式（`text/event-stream` SSE）两种返回；只要是同一格式的服务（OpenAI / DeepSeek / 本地 Ollama 的 `/v1/chat/completions` / 各类网关）都能直接用。
-
----
-
-## 推送到 GitHub
+仓库已建于 **https://github.com/wangjia0910/sambon**（公开）。后续推送：
 
 ```bash
-cd sambon
-git init
-git add -A
-git commit -m "initial: 三宝殿 八字六爻神算子"
-
-# 在 github.com 新建仓库（建议名 sambon），拿到仓库地址后：
-git remote add origin https://github.com/<你的用户名>/sambon.git
-git branch -M main
+git remote add origin https://github.com/<你的用户名>/sambon.git   # 已配置则为 wangjia0910/sambon
+git add -A && git commit -m "your message"
 git push -u origin main
 ```
 
-> 推送需要 GitHub 账号与凭证：HTTPS 方式请用**个人访问令牌（PAT，classic 或 fine-grained，勾选 repo 权限）**作为密码；或配置 SSH key。
+> HTTPS 推送需用个人访问令牌（PAT，勾选 repo 权限）作为密码，或配置 SSH key。
 
 ---
 
-## 部署到 Cloudflare Pages
+## 部署到 Cloudflare Pages · Deploy
+
+本站为**纯静态**（无 `functions/` 后端），部署极简。
 
 ### 方式 A（推荐）：连接 GitHub 自动部署
+1. Cloudflare Dashboard → **Workers &amp; Pages** → **Create** → **Pages** → **Connect to Git**，授权并选中 `sambon`。
+2. 构建设置：Framework preset **None**；Build command **留空**；Output directory **`/`**；Production branch **`main`**。
+3. **Save and Deploy** → 得到 `https://sambon.pages.dev`。
+4. 绑定 `sambon.net`：项目 → **Custom domains** → 添加，按提示把域名 DNS 托管到 Cloudflare。
 
-1. 登录 Cloudflare Dashboard → **Workers & Pages** → **Create** → **Pages** → 选择 **Connect to Git**，授权并选中 `sambon` 仓库。
-2. 构建设置：
-   - Framework preset：**None**
-   - Build command：**留空**
-   - Output directory：**`/`（项目根即站点根）**
-3. 点击 **Save and Deploy**，完成后获得形如 `https://sambon.pages.dev` 的地址。
-4. **绑定自定义域名 `sambon.net`**：Pages 项目 → **Custom domains** → 添加 `sambon.net`，按提示在域名 DNS 处添加 CNAME 指向你的 `*.pages.dev`（若域名 DNS 也托管在 Cloudflare，可直接一键添加并启用代理）。
+此后每次 `git push` 到 `main`，Cloudflare 自动重新部署。
 
-此后每次 `git push` 到 GitHub，Cloudflare 会自动重新部署。
-
-### 方式 B：CLI 直接上传（需 Cloudflare 凭证）
-
+### 方式 B：CLI 直接上传
 ```bash
-# 需先安装并登录 wrangler：npm i -g wrangler 然后 wrangler login
-# 或设置环境变量 CLOUDFLARE_API_TOKEN（含 Pages 编辑权限）
-npx wrangler pages deploy . --project-name sambon
+npm i -g wrangler
+npx wrangler pages deploy . --project-name sambon --branch main
 ```
 
 ---
 
-## 免责声明
+## 免责声明 · Disclaimer
 
-本站所有内容均属**中国传统民俗文化与哲学**范畴，是古人用「阴阳五行、干支、八卦」这一套古代宇宙观去推演人生的民间实践。**它没有任何科学依据**，不可用于健康、财务、人生等重大决策。请仅作文化了解与休闲娱乐，理性看待。
+本站所有内容均属**中国传统民俗文化与哲学**，是古人以「阴阳五行、干支、八卦」推演人生的民间实践，**无任何科学依据**，不可用于健康、财务、人生等重大决策。神算子攀谈及其内嵌模型为娱乐化的人机互动，其“结论”由预设规则与本地学习机制生成。请仅作文化了解与休闲娱乐，理性看待。

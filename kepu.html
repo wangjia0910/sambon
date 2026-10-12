@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>基础科普 · 三宝殿</title>
-<meta name="description" content="通俗讲解八字与六爻：天干地支、五行生克、十神、日主强弱、大运流年、同八字人数，以及六爻起卦与白话解卦。">
+<title>基础科普 · 三宝殿 ｜ Basics · Hall of the Three Treasures</title>
+<meta name="description" content="中英双语通俗讲解八字与六爻，及三宝（天·地·人）与天人合一的基本原理。A bilingual, plain-language guide to BaZi & LiuYao and the Three Treasures (Heaven, Earth, Human).">
 <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
@@ -16,132 +16,173 @@
     <div class="plaque">
       <span class="plaque-title">基 础 科 普</span>
     </div>
-    <p class="slogan">用大白话，把"八字"和"六爻"讲明白</p>
+    <p class="plaque-sub"><span class="zh">三宝者，天 · 地 · 人也 —— 本于「天人合一」</span><span class="en">The Three Treasures: Heaven · Earth · Human</span></p>
+    <p class="slogan"><span class="zh">用大白话（中英双语），把"八字"和"六爻"讲明白</span><span class="en">BaZi &amp; LiuYao explained in plain bilingual language</span></p>
     <nav class="topnav">
-      <a href="./index.html">← 返回三宝殿</a>
+      <a href="./index.html"><span class="zh">← 返回三宝殿</span><span class="en">← Back to the Hall</span></a>
+      <span class="nav-right">
+        <button class="pill-btn lang-btn" id="langBtn">EN</button>
+      </span>
     </nav>
   </header>
 
-  <div class="note" style="margin-bottom:26px">
-    本页只讲"是什么、怎么算"，不替你算命。所有内容均属中国传统民俗文化与哲学，无任何科学依据，请理性看待、当作文化了解。
+  <div class="note">
+    <span class="zh">本页只讲"是什么、怎么算"，不替你算命。所有内容均属中国传统民俗文化与哲学，无任何科学依据，请理性看待、当作文化了解。</span>
+    <span class="en">This page only explains "what it is and how it works" — it does not tell your fortune. All content belongs to traditional Chinese folklore and philosophy; it has no scientific basis. Please treat it as cultural knowledge.</span>
   </div>
+
+  <!-- ===== 〇 · 三宝与天人合一 ===== -->
+  <section>
+    <div class="hall-label"><span>叁</span><span class="env-tag">理 · Principle</span></div>
+    <h2><span class="zh">〇、三宝与「天人合一」</span><span class="en">0 · The Three Treasures and “Heaven-and-Human as One”</span></h2>
+    <div class="card">
+      <p><span class="zh">三宝殿所奉"三宝"，乃是<strong>天、地、人</strong>。其基本原理，是古人所说的<strong>「天人合一」</strong>——人不是孤立地活在这世上，而是与"天时""地理"时时相参：</span><span class="en">The "Three Treasures" of this hall are <strong>Heaven, Earth, and Human</strong>. Their foundational principle is what the ancients called <strong>“Heaven-and-Human as One”</strong> — a person never lives in isolation, but in constant attunement with the timing of Heaven and the patterns of Earth.</span></p>
+      <ul>
+        <li><span class="zh"><strong>天 · 八字</strong>：以你出生那一刻的年/月/日/时干支，记录你与"天时"的相参。</span><span class="en"><strong>Heaven · BaZi</strong>: the stems &amp; branches of your birth moment record your attunement to Heaven's timing.</span></li>
+        <li><span class="zh"><strong>地 · 六爻</strong>：以阴阳爻变之卦，摹写"地理"与事态之流转。</span><span class="en"><strong>Earth · LiuYao</strong>: the shifting yin–yang lines of a hexagram mirror Earth's patterns and the flow of events.</span></li>
+        <li><span class="zh"><strong>人 · 神算子</strong>：以"人"这一才——来客心中的疑问——去会通天、地，给出解惑。</span><span class="en"><strong>Human · the Oracle</strong>: the human capacity — a visitor's question — meets Heaven and Earth to offer counsel.</span></li>
+      </ul>
+      <p class="muted"><span class="zh">所以本站的三殿，正是天、地、人三才：八字殿主天，六爻殿主地，神算子殿主人。三才相参，即是"合一"。</span><span class="en">Thus the three halls map to the three powers: the Hall of BaZi to Heaven, the Hall of LiuYao to Earth, the Hall of the Oracle to Human. Their counsel together is the "oneness."</span></p>
+    </div>
+  </section>
 
   <!-- ===== 八字 ===== -->
   <section>
-    <h2>一、八字是什么（用大白话）</h2>
+    <h2><span class="zh">一、八字是什么（用大白话）</span><span class="en">I · What Is BaZi (in plain words)</span></h2>
     <div class="card">
-      <p>古人没有身份证号，就用"<strong>干支</strong>"给时间编了一套码。把一个人出生的<strong>年、月、日、时</strong>各配一个"天干 + 地支"，合起来正好八个字，所以叫"八字"，也叫"<strong>四柱</strong>"（年柱、月柱、日柱、时柱）。</p>
-      <p>你可以把它理解成：用四个"时间坐标"，把你在天地间的出生那一刻"编码"下来。后面所有的解读，都是在对这八个字做结构分析。</p>
+      <p><span class="zh">古人没有身份证号，就用"干支"给时间编了一套码。把一个人出生的<strong>年、月、日、时</strong>各配一个"天干 + 地支"，合起来正好八个字，所以叫"八字"，也叫"<strong>四柱</strong>"（年柱、月柱、日柱、时柱）。</span><span class="en">Long before ID numbers, the ancients encoded time with "stems &amp; branches." Assign a "Heavenly Stem + Earthly Branch" to each of a person's birth <strong>year, month, day, and hour</strong>, and you get eight characters — hence "BaZi" (Eight Characters), also called the <strong>Four Pillars</strong>.</span></p>
+      <p><span class="zh">你可以把它理解成：用四个"时间坐标"，把你在天地间的出生那一刻"编码"下来。后面所有的解读，都是在对这八个字做结构分析。</span><span class="en">Think of it as four "time coordinates" that encode the exact moment you entered the world between Heaven and Earth. Every later reading is a structural analysis of those eight characters.</span></p>
     </div>
 
     <div class="card">
-      <h3>1. 天干地支：古人的"计数积木"</h3>
-      <p><strong>天干（10 个，像"十位"）</strong>：甲 乙 丙 丁 戊 己 庚 辛 壬 癸。</p>
-      <p><strong>地支（12 个，像"十二位"，也是生肖）</strong>：子(鼠) 丑(牛) 寅(虎) 卯(兔) 辰(龙) 巳(蛇) 午(马) 未(羊) 申(猴) 酉(鸡) 戌(狗) 亥(猪)。</p>
-      <p>天干、地支按顺序两两搭配，60 种一循环，叫"<strong>六十甲子</strong>"。比如 2024 是"甲辰"年，2025 是"乙巳"年。本质上，这是一套比公历还古老的"日期编码系统"。</p>
+      <h3><span class="zh">1. 天干地支：古人的"计数积木"</span><span class="en">1 · Stems &amp; Branches: the ancients' counting blocks</span></h3>
+      <p><span class="zh"><strong>天干（10 个，像"十位"）</strong>：甲 乙 丙 丁 戊 己 庚 辛 壬 癸。</span><span class="en"><strong>Heavenly Stems (10)</strong>: 甲乙丙丁戊己庚辛壬癸.</span></p>
+      <p><span class="zh"><strong>地支（12 个，像"十二位"，也是生肖）</strong>：子(鼠) 丑(牛) 寅(虎) 卯(兔) 辰(龙) 巳(蛇) 午(马) 未(羊) 申(猴) 酉(鸡) 戌(狗) 亥(猪)。</span><span class="en"><strong>Earthly Branches (12, also the zodiac)</strong>: 子(rat) 丑(ox) 寅(tiger) 卯(rabbit) 辰(dragon) 巳(snake) 午(horse) 未(goat) 申(monkey) 酉(rooster) 戌(dog) 亥(pig).</span></p>
+      <p><span class="zh">天干、地支按顺序两两搭配，60 种一循环，叫"<strong>六十甲子</strong>"。比如 2024 是"甲辰"年，2025 是"乙巳"年。本质上，这是一套比公历还古老的"日期编码系统"。</span><span class="en">Stems and branches pair in order, cycling every 60 — the <strong>sexagenary cycle</strong>. 2024 is 甲辰, 2025 is 乙巳. In essence it is an ancient date-encoding system, older than the Gregorian calendar.</span></p>
     </div>
 
     <div class="card">
-      <h3>2. 五行：万物的五个"属性标签"</h3>
-      <p>每个天干地支都贴着一个<strong>五行</strong>标签：木、火、土、金、水，而且还分阴阳（比如甲是阳木、乙是阴木）。</p>
-      <p>五行之间有两条铁律，像一套"关系网"：</p>
+      <h3><span class="zh">2. 五行：万物的五个"属性标签"</span><span class="en">2 · The Five Phases: five labels for all things</span></h3>
+      <p><span class="zh">每个天干地支都贴着一个<strong>五行</strong>标签：木、火、土、金、水，而且还分阴阳（比如甲是阳木、乙是阴木）。</span><span class="en">Every stem and branch carries a <strong>Five-Phase</strong> label: Wood, Fire, Earth, Metal, Water — each with a yin/yang flavor (e.g. 甲 is yang Wood, 乙 yin Wood).</span></p>
+      <p><span class="zh">五行之间有两条铁律，像一套"关系网"：</span><span class="en">Between the phases run two rules, like a relationship web:</span></p>
       <ul>
-        <li><strong>相生（互相滋养）</strong>：木生火 → 火生土 → 土生金 → 金生水 → 水生木（循环往复，像食物链）。</li>
-        <li><strong>相克（互相制约）</strong>：木克土 → 土克水 → 水克火 → 火克金 → 金克木。</li>
+        <li><span class="zh"><strong>相生（互相滋养）</strong>：木生火 → 火生土 → 土生金 → 金生水 → 水生木（循环往复，像食物链）。</span><span class="en"><strong>Generating</strong>: Wood feeds Fire → Fire feeds Earth → Earth bears Metal → Metal carries Water → Water nourishes Wood.</span></li>
+        <li><span class="zh"><strong>相克（互相制约）</strong>：木克土 → 土克水 → 水克火 → 火克金 → 金克木。</span><span class="en"><strong>Overcoming</strong>: Wood parts Earth → Earth dams Water → Water quenches Fire → Fire melts Metal → Metal chops Wood.</span></li>
       </ul>
-      <p class="muted">生活比喻：木是柴、火是焰、土是灰、金是器、水是润——古人用这套关系，去类比世间万物的生灭与平衡。</p>
+      <p class="muted"><span class="zh">生活比喻：木是柴、火是焰、土是灰、金是器、水是润——古人用这套关系，去类比世间万物的生灭与平衡。</span><span class="en">A homely analogy: Wood is fuel, Fire flame, Earth ash, Metal a tool, Water moisture — the ancients used this web to analogize the rise, fall and balance of all things.</span></p>
     </div>
 
     <div class="card">
-      <h3>3. 十神：把"我"和别人的关系翻译成十种角色</h3>
-      <p>八字里，以<strong>日柱的天干</strong>代表"我自己"（叫"日主"或"命主"）。其余七个字，按它们和日主的五行"生、克、同、异"关系，换算成十种"角色"，统称<strong>十神</strong>：</p>
+      <h3><span class="zh">3. 十神：把"我"和别人的关系翻译成十种角色</span><span class="en">3 · The Ten Deities: translating relationships into ten roles</span></h3>
+      <p><span class="zh">八字里，以<strong>日柱的天干</strong>代表"我自己"（叫"日主"或"命主"）。其余七个字，按它们和日主的五行"生、克、同、异"关系，换算成十种"角色"，统称<strong>十神</strong>：</span><span class="en">In BaZi, the <strong>Day Stem</strong> stands for "myself" (the Day Master). The other seven characters are converted, by how they generate, overcome, match or differ from the Day Master, into ten roles — the <strong>Ten Deities</strong>:</span></p>
       <ul>
-        <li><strong>比肩 / 劫财</strong>：和我同五行的（同辈、朋友、竞争者）。</li>
-        <li><strong>食神 / 伤官</strong>：我生出来的（才华、口才、子女、创意）。</li>
-        <li><strong>正财 / 偏财</strong>：我克制的（钱财、资源；男命也代表妻子 / 偏缘）。</li>
-        <li><strong>正官 / 七杀</strong>：克制我的（规矩、职位、功名、压力；女命也代表丈夫）。</li>
-        <li><strong>正印 / 偏印</strong>：生助我的（学业、文书、长辈、贵人）。</li>
+        <li><span class="zh"><strong>比肩 / 劫财</strong>：和我同五行的（同辈、朋友、竞争者）。</span><span class="en"><strong>Rob Wealth / Friend</strong>: same phase as me (peers, friends, rivals).</span></li>
+        <li><span class="zh"><strong>食神 / 伤官</strong>：我生出来的（才华、口才、子女、创意）。</span><span class="en"><strong>Eating God / Hurting Officer</strong>: what I produce (talent, expression, children, creativity).</span></li>
+        <li><span class="zh"><strong>正财 / 偏财</strong>：我克制的（钱财、资源；男命也代表妻子 / 偏缘）。</span><span class="en"><strong>Direct / Indirect Wealth</strong>: what I control (money, resources; in male charts also spouse).</span></li>
+        <li><span class="zh"><strong>正官 / 七杀</strong>：克制我的（规矩、职位、功名、压力；女命也代表丈夫）。</span><span class="en"><strong>Direct Officer / 7 Killings</strong>: what controls me (rules, office, status, pressure; in female charts also husband).</span></li>
+        <li><span class="zh"><strong>正印 / 偏印</strong>：生助我的（学业、文书、长辈、贵人）。</span><span class="en"><strong>Direct / Indirect Seal</strong>: what nourishes me (study, documents, elders, benefactors).</span></li>
       </ul>
-      <p>看一个人八字里哪种"神"多，古人就推断他这一生会在哪些领域"戏份重"：财星旺的多和钱打交道，官杀旺的多在事业功名上打拼，印旺的多与文书学业有缘。</p>
+      <p><span class="zh">看一个人八字里哪种"神"多，古人就推断他这一生会在哪些领域"戏份重"：财星旺的多和钱打交道，官杀旺的多在事业功名上打拼，印旺的多与文书学业有缘。</span><span class="en">Which deity dominates, the ancients inferred, shows where one's life has the most "screen time": strong Wealth deals with money, strong Officer/7-Killings with career and status, strong Seal with study and documents.</span></p>
     </div>
 
     <div class="card">
-      <h3>4. 日主强弱与"喜用神"：给命局找平衡</h3>
-      <p>八字解读的第一要务，是看<strong>日主是强是弱</strong>：生我、助我的五行多，日主就强；克我、泄我的多，就弱。</p>
-      <p>强弱不是"好 / 坏"，而是"哪里失衡"。于是引出<strong>喜用神</strong>（对我有利的五行）和<strong>忌神</strong>（对我不利的）：</p>
+      <h3><span class="zh">4. 日主强弱与"喜用神"：给命局找平衡</span><span class="en">4 · Strength &amp; the Favorable Element: balancing the chart</span></h3>
+      <p><span class="zh">八字解读的第一要务，是看<strong>日主是强是弱</strong>：生我、助我的五行多，日主就强；克我、泄我的多，就弱。</span><span class="en">The first task is to judge whether the <strong>Day Master is strong or weak</strong>: many phases that generate or support it → strong; many that control or drain it → weak.</span></p>
+      <p><span class="zh">强弱不是"好 / 坏"，而是"哪里失衡"。于是引出<strong>喜用神</strong>（对我有利的五行）和<strong>忌神</strong>（对我不利的）：</span><span class="en">Strong or weak is not "good or bad" — it is "where the balance tips." Hence the <strong>Favorable Element</strong> (helpful phases) and the <strong>Unfavorable</strong>:</span></p>
       <ul>
-        <li>日主<strong>偏弱</strong> → 喜"生扶"：补同类（比劫）和"生我"的（印）。</li>
-        <li>日主<strong>偏强</strong> → 喜"克泄耗"：用官杀约束、食伤泄秀、财星消耗。</li>
+        <li><span class="zh">日主<strong>偏弱</strong> → 喜"生扶"：补同类（比劫）和"生我"的（印）。</span><span class="en">A <strong>weak</strong> Day Master favors support: same-phase companions and the phase that generates it.</span></li>
+        <li><span class="zh">日主<strong>偏强</strong> → 喜"克泄耗"：用官杀约束、食伤泄秀、财星消耗。</span><span class="en">A <strong>strong</strong> Day Master favors draining: Officers to restrain, Output to vent, Wealth to consume.</span></li>
       </ul>
-      <p class="muted">说白了，这是古人版的"缺哪补哪"——命局哪边轻，就往哪边借力。属一种朴素的平衡观。</p>
+      <p class="muted"><span class="zh">说白了，这是古人版的"缺哪补哪"——命局哪边轻，就往哪边借力。属一种朴素的平衡观。</span><span class="en">In short, an ancient "balance what's thin": borrow strength where the chart is light — a plain philosophy of equilibrium.</span></p>
     </div>
 
     <div class="card">
-      <h3>5. 大运与流年：把时间切成"运势季节"</h3>
-      <p>八字是"出厂设置"，但人生是动态的。于是古人加上两条时间轴：</p>
+      <h3><span class="zh">5. 大运与流年：把时间切成"运势季节"</span><span class="en">5 · Fortune Cycles &amp; Annual Luck: slicing time into seasons</span></h3>
+      <p><span class="zh">八字是"出厂设置"，但人生是动态的。于是古人加上两条时间轴：</span><span class="en">BaZi is the "factory setting," but life is dynamic. So the ancients added two timelines:</span></p>
       <ul>
-        <li><strong>大运</strong>：每十年换一运，从月柱出发，阳年男 / 阴年女"顺排"、阴年男 / 阳年女"逆排"，约三日出生算一岁起运。</li>
-        <li><strong>流年</strong>：每一年换一个干支，是大运之下的"当年天气"。</li>
+        <li><span class="zh"><strong>大运</strong>：每十年换一运，从月柱出发，阳年男 / 阴年女"顺排"、阴年男 / 阳年女"逆排"，约三日出生算一岁起运。</span><span class="en"><strong>Fortune Cycles</strong>: one per decade from the Month Pillar — forward for yang-year males &amp; yin-year females, backward otherwise; about three days of life per year before onset.</span></li>
+        <li><span class="zh"><strong>流年</strong>：每一年换一个干支，是大运之下的"当年天气"。</span><span class="en"><strong>Annual Luck</strong>: a new stem–branch each year — the "weather" beneath the decade cycle.</span></li>
       </ul>
-      <p>大运如季节、流年如当年风雨；"命好不如运好"这句老话，讲的就是命局（静态）和运势（动态）叠加后的结果。</p>
+      <p><span class="zh">大运如季节、流年如当年风雨；"命好不如运好"这句老话，讲的就是命局（静态）和运势（动态）叠加后的结果。</span><span class="en">Cycles are seasons, annual luck the year's weather. "A good cycle beats a good chart" speaks to the static chart layered with dynamic fortune.</span></p>
     </div>
 
     <div class="card">
-      <h3>6. 一个有趣的数字：同八字的人有多少？</h3>
-      <p>八字四柱若完全独立，有 60⁴ ≈ 1296 万种。但月柱受年干约束、时柱受日干约束，真正<strong>合法的八字组合只有 518,400 局</strong>（60 × 12 × 60 × 12）。</p>
-      <p>而全球人口已超 80 亿——也就是说，<strong>平均每个八字对应上万人</strong>，同八字而命运天差地别者比比皆是。这正是命理学绕不开的矛盾：出生时辰这套"编码"，远不足以决定一个人的实际人生。所以本站会把"同八字人数"算给你看，提醒一句：运在人为。</p>
+      <h3><span class="zh">6. 一个有趣的数字：同八字的人有多少？</span><span class="en">6 · A curious number: how many share your chart?</span></h3>
+      <p><span class="zh">八字四柱若完全独立，有 60⁴ ≈ 1296 万种。但月柱受年干约束、时柱受日干约束，真正<strong>合法的八字组合只有 518,400 局</strong>（60 × 12 × 60 × 12）。</span><span class="en">If the four pillars were fully independent there'd be 60⁴ ≈ 12.96 million. But month is bound by the year stem and hour by the day stem, leaving only <strong>518,400 valid charts</strong> (60 × 12 × 60 × 12).</span></p>
+      <p><span class="zh">而全球人口已超 80 亿——也就是说，<strong>平均每个八字对应上万人</strong>，同八字而命运天差地别者比比皆是。这正是命理学绕不开的矛盾：出生时辰这套"编码"，远不足以决定一个人的实际人生。所以本站会把"同八字人数"算给你看，提醒一句：运在人为。</span><span class="en">With over 8 billion people, <strong>each chart is shared by tens of thousands</strong>, and identical charts lead to wildly different lives. This is the contradiction metaphysics can't escape: the birth-time "code" is far from enough to decide a life. So we show your "shared-chart count" as a reminder: fortune is made by the person.</span></p>
     </div>
   </section>
 
   <!-- ===== 六爻 ===== -->
   <section>
-    <h2>二、六爻是什么（用大白话）</h2>
+    <h2><span class="zh">二、六爻是什么（用大白话）</span><span class="en">II · What Is LiuYao (in plain words)</span></h2>
     <div class="card">
-      <p>如果说八字是"看一生格局"，那<strong>六爻</strong>是"问一件事吉凶"。它源自《周易》的占筮，用三枚铜钱（或随机）摇出六爻，自下而上叠成一卦。</p>
+      <p><span class="zh">如果说八字是"看一生格局"，那<strong>六爻</strong>是"问一件事吉凶"。它源自《周易》的占筮，用三枚铜钱（或随机）摇出六爻，自下而上叠成一卦。</span><span class="en">If BaZi reads a whole life's structure, <strong>LiuYao</strong> asks about one matter's fortune. From the divination of the Yijing, six lines (three coins, or randomness) stack from bottom to top into a hexagram.</span></p>
     </div>
 
     <div class="card">
-      <h3>1. 爻与卦：阴阳积木搭成 64 卦</h3>
-      <p>每一"爻"分阴阳：阳爻（▇）、阴爻（▱）。三爻合成一个"经卦"，就是大家熟悉的<strong>八卦</strong>：乾(天) 兑(泽) 离(火) 震(雷) 巽(风) 坎(水) 艮(山) 坤(地)。两个经卦上下一叠，得"别卦"，共 <strong>64 卦</strong>（如"水火既济""地天泰"）。</p>
+      <h3><span class="zh">1. 爻与卦：阴阳积木搭成 64 卦</span><span class="en">1 · Lines &amp; Hexagrams: yin–yang blocks build 64</span></h3>
+      <p><span class="zh">每一"爻"分阴阳：阳爻（▇）、阴爻（▱）。三爻合成一个"经卦"，就是大家熟悉的<strong>八卦</strong>：乾(天) 兑(泽) 离(火) 震(雷) 巽(风) 坎(水) 艮(山) 坤(地)。两个经卦上下一叠，得"别卦"，共 <strong>64 卦</strong>（如"水火既济""地天泰"）。</span><span class="en">Each line is yin or yang: yang (▇), yin (▱). Three lines make a trigram — the familiar <strong>Eight Trigrams</strong>: 乾(Heaven) 兑(Lake) 离(Fire) 震(Thunder) 巽(Wind) 坎(Water) 艮(Mountain) 坤(Earth). Two trigrams stacked make a hexagram — <strong>64 in all</strong> (e.g. 水火既济, 地天泰).</span></p>
     </div>
 
     <div class="card">
-      <h3>2. 起卦与动爻、变卦</h3>
+      <h3><span class="zh">2. 起卦与动爻、变卦</span><span class="en">2 · Casting, moving lines &amp; the changed hexagram</span></h3>
       <ul>
-        <li><strong>起卦</strong>：随机六次得六爻，前三者为下卦、后三者为上卦，拼出本卦。</li>
-        <li><strong>动爻（老阳 / 老阴）</strong>：偶有"发动"的爻，阴阳反转后，另得一"变卦"，代表事情有了转机或变化方向。</li>
-        <li><strong>静卦</strong>：六爻皆"少"，无动爻，主事态暂稳。</li>
+        <li><span class="zh"><strong>起卦</strong>：随机六次得六爻，前三者为下卦、后三者为上卦，拼出本卦。</span><span class="en"><strong>Casting</strong>: six random lines; the first three form the lower trigram, the last three the upper — together the main hexagram.</span></li>
+        <li><span class="zh"><strong>动爻（老阳 / 老阴）</strong>：偶有"发动"的爻，阴阳反转后，另得一"变卦"，代表事情有了转机或变化方向。</span><span class="en"><strong>Moving lines</strong>: occasionally a line "moves," flips its polarity, and yields a changed hexagram — a turning point or new direction.</span></li>
+        <li><span class="zh"><strong>静卦</strong>：六爻皆"少"，无动爻，主事态暂稳。</span><span class="en"><strong>Still hexagram</strong>: no moving lines — matters are stable for now.</span></li>
       </ul>
     </div>
 
     <div class="card">
-      <h3>3. 卦辞怎么"白话"读</h3>
-      <p>每卦都有其意象与断语。在三宝殿里，我们不只给你卦名和古文辞，还会用<strong>白话解卦</strong>翻成大白话：先说这卦名叫什么、上面是哪个卦下面是哪个卦（各主什么意象），再讲卦辞大意，最后点出动爻意味着"事情要变"还是"暂且稳住"。这样即使没读过《易经》，也能听懂这卦在说什么。</p>
-      <p class="muted">举例：「火水未济」——火在上、水在下，火水不相交济，卦辞讲"事未成，慎终如始、防小狐渡河湿尾"。白话就是：事情还没成，越到收尾越要小心，别在最后一步翻船。</p>
+      <h3><span class="zh">3. 卦辞怎么"白话"读</span><span class="en">3 · Reading the hexagram in plain words</span></h3>
+      <p><span class="zh">每卦都有其意象与断语。在三宝殿里，我们不只给你卦名和古文辞，还会用<strong>白话解卦</strong>翻成大白话：先说这卦名叫什么、上面是哪个卦下面是哪个卦（各主什么意象），再讲卦辞大意，最后点出动爻意味着"事情要变"还是"暂且稳住"。这样即使没读过《易经》，也能听懂这卦在说什么。</span><span class="en">Each hexagram has imagery and a verdict. In this hall we don't just give the name and classical text — we add a <strong>plain-language reading</strong>: what the hexagram is called, which trigrams sit above and below (and what they mean), the gist of the text, and whether a moving line signals change or "hold steady." Even without reading the Yijing, you can follow it.</span></p>
+      <p class="muted"><span class="zh">举例：「火水未济」——火在上、水在下，火水不相交济，卦辞讲"事未成，慎终如始、防小狐渡河湿尾"。白话就是：事情还没成，越到收尾越要小心，别在最后一步翻船。</span><span class="en">Example: 火水未济 — Fire above, Water below, the two not crossing. The text says "unfinished; be as careful at the end as at the start, lest the little fox wet its tail crossing the river." In plain words: it isn't done yet — be most careful at the finish, don't capsize on the last step.</span></p>
     </div>
   </section>
 
   <!-- ===== 客观定位 ===== -->
   <section>
-    <h2>三、它为什么"显得准"，以及该怎么看</h2>
+    <h2><span class="zh">三、它为什么"显得准"，以及该怎么看</span><span class="en">III · Why It "Seems Accurate," and How to See It</span></h2>
     <div class="card">
       <ul>
-        <li><strong>巴纳姆效应</strong>：描述多为"你外表坚强内心敏感"这类人人觉得像自己的话。</li>
-        <li><strong>模糊与开放</strong>：一个"财星受克"可对应破财、感情、工作变动，事后总能对上。</li>
-        <li><strong>选择性记忆</strong>：人更记得"说中的"，自动忽略"没说中的"。</li>
+        <li><span class="zh"><strong>巴纳姆效应</strong>：描述多为"你外表坚强内心敏感"这类人人觉得像自己的话。</span><span class="en"><strong>Barnum effect</strong>: statements like "strong outside, sensitive inside" fit almost everyone.</span></li>
+        <li><span class="zh"><strong>模糊与开放</strong>：一个"财星受克"可对应破财、感情、工作变动，事后总能对上。</span><span class="en"><strong>Vagueness</strong>: "Wealth star constrained" can mean a loss, a romance, or a job change — something always fits after the fact.</span></li>
+        <li><span class="zh"><strong>选择性记忆</strong>：人更记得"说中的"，自动忽略"没说中的"。</span><span class="en"><strong>Selective memory</strong>: we remember the hits and forget the misses.</span></li>
       </ul>
-      <p>八字与六爻，是古人用"阴阳五行、干支、八卦"这一套宇宙观，去<strong>推演人生</strong>的民间实践，在文化史、哲学史上自有价值。但<strong>它没有任何可证伪、可重复的科学依据</strong>。健康、财务、职业等重大决定，请交给现实信息与专业人士。</p>
+      <p><span class="zh">八字与六爻，是古人用"阴阳五行、干支、八卦"这一套宇宙观，去<strong>推演人生</strong>的民间实践，在文化史、哲学史上自有价值。但<strong>它没有任何可证伪、可重复的科学依据</strong>。健康、财务、职业等重大决定，请交给现实信息与专业人士。</span><span class="en">BaZi and LiuYao are folk practices that use a cosmology of yin–yang, five phases, stems–branches and trigrams to <strong>reason about life</strong>; they hold real value in cultural and philosophical history. But they have <strong>no falsifiable, repeatable scientific basis</strong>. For major health, financial or career decisions, rely on real information and professionals.</span></p>
     </div>
     <div class="note">
-      郑重声明：三宝殿所有内容仅供文化与休闲，不构成任何人生、健康、财务决策建议。神算子攀谈为娱乐化的人机互动，其"结论"由预设规则生成，请勿当真。
+      <span class="zh">郑重声明：三宝殿所有内容仅供文化与休闲，不构成任何人生、健康、财务决策建议。神算子攀谈及其内嵌模型为娱乐化的人机互动，其"结论"由预设规则与学习机制生成，请勿当真。</span>
+      <span class="en">Disclaimer: all content is for culture and leisure only and is not advice on life, health or finances. The Oracle conversation and its embedded model are entertainment — their "conclusions" are generated by preset rules and a learning mechanism. Please don't take them as truth.</span>
     </div>
   </section>
 
   <div class="footer">
-    三宝殿 · sambon.net ｜ 八字与六爻民俗文化娱乐工具 ｜ 内容无科学依据，仅供文化与休闲<br>
-    <a href="./index.html">返回三宝殿主站</a>
+    <span class="zh">三宝殿 · sambon.net ｜ 天 · 地 · 人 ｜ 内容无科学依据，仅供文化与休闲 ｜ <a href="./index.html">返回三宝殿主站</a></span>
+    <span class="en">Hall of the Three Treasures · sambon.net ｜ Heaven · Earth · Human ｜ For culture &amp; leisure; no scientific basis ｜ <a href="./index.html">Back to the Hall</a></span>
   </div>
 
 </main>
+
+<script>
+/* 科普页语言切换（自包含，不依赖主站 app.js） */
+(function () {
+  var b = document.getElementById('langBtn');
+  function apply(l) {
+    var en = (l === 'en');
+    document.documentElement.classList.toggle('lang-en', en);
+    document.documentElement.lang = en ? 'en' : 'zh-CN';
+    if (b) b.textContent = en ? '中文' : 'EN';
+    try { localStorage.setItem('sambon_lang', l); } catch (e) {}
+  }
+  var l = 'zh';
+  try { l = localStorage.getItem('sambon_lang') || 'zh'; } catch (e) {}
+  apply(l);
+  if (b) b.addEventListener('click', function () {
+    apply(document.documentElement.classList.contains('lang-en') ? 'zh' : 'en');
+  });
+})();
+</script>
 </body>
 </html>
