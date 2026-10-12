@@ -1,6 +1,7 @@
 /*
  * liuyao.js — 六爻起卦核心（随机成卦 / 64卦名 / 卦辞 / 动爻变卦）
  * UMD: 浏览器挂 window.Liuyao；Node 可 require 验证。
+ * 双语：plain(g, lang) 支持 'zh'（默认）| 'en'；cast() 结果附带 nameEn/descEn/bianNameEn。
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -19,6 +20,17 @@
     ['天山遁','泽山咸','火山旅','雷山小过','风山渐','水山蹇','艮为山','地山谦'],
     ['天地否','泽地萃','火地晋','雷地豫','风地观','水地比','山地剥','坤为地']
   ];
+  // 64 卦英文名（Wilhelm 通用译名，与 GUAS 同构）
+  var GUAS_EN = [
+    ['The Creative','Breakthrough','Possession in Great Measure','The Power of the Great','The Taming Power of the Small','Waiting','The Taming Power of the Great','Peace'],
+    ['Treading','The Joyous','Opposition','The Marrying Maiden','Inner Truth','Limitation','Decrease','Approach'],
+    ['Fellowship','Revolution','The Clinging','Abundance','The Family','After Completion','Grace','Darkening of the Light'],
+    ['Innocence','Following','Biting Through','The Arousing','Increase','Difficulty at the Beginning','Nourishment','Return'],
+    ['Coming to Meet','Preponderance of the Great','The Cauldron','Duration','The Gentle','The Well','Decay','Pushing Upward'],
+    ['Conflict','Oppression','Before Completion','Deliverance','Dispersion','The Abysmal','Youthful Folly','The Army'],
+    ['Retreat','Influence','The Wanderer','Preponderance of the Small','Development','Obstruction','Keeping Still','Modesty'],
+    ['Standstill','Gathering Together','Progress','Enthusiasm','Contemplation','Union','Splitting Apart','The Receptive']
+  ];
   // 对应卦辞（通俗一句解读）
   var GUAS_DESC = [
     ['刚健中正，万事当头，宜进不宜退','决断之象，果敢除弊，防小人','日丽中天，大有收获，守富以礼','阳刚壮盛，势强力壮，戒骄躁','小有积蓄，蓄而后发，待时','云上于天，需待时机，饮食宴乐','大畜厚积，止而能蓄，利涉大川','天地交泰，通顺安泰，上下和合'],
@@ -30,17 +42,32 @@
     ['天下有山，遁而退避，远小人','山泽通气，感应相与，少男少女','旅琐琐，行旅在外，安分慎处','小者过越，可小事不可大，宜下','鸿渐于陆，循序渐进，女归吉','蹇难在前，反身修德，利西南','兼山艮止，止其所止，思不出位','地中有山，谦尊而光，君子有终'],
     ['天地不交，闭塞不通，俭德辟难','泽上于地，荟萃聚集，聚以正','明出地上，进而显耀，昼日三接','雷出地奋，逸豫和乐，先作乐','风行地上，观民设教，盥而不荐','地上有水，亲比相辅，先王建万国','剥落侵蚀，剥极必复，顺而止','厚德载物，含弘光大，安贞吉']
   ];
+  // 64 卦辞英译（通俗一句，与 GUAS_DESC 同构）
+  var GUAS_DESC_EN = [
+    ['Steadfast strength at the center — advance, do not retreat','Decisive cutting away of rot; beware petty men','The sun at noon: great gain — guard wealth with courtesy','Yang in full force: strong, but guard against pride','Small store gathered — save, then release; wait for the time','Clouds rising to heaven: wait for the hour; eat and be merry','Great store, held in check yet able to carry — ford the great stream','Heaven and Earth mingling: smooth passage, harmony above and below'],
+    ['Treading the tiger’s tail — walk carefully, guard with courtesy','Two lakes brimming: joy flows, hearts as one','Polarity and estrangement: seek common ground, keep your own counsel','A maiden wed as consort: completion through alliance — guard the improper','Sincerity at the core: trust reaches the smallest things; hold to what is right','Water over the lake: know measure; stop at enough','Decrease below to increase above: gain within loss; curb anger and desire','Approaching from above: yang grows — teach and nourish without end'],
+    ['Fellowship in the open: join hands, ford the stream','Heaven’s timing, the people’s will: change what is worn out; weigh the hour','Brightness doubled, clinging to light: revere it, and keep the inward straight','Great radiance: fullness at its peak — rejoice at noon, not at dusk','A household with its stern lord: order the family first; the wife’s constancy','The work is done — guard against relapse; good at first, disorder at the end','Adornment and pattern: beauty awaits its ornament — do not chase the vain','Light sinking into earth: hide your brilliance; hold the right through hardship'],
+    ['Nothing forced: act without presumption and no harm follows','Follow as the hour allows: choose the good, choose your company','Something in the cheek: bite through the obstruction; hardship overcome','Thunder upon thunder: fear, then mend; rise and act','Wind and thunder aiding: give from above to bless below; move with the time','All things struggling to be born: hard beginning — build the foothold first','Nourishment the right way: watch your words, measure your food','One yang returning: the way turns back — on the seventh day it comes again'],
+    ['An unlooked-for meeting: yin grows — beware; do not take this wife','The beam bending: an extraordinary matter — stand alone, unafraid','The cauldron renewed: cast out the old, take in the new; cook and feed the worthy','Enduring: the way of the long run — it favors having somewhere to go','Wind penetrating, gentle: proceed by degrees; commands given humbly','The well that never runs dry: nourish all; do not roof it over','Rot that must be mended: set it aright before the first day, and after','Wood rising from earth: pile small into high; ascend by compliance'],
+    ['Heaven and water parting ways: conflict — begin carefully; yield to be safe','Hemmed in by want: hold the right inside the strait; wait, and plan','Not yet done: be as careful at the end as at the start — the fox’s tail gets wet','Danger dissolving: relief spreads; it favors the southwest','Wind over water: the tangle loosens; reach out and lift the drowning','Water upon water, danger upon danger: keep the heart open; practice through it','A spring beneath the mountain: enlighten the young; the child asks, I do not beg','The army in array: use the host with right; danger met with order'],
+    ['A mountain under heaven: withdraw and retire; keep far from petty men','Mountain and lake breathing as one: influence passes; boy meets girl','The traveler on the road: small and careful; stay in your place, be circumspect','The small overreaching: small deeds yes, great no — stay low','The wild goose step by step to the plain: gradual advance; the bride’s going is auspicious','Obstruction ahead: turn inward and cultivate; it favors the southwest','Mountain on mountain, stillness: stop where you should; thought goes not beyond its place','A mountain within the earth: humility that shines — the noble one’s end is well' ],
+    ['Heaven and Earth not mingling: blocked and stopped — frugal virtue avoids calamity','Lake rising over earth: gathering and collecting; assemble with right','Brightness rising over earth: advance and shine — thrice received at court','Thunder breaking from earth: delight and movement; make music first','Wind moving over earth: observe the people and teach them; the washing of hands before offering','Water resting on earth: closeness and mutual aid; the old king built ten thousand states','Peeling and wearing away: stripped to the root it must return; stop in compliance','Earth’s vastness carrying all: deep virtue, broad and shining; rest in the right']
+  ];
   // 先天八卦序值 0..7（坤艮坎巽震离兑乾）→ 先天数 1..8
   var NUMOF = [8, 7, 6, 5, 4, 3, 2, 1];
   var HEXWX  = ['土','土','水','木','木','火','金','金']; // value 0..7 之五行
   var HEXNAME= ['坤','艮','坎','巽','震','离','兑','乾'];
+  var HEXNAME_EN = ['Kun','Gen','Kan','Xun','Zhen','Li','Dui','Qian'];
+  var WX_EN = {木:'Wood',火:'Fire',土:'Earth',金:'Metal',水:'Water'};
 
   function hexValue(three) { // three 自最下爻至上，返回 0..7
     return three[0] + three[1] * 2 + three[2] * 4;
   }
   // 矩阵 row = 下卦、col = 上卦（与 GUAS/GUAS_DESC 排列一致）
   function nameOf(uv, dv) { return GUAS[NUMOF[dv] - 1][NUMOF[uv] - 1]; }
+  function nameEnOf(uv, dv) { return GUAS_EN[NUMOF[dv] - 1][NUMOF[uv] - 1]; }
   function descOf(uv, dv) { return GUAS_DESC[NUMOF[dv] - 1][NUMOF[uv] - 1]; }
+  function descEnOf(uv, dv) { return GUAS_DESC_EN[NUMOF[dv] - 1][NUMOF[uv] - 1]; }
 
   // 起卦：六爻，1=阳(▇) 0=阴(▱)；随机 0~1 个动爻
   function cast() {
@@ -50,22 +77,27 @@
     var lower = hexValue([lines[0], lines[1], lines[2]]);
     var uv = upper, dv = lower;
     var dong = (Math.random() < 0.5) ? -1 : Math.floor(Math.random() * 6); // -1 静卦
-    var bianName = null;
+    var bianName = null, bianNameEn = null;
     if (dong >= 0) {
       lines[dong] = lines[dong] ? 0 : 1;
       var bu = hexValue([lines[3], lines[4], lines[5]]);
       var bd = hexValue([lines[0], lines[1], lines[2]]);
       bianName = nameOf(bu, bd);
+      bianNameEn = nameEnOf(bu, bd);
     }
     return {
       lines: lines,
       upper: uv, lower: dv,
       upperWX: HEXWX[uv], lowerWX: HEXWX[dv],
       upperName: HEXNAME[uv], lowerName: HEXNAME[dv],
+      upperNameEn: HEXNAME_EN[uv], lowerNameEn: HEXNAME_EN[dv],
       name: nameOf(uv, dv),
+      nameEn: nameEnOf(uv, dv),
       desc: descOf(uv, dv),
+      descEn: descEnOf(uv, dv),
       dong: dong,            // 动爻位 0..5（自下），-1 为静卦
-      bianName: bianName
+      bianName: bianName,
+      bianNameEn: bianNameEn
     };
   }
 
@@ -80,14 +112,47 @@
     兑: '泽水，喜悦口舌、交欢说辞',
     乾: '苍天，刚健主动、尊贵首领'
   };
+  var HEX_BAIHUA_EN = [
+    'the receptive earth — soft, carrying, deeply containing',
+    'the mountain — still, steadfast, knowing where to stop',
+    'water — flowing through danger, moving in the abyss',
+    'the wind — gentle, penetrating, gradual; it carries documents and news',
+    'thunder — rousing, awakening, action that makes a sound',
+    'fire — bright, clinging, radiantly civilizing',
+    'the lake — joyous, open, the speech of meeting and parting',
+    'heaven — strong, ceaselessly active, noble and leading'
+  ];
 
-  // 白话解卦：把卦名、上下卦、卦辞翻成大白话
-  function plain(g) {
-    var s = '白话解卦：这卦叫「' + g.name + '」。上面是' + g.upperName + '（' + g.upperWX + '，' + HEX_BAIHUA[g.upperName] +
-      '），下面是' + g.lowerName + '（' + g.lowerWX + '，' + HEX_BAIHUA[g.lowerName] + '）。';
-    s += '卦辞大意："' + g.desc + '"。';
+  // 白话解卦：把卦名、上下卦、卦辞翻成大白话（lang: 'zh' 默认 | 'en'）
+  function plain(g, lang) {
+    var en = lang === 'en';
+    var up = en ? g.upperNameEn : g.upperName;
+    var lo = en ? g.lowerNameEn : g.lowerName;
+    var upB = en ? HEX_BAIHUA_EN[g.upper] : HEX_BAIHUA[g.upperName];
+    var loB = en ? HEX_BAIHUA_EN[g.lower] : HEX_BAIHUA[g.lowerName];
+    var upWX = en ? WX_EN[g.upperWX] : g.upperWX;
+    var loWX = en ? WX_EN[g.lowerWX] : g.lowerWX;
+    var name = en ? g.nameEn : g.name;
+    var desc = en ? g.descEn : g.desc;
+    var bian = en ? (g.bianNameEn || g.bianName) : g.bianName;
+    var s;
+    if (en) {
+      s = 'In plain words: this hexagram is called "' + name + '". Above is ' + up + ' (' + upWX + ', ' + upB +
+        '), below is ' + lo + ' (' + loWX + ', ' + loB + ').';
+      s += ' Its judgment reads: "' + desc + '".';
+      if (g.dong >= 0) {
+        s += ' The ' + (g.dong + 1) + 'th line from the bottom is moving (old yang or old yin) — like a matter stirring, it will turn toward "' + bian +
+          '": act as the moment allows, and turn with it.';
+      } else {
+        s += ' No line is moving (a still hexagram) — matters rest for now; follow the existing trend and force nothing.';
+      }
+      return s;
+    }
+    s = '白话解卦：这卦叫「' + name + '」。上面是' + up + '（' + upWX + '，' + upB +
+      '），下面是' + lo + '（' + loWX + '，' + loB + '）。';
+    s += '卦辞大意："' + desc + '"。';
     if (g.dong >= 0) {
-      s += ' 中间第 ' + (g.dong + 1) + ' 爻在"发动"（老阳或老阴），好比事情起了变化，会往「' + g.bianName +
+      s += ' 中间第 ' + (g.dong + 1) + ' 爻在"发动"（老阳或老阴），好比事情起了变化，会往「' + bian +
         '」那头转化——宜相机而动、顺势而转。';
     } else {
       s += ' 眼下没有动爻（静卦），事态暂稳，照着既有趋势走即可，不必妄动。';
@@ -96,7 +161,7 @@
   }
 
   return {
-    GUAS: GUAS, HEXWX: HEXWX, HEXNAME: HEXNAME,
+    GUAS: GUAS, GUAS_EN: GUAS_EN, HEXWX: HEXWX, HEXNAME: HEXNAME, HEXNAME_EN: HEXNAME_EN,
     cast: cast, nameOf: nameOf, descOf: descOf, plain: plain
   };
 });
