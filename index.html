@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>三宝殿 · 八字六爻神算子 ｜ Hall of the Three Treasures</title>
-<meta name="description" content="三宝殿：天·地·人 三宝，本于天人合一。八字推演、六爻起卦与内嵌神算模型（随互动进化，纯本地零外部 API）。民俗文化娱乐工具。The Three Treasures — Heaven, Earth, Human: BaZi, LiuYao and an on-device, self-evolving Oracle.">
+<meta name="description" content="三宝殿：天·地·人 三宝，本于天人合一。八字推演、六爻起卦与神算子攀谈——越聊，越懂你。民俗文化娱乐工具。The Three Treasures — Heaven, Earth, Human: BaZi, LiuYao, and an Oracle that grows attuned to you.">
 <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
@@ -23,12 +23,7 @@
     <a href="#shen-section">神算子殿</a>
     <a href="./kepu.html">基础科普</a>
     <span class="nav-right">
-      <span id="growthPill" class="growth-pill" title="内嵌模型进化进度 / Oracle growth"></span>
-      <button class="pill-btn" id="modelBtn" data-action="model-panel" title="内嵌神算模型 / Embedded Oracle">
-        <span class="zh">神算模型</span><span class="en">Oracle Model</span>
-      </button>
       <button class="pill-btn lang-btn" id="langBtn" data-action="lang-toggle">EN</button>
-      <span id="authArea"></span>
     </span>
   </nav>
 </header>
@@ -36,7 +31,7 @@
 <main class="wrap">
 
   <section class="hero">
-    <p class="hero-incant"><span class="zh">天机隐于干支，卦象藏于爻变。客官既入三宝殿，且静心一念，听老朽为你参详——内嵌神算模型会随你的互动而进化，一切只在本机，不上传分毫。</span><span class="en">Heaven’s secret hides in the stems and branches; the hexagram hides in the moving lines. You have entered the Hall of the Three Treasures — settle your mind. The embedded Oracle evolves with your interaction, entirely on-device, never uploaded.</span></p>
+    <p class="hero-incant"><span class="zh">天机隐于干支，卦象藏于爻变。客官既入三宝殿，且静心一念，听老朽为你参详——所言之道，会随你的互动，越聊越合心意。</span><span class="en">Heaven’s secret hides in the stems and branches; the hexagram hides in the moving lines. You have entered the Hall of the Three Treasures — settle your mind and let the old man counsel you; his words grow ever closer to your heart as you talk.</span></p>
   </section>
 
   <!-- ============ 引 · 基础科普 ============ -->
@@ -85,67 +80,21 @@
     <h2><span class="zh">神算子殿 · 神算子攀谈</span><span class="en">Hall of the Oracle · A Conversation</span></h2>
     <div class="card">
       <p><span class="zh">神算子不急于断你何事。他先观你八字、再卜一卦，略陈观感（含<strong>白话解卦</strong>），便循循善诱，与你攀谈数语，终而点出<strong>你此来心中所悬之事</strong>——此殿主<strong>人</strong>：以人心之问，会通天时与地象。</span><span class="en">The Oracle will not rush to a verdict. He reads your chart, casts a hexagram, offers his impressions (with a plain-language reading), then draws you out in conversation until he names <strong>what truly weighs on you</strong> — this hall belongs to the <strong>Human</strong>: the question of a heart meeting Heaven’s timing and Earth’s signs.</span></p>
-      <p class="muted"><span class="zh">玩法：先完成上方「八字推演」与「六爻起卦」，再请神算子入局攀谈。<strong>神算子须登录后使用</strong>（免费演示账号，仅存本机浏览器）。解惑由<strong>内嵌神算模型</strong>实时生成——纯本地、零外部 API，并会依据你的 👍/👎 与互动<strong>自动进化</strong>。</span><span class="en">How: run the BaZi chart and cast a hexagram above, then call the Oracle in. <strong>Sign-in required</strong> (free demo account, stored only in your browser). Guidance is produced by the <strong>embedded Oracle model</strong> — fully local, no external API — and it <strong>evolves</strong> with your reactions and interaction.</span></p>
+      <p class="muted"><span class="zh">玩法：先完成上方「八字推演」与「六爻起卦」，再请神算子入局攀谈。解得准与不准，尽可点破——他听在耳里、记在心上，越聊越懂你。</span><span class="en">How: run the BaZi chart and cast a hexagram above, then call the Oracle in. Tell him what lands and what misses — he takes it to heart and grows attuned to you.</span></p>
       <button class="btn-ghost" data-action="shen"><span class="zh">请神算子参详</span><span class="en">Consult the Oracle</span></button>
       <div id="shen-box"></div>
     </div>
   </section>
 
   <div class="footer">
-    <span class="zh">三宝殿 · sambon.net ｜ 天 · 地 · 人 ｜ 八字与六爻民俗文化娱乐工具 ｜ 内容无科学依据，仅供文化与休闲<br>本站为纯静态站点，可部署于任意静态托管（含 Cloudflare Pages）；神算模型内嵌本机，不上传任何数据。</span>
-    <span class="en">Hall of the Three Treasures · sambon.net ｜ Heaven · Earth · Human ｜ A folklore &amp; culture tool for BaZi &amp; LiuYao ｜ No scientific basis; for culture &amp; leisure.<br>A fully static site, deployable on any static host (incl. Cloudflare Pages). The Oracle runs on-device; nothing is uploaded.</span>
+    <span class="zh">三宝殿 · sambon.net ｜ 天 · 地 · 人 ｜ 八字与六爻民俗文化娱乐工具 ｜ 内容无科学依据，仅供文化与休闲<br>本站为纯静态站点，可部署于任意静态托管（含 Cloudflare Pages）。</span>
+    <span class="en">Hall of the Three Treasures · sambon.net ｜ Heaven · Earth · Human ｜ A folklore &amp; culture tool for BaZi &amp; LiuYao ｜ No scientific basis; for culture &amp; leisure.<br>A fully static site, deployable on any static host (incl. Cloudflare Pages).</span>
   </div>
 
 </main>
 
-<!-- ============ 内嵌神算模型面板 ============ -->
-<div id="oracleModal" class="modal hidden">
-  <div class="modal-card">
-    <div class="modal-h">三宝殿 · 神算模型</div>
-    <p class="muted"><span class="zh">内嵌于本站的神算模型：<strong>纯本地、零外部 API</strong>，依据你的 👍/👎、所选心事、自由描述与复访关注<strong>自动进化</strong>。数据仅存本机，可导出随身，也可随时重置。</span><span class="en">An embedded Oracle: <strong>fully local, zero external API</strong>, evolving from your reactions, chosen concerns, free text and recurring focus. Stored on-device only; export it, or reset anytime.</span></p>
-    <div class="om-grid">
-      <div class="om-k"><span class="zh">境界</span><span class="en">Stage</span></div><div id="omLevel">—</div>
-      <div class="om-k"><span class="zh">对谈次数</span><span class="en">Sessions</span></div><div id="omSessions">0</div>
-      <div class="om-k"><span class="zh">进化次数</span><span class="en">Evolutions</span></div><div id="omUpdates">0</div>
-      <div class="om-k"><span class="zh">共鸣率</span><span class="en">Resonance</span></div><div id="omResonance">—</div>
-      <div class="om-k"><span class="zh">赞 / 踩</span><span class="en">Like / Dislike</span></div><div id="omLike">0 / 0</div>
-      <div class="om-k"><span class="zh">常念之事</span><span class="en">Recurring</span></div><div id="omRecurring">—</div>
-      <div class="om-k"><span class="zh">学过的心事词</span><span class="en">Learned terms</span></div><div id="omTerms">—</div>
-    </div>
-    <div class="modal-btns">
-      <button class="btn-ghost btn-sm" data-action="model-toggle" id="omToggle"><span class="zh">内嵌解惑：开</span><span class="en">Oracle: ON</span></button>
-      <button class="btn-secondary btn-sm" data-action="model-export"><span class="zh">导出模型</span><span class="en">Export</span></button>
-      <button class="btn-ghost btn-sm" data-action="model-import"><span class="zh">导入</span><span class="en">Import</span></button>
-      <button class="btn-ghost btn-sm" data-action="model-reset"><span class="zh">重置</span><span class="en">Reset</span></button>
-      <button class="btn-ghost btn-sm" data-action="close-model"><span class="zh">关闭</span><span class="en">Close</span></button>
-    </div>
-    <div class="om-io">
-      <input type="file" id="oracleFile" accept="application/json,.json">
-      <textarea id="oraclePaste" rows="2" placeholder="或在此粘贴模型 JSON / or paste model JSON here"></textarea>
-    </div>
-    <div id="oracleMsg" class="lg-msg"></div>
-  </div>
-</div>
-
-<!-- ============ 登录弹窗 ============ -->
-<div id="loginModal" class="modal hidden">
-  <div class="modal-card">
-    <div class="modal-h">三宝殿 · 入门</div>
-    <p class="muted"><span class="zh">神算子攀谈需登录后使用。此为本机<strong>演示账号</strong>，仅存于你的浏览器，<strong>非真实安全机制</strong>。</span><span class="en">Sign in to consult the Oracle. This is a <strong>demo account</strong> stored only in your browser — <strong>not real security</strong>.</span></p>
-    <label><span class="zh">用户名</span><span class="en">Username</span></label><input id="lgName" placeholder="起个名号 / pick a name">
-    <label><span class="zh">密码</span><span class="en">Password</span></label><input id="lgPass" type="password" placeholder="至少 4 位 / at least 4 chars">
-    <div id="lgMsg" class="lg-msg"></div>
-    <div class="modal-btns">
-      <button class="btn-primary" data-action="do-login"><span class="zh">登录</span><span class="en">Sign in</span></button>
-      <button class="btn-ghost" data-action="do-register"><span class="zh">注册并登录</span><span class="en">Register</span></button>
-      <button class="btn-ghost" data-action="close-login"><span class="zh">取消</span><span class="en">Cancel</span></button>
-    </div>
-  </div>
-</div>
-
 <script src="./assets/js/bazi.js"></script>
 <script src="./assets/js/liuyao.js"></script>
-<script src="./assets/js/auth.js"></script>
 <script src="./assets/js/shensuan.js"></script>
 <script src="./assets/js/oracle.js"></script>
 <script src="./assets/js/app.js"></script>

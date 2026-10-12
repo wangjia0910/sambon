@@ -160,23 +160,6 @@ pre{white-space:pre-wrap;font-family:"Menlo","Consolas",monospace;font-size:13.5
 .fade{animation:fade .55s ease}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-/* ---------- 登录区 ---------- */
-.auth-area{display:flex;align-items:center;gap:10px}
-.welcome{color:var(--mut);font-size:13px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* ---------- 弹窗 ---------- */
-.modal{position:fixed;inset:0;background:rgba(6,4,12,.72);display:flex;align-items:center;
-  justify-content:center;z-index:50;padding:16px;backdrop-filter:blur(3px)}
-.modal.hidden{display:none}
-.modal-card{background:linear-gradient(180deg,#1c1628,#15101f);border:1px solid var(--gold);
-  border-radius:18px;padding:26px 28px;max-width:400px;width:100%;
-  box-shadow:0 18px 60px rgba(0,0,0,.55),0 0 30px rgba(201,168,90,.2)}
-.modal-h{font-family:"KaiTi","STKaiti","楷体",serif;font-size:20px;font-weight:600;
-  color:var(--gold-bright);margin-bottom:8px;letter-spacing:2px;text-align:center}
-.lg-msg{font-size:13px;color:var(--cinnabar-soft);min-height:18px;margin:8px 0 0}
-.modal-btns{margin-top:16px}
-.modal-btns button{margin:6px 6px 0 0}
-
 /* ---------- 中英双语切换 ---------- */
 .en{display:none}
 html.lang-en .zh{display:none}
@@ -188,31 +171,19 @@ html.lang-en .en{display:inline}
   padding:2px 12px;margin-left:10px;font-size:12.5px;font-family:"Microsoft YaHei",sans-serif;
   color:var(--gold);box-shadow:0 0 12px rgba(201,168,90,.18);vertical-align:middle}
 
-/* ---------- 顶栏胶囊按钮（神算模型 / 语言） ---------- */
+/* ---------- 顶栏胶囊按钮（语言） ---------- */
 .pill-btn{background:transparent;color:var(--gold);border:1px solid var(--gold);
   padding:6px 13px;font-size:13px;letter-spacing:1px;margin:0;border-radius:999px;cursor:pointer;transition:.2s}
 .pill-btn:hover{background:rgba(201,168,90,.14)}
 .lang-btn{min-width:52px}
-.growth-pill{font-size:12px;color:var(--jade);border:1px solid rgba(95,174,154,.4);
-  background:rgba(95,174,154,.08);border-radius:999px;padding:3px 11px;white-space:nowrap}
 
-/* ---------- 内嵌神算模型：反馈条 / 文本 ---------- */
+/* ---------- 神算子点拨：反馈条 / 文本 ---------- */
 .ai-note{font-size:12px;color:var(--mut);margin-top:8px}
 .oracle-title{font-family:"KaiTi","STKaiti","楷体",serif;color:var(--gold-bright);font-weight:700;letter-spacing:1px}
 .oracle-text{white-space:pre-wrap;line-height:1.95}
-.oracle.off{opacity:.86}
 .fb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;
   padding-top:10px;border-top:1px dashed var(--line-soft)}
 .fb .muted{font-size:12.5px;margin-right:2px}
-
-/* ---------- 神算模型面板 ---------- */
-.om-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin-top:14px;font-size:13.5px}
-.om-k{color:var(--mut)}
-.om-grid>div:nth-child(even){color:var(--ink)}
-.om-io{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.om-io input[type=file]{font-size:12px;color:var(--mut)}
-.om-io textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;
-  background:rgba(10,8,16,.6);color:var(--ink);font-size:12px;resize:vertical}
 
 /* ---------- 科普页微调 ---------- */
 .kepu p{color:var(--ink)}
