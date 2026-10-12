@@ -116,11 +116,21 @@ pre{white-space:pre-wrap;font-family:"Menlo","Consolas",monospace;font-size:13.5
   padding:16px 18px;color:#d9d0bd}
 .gua-box{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
 .yaos{display:flex;flex-direction:column-reverse;gap:8px}
-.yao{width:60px;height:15px;border-radius:3px;
+.yao{width:60px;height:15px;border-radius:3px;transform-origin:left center;
   background:linear-gradient(90deg,var(--gold),var(--gold-bright));
-  box-shadow:0 0 10px rgba(201,168,90,.4)}
+  box-shadow:0 0 10px rgba(201,168,90,.4);
+  animation:yaoIn .5s cubic-bezier(.22,1,.36,1) both}
+.yao:nth-child(1){animation-delay:.05s}
+.yao:nth-child(2){animation-delay:.16s}
+.yao:nth-child(3){animation-delay:.27s}
+.yao:nth-child(4){animation-delay:.38s}
+.yao:nth-child(5){animation-delay:.49s}
+.yao:nth-child(6){animation-delay:.60s}
+@keyframes yaoIn{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
 .yao.yin{background:transparent;border:2px solid var(--gold);height:11px}
-.yao.dong{outline:3px solid var(--cinnabar);outline-offset:3px}
+.yao.dong{outline:3px solid var(--cinnabar);outline-offset:3px;
+  animation:yaoIn .5s cubic-bezier(.22,1,.36,1) .60s both, dongGlow 1.8s ease-in-out 1.3s infinite}
+@keyframes dongGlow{0%,100%{box-shadow:0 0 6px rgba(194,59,46,.55)}50%{box-shadow:0 0 18px rgba(217,89,74,.95)}}
 .gua-meta{font-size:14px;line-height:1.9}
 .gua-meta b{color:var(--gold-bright)}
 .pill{display:inline-block;background:rgba(201,168,90,.12);border:1px solid var(--line);
@@ -189,3 +199,44 @@ html.lang-en .en{display:inline}
 .kepu p{color:var(--ink)}
 .kepu ul{margin:6px 0 6px 1.2em;padding:0}
 .kepu li{margin:4px 0;color:var(--ink)}
+
+/* ---------- 移动端适配（≤640px） ---------- */
+@media (max-width:640px){
+  body{font-size:14px}
+  .wrap{padding:0 12px 56px}
+  .site-header{padding:30px 0 8px}
+  .plaque{padding:10px 18px;gap:8px;border-radius:12px}
+  .plaque-title{font-size:27px;letter-spacing:6px}
+  .emblem{font-size:23px}
+  .plaque-sub{font-size:12px;letter-spacing:1px}
+  .slogan{font-size:12px;letter-spacing:2px;margin-top:10px}
+  .topnav{gap:0;padding:8px 4px}
+  .topnav a{padding:6px 10px;font-size:13px;letter-spacing:1px}
+  .nav-right{gap:6px}
+  .lang-btn{min-width:46px;padding:5px 10px}
+  section{margin-bottom:30px;scroll-margin-top:92px}
+  h2{font-size:19px;letter-spacing:3px;margin:0 0 14px}
+  h3{font-size:15px}
+  .card{padding:16px 14px;border-radius:12px}
+  .card::before{margin:-16px -14px 14px}
+  .hero{margin:14px 0 4px}
+  .hero-incant{font-size:14.5px;letter-spacing:1.5px;line-height:1.95}
+  .row{flex-direction:column;gap:0}
+  .row>div{min-width:0}
+  input,select{padding:9px 10px;font-size:14px}
+  button{padding:10px 16px;font-size:13.5px;letter-spacing:1px}
+  .btn-sm{padding:6px 12px;font-size:12.5px}
+  pre{font-size:12px;padding:12px;line-height:1.75}
+  .gua-box{gap:14px}
+  .yao{width:48px}
+  .gua-meta{font-size:13px}
+  .shen-box{padding:14px 14px}
+  .fb{gap:6px}
+  .fb .muted{font-size:12px}
+  .solution{padding:12px 14px}
+  .sol-item{flex-direction:column;gap:0}
+  .sol-item b{flex-basis:auto}
+  .note{font-size:12px;padding:10px 12px}
+  .footer{font-size:11px;letter-spacing:0}
+  .oracle-text{font-size:14px}
+}
