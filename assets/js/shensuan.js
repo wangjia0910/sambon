@@ -84,6 +84,95 @@
   function fieldName(key) { return DOMAIN_NAME[key] || '心事'; }
   function subLabel(key, sub) { return (SUB_LABEL[key] && SUB_LABEL[key][sub]) || ''; }
 
+  // ---- 神算子详细解决方案（结合八字 + 大运 + 卦象，五步解惑）----
+  function countSS(bz) {
+    var ss = bz.shishen;
+    var all = [ss.yearGan, ss.yearZhi, ss.monthGan, ss.monthZhi, ss.dayZhi, ss.hourGan, ss.hourZhi];
+    var cnt = {};
+    all.forEach(function (x) { if (x && x !== '?') cnt[x] = (cnt[x] || 0) + 1; });
+    return cnt;
+  }
+  function strongWord(score) {
+    return score >= 60 ? '偏强而能任事' : (score <= 40 ? '偏弱而需借力' : '中和而随运转');
+  }
+  function domainSignal(bz, key) {
+    var c = countSS(bz), ss = bz.shishen;
+    if (key === 'cai') {
+      var ci = (c['正财'] || 0) + (c['偏财'] || 0);
+      return '论财，命局财星' + (ci ? ('有 ' + ci + ' 现') : '不显') + '，' +
+        (bz.strength.score >= 60 ? '身强足以任财，进财可期' : '身偏弱，宜合作分财、稳积为先') + '。';
+    }
+    if (key === 'guan') {
+      var gi = (c['正官'] || 0) + (c['七杀'] || 0);
+      return '论事业，官杀' + (gi ? ('有 ' + gi + ' 现，宜就名位、担责任') : '不显，宜以才（食伤）或以财立身') + '。';
+    }
+    if (key === 'qing') {
+      var root = (bz.raw.sex === '男' && ((c['正财'] || 0) + (c['偏财'] || 0) > 0)) ||
+                 (bz.raw.sex === '女' && ((c['正官'] || 0) + (c['七杀'] || 0) > 0));
+      return '论情，日支（配偶宫）坐「' + ss.dayZhi + '」，' + (root ? '缘法有根，姻缘可期' : '缘法宜缓，宜在喜用大运中遇人') + '。';
+    }
+    if (key === 'health') {
+      var miss = ['木', '火', '土', '金', '水'].filter(function (w) { return bz.cnt[w] === 0; });
+      return '论身，' + (miss.length ? ('五行缺 ' + miss.join('、') + '，所主' +
+        miss.map(function (w) { return WX_ORGAN[w]; }).join('、') + '之气偏弱，宜加顾惜') : '五行俱全，本元尚充') + '。';
+    }
+    if (key === 'xue') {
+      var yi = (c['正印'] || 0) + (c['偏印'] || 0);
+      return '论学，印星' + (yi ? ('有 ' + yi + ' 现，利文教文书、易得名望') : '不显，宜以勤补、以静修') + '。';
+    }
+    if (key === 'ren') {
+      var ri = (c['食神'] || 0) + (c['伤官'] || 0) + (c['比肩'] || 0) + (c['劫财'] || 0);
+      return '论人际，食伤比劫' + (ri ? ('共 ' + ri + ' 现，人缘与同辈之力可用') : '偏弱，宜主动结善、少独行') + '。';
+    }
+    return '综观命局，日主强弱与五行偏枯，已示君所忧之根；具体宜就喜用五行与当令大运参之。';
+  }
+  var WX_GUIDE = {
+    '木': '木为君之所喜：宜向东方、近自然草木，从事文教、林业、创意、成长型事业；多读书、养仁心，绿色为助。',
+    '火': '火为君之所喜：宜向南方、从事文化、餐饮、能源、传媒、表达类事业；主动出击、以礼待人，红色为助。',
+    '土': '土为君之所喜：宜守本地中央、从事地产、稳健实业、服务类事业；踏实积累、以信立身，黄色为助。',
+    '金': '金为君之所喜：宜向西方、从事金融、机械、法律、管理、规则类事业；讲决断、守义气，白色为助。',
+    '水': '水为君之所喜：宜向北方、从事流通、智慧、物流、咨询、变通类事业；灵活应机、以智取胜，黑色为助。'
+  };
+  function wxGuide(like) {
+    return like.slice(0, 2).map(function (w) { return WX_GUIDE[w] || ''; }).join(' ');
+  }
+  function guaHint(gua) {
+    if (gua.dong >= 0) return '卦有动爻，主"变"，君所忧之事或有转机，宜审时度势、择机而动，勿胶着。';
+    return '卦为静体，主"守"，君所忧之事宜先沉淀、明辨得失，暂勿轻动。';
+  }
+
+  // 详细解决方案
+  function solution(bz, gua, key, sub, free) {
+    var s = bz.strength, like = bz.strength.like, dm = bz.dayMaster;
+    var domainWord = fieldName(key);
+    var subWord = free || subLabel(key, sub) || '心中所忧';
+    var details = (typeof Bazi !== 'undefined' && Bazi.dayunDetail) ? Bazi.dayunDetail(bz) : [];
+    var fav = details.filter(function (d) { return d.xiji === '喜'; });
+    var unfav = details.filter(function (d) { return d.xiji === '忌'; });
+
+    var parts = [];
+    parts.push('一、现状参断　日主 ' + bz.dayGan + '（' + dm + '）' + strongWord(s.score) +
+      '，喜用 ' + like.join('、') + '。' + domainSignal(bz, key));
+    if (fav.length) {
+      var f = fav.slice(0, 2).map(function (d) { return d.gan + d.zhi + '（约' + d.age + '）'; }).join('、');
+      var u = unfav.length ? ('　而 ' + unfav.slice(0, 1).map(function (d) { return d.gan + d.zhi + '（约' + d.age + '）'; }).join('、') +
+        ' 〔忌〕，行此运宜守成蓄势，勿妄动。') : '';
+      parts.push('二、时机·大运　君命中最得力之运在 ' + f + ' 〔喜〕，逢此龄宜把握、宜发力。' + u);
+    } else {
+      parts.push('二、时机·大运　君之大运喜用不显，宜以逐年"流年小运"补之；凡逢 ' +
+        like.join('、') + ' 旺之年，便是小吉之机，宜相机而动。');
+    }
+    parts.push('三、趋避之法（依君喜用五行）　' + wxGuide(like));
+    parts.push('四、卦象印证　所起「' + gua.name + '」——' + gua.desc + '。' + guaPlain(gua) +
+      '　此卦与君所忧' + domainWord + '相参：' + guaHint(gua));
+    var favLine = fav.length ? ('当喜用大运（' + fav.slice(0, 1).map(function (d) { return d.gan + d.zhi; }).join('') +
+      ' 等）临身之时，便是最好的发力窗口') : ('逢 ' + like.join('、') + ' 旺之流年，即是小吉之机');
+    parts.push('五、神算子一言　命理示"天时之约"，非"定数之锁"。' + domainWord + '·' + subWord +
+      ' 之困，君可借喜用 ' + like.join('、') + ' 之向、循 ' + favLine + '。' +
+      '运未至则养、运将至则动；吉凶在人，决断在君——此乃老朽助君解惑之心，非缚君之绳。');
+    return parts.join('\n\n');
+  }
+
   function conclude(bz, gua, key, sub, free) {
     var s = bz.strength;
     var strong = s.score >= 60 ? '偏强' : (s.score <= 40 ? '偏弱' : '中和');
@@ -105,18 +194,16 @@
       '，喜用 ' + s.like.join('、') + '。' +
       (organMissing.length ? ('命局 ' + organMissing.join('、') + ' 之气偏弱，宜加顾惜。') : '') +
       '卦得「' + gua.name + '」——' + gua.desc + '。' + guaPlain(gua) + seg +
-      '客官所言"' + domainWord + '·' + subWord + '"，正与此象相印。' +
-      '老朽进一言：命理者，天时之约也，运未至则守，运将至则动；' + s.like.join('、') +
-      '为君之向，顺势而为可减蹉跎。此乃参详，吉凶在人，决断在君。';
+      '客官所言"' + domainWord + '·' + subWord + '"，正与此象相印。';
 
     var summary = free
       ? '客官此来三宝殿，心中所悬者，归根结底乃是：' + free + ' 之困。'
       : '客官此来三宝殿，心中所悬者，归根结底乃是：' + domainWord + '·' + subWord + ' 之困。';
-    return { summary: summary, reading: reading };
+    return { summary: summary, reading: reading, solution: solution(bz, gua, key, sub, free) };
   }
 
   return {
     WX_ORGAN: WX_ORGAN, DOMAIN_NAME: DOMAIN_NAME, SUB_LABEL: SUB_LABEL,
-    assess: assess, refine: refine, fieldName: fieldName, subLabel: subLabel, conclude: conclude
+    assess: assess, refine: refine, fieldName: fieldName, subLabel: subLabel, conclude: conclude, solution: solution
   };
 });

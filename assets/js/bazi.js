@@ -241,6 +241,197 @@
     return lines.join('\n');
   }
 
+  // =====================================================================
+  //  人生推论 + 大运详批（性格 / 命运 / 事业 / 财运 / 感情人际 / 逐运解析）
+  // =====================================================================
+  // 日主五行 → 性格基调
+  var DM_PERSONA = {
+    '木': { core: '木主仁，性直而向上，有生机与韧劲，如春木向阳。',
+            strong: '木气偏盛，则主见强、行动果决，然亦须防过于刚直、不善迂回。',
+            weak: '木气偏弱，则外柔内秀、思虑周详，然魄力稍欠，宜借火（礼）以扬、借水（智）以润。' },
+    '火': { core: '火主礼，性热而明快，热情外露、善表达，如夏日当空。',
+            strong: '火气偏盛，则精力旺、感染力强，然性急易躁，须以水（智）济之、以静制动。',
+            weak: '火气偏弱，则内秀温和、不喜张扬，宜借木（仁）以生、借火以暖。' },
+    '土': { core: '土主信，性稳而包容，踏实诚信、重情义，如大地载物。',
+            strong: '土气偏盛，则稳健可靠、能扛事，然或显迟重，宜借金（义）以疏、借木以达。',
+            weak: '土气偏弱，则心性浮动、根基未稳，宜借火（礼）以生、借土以培。' },
+    '金': { core: '金主义，性刚而决断，重规则、有锋芒，如秋金肃杀。',
+            strong: '金气偏盛，则刚毅果敢、律己严，然或显冷峻，宜借水（智）以润、借火以炼。',
+            weak: '金气偏弱，则心软寡断、易从众，宜借土（信）以生、借金以坚。' },
+    '水': { core: '水主智，性灵而变通，机敏善谋、随方就圆，如江河行地。',
+            strong: '水气偏盛，则智谋足、适应强，然或流于泛、少定性，宜借土（信）以堤、借木以导。',
+            weak: '水气偏弱，则神思发散、定力不足，宜借金（义）以生、借水以养。' }
+  };
+  // 主导十神 → 性格侧写
+  var SS_TRAIT = {
+    '比肩': '重同辈情谊、自力更生，然须防朋辈分财。',
+    '劫财': '慷慨仗义、出手大方，然财易外流，宜明算账。',
+    '食神': '温润有才、善表达与享生活，多具艺术或口福之缘。',
+    '伤官': '聪颖外露、敢破敢立，宜以才艺立身，然须谨言避锋。',
+    '正财': '务实持重、勤劳生财，宜稳进积财、不宜投机。',
+    '偏财': '机变通达、多有意外之得，宜以人脉与机会生财。',
+    '正官': '循规守责、重名望，宜就公职或管理，然勿为规则所缚。',
+    '七杀': '有魄力、能承压，宜闯宜管，然须防过刚招损、以印化之。',
+    '正印': '沉静好学、得长辈荫护，宜以文以学立身。',
+    '偏印': '独具冷门才华、善钻研，宜走专精之路，然防孤僻。'
+  };
+  function countSS(bz) {
+    var ss = bz.shishen;
+    var all = [ss.yearGan, ss.yearZhi, ss.monthGan, ss.monthZhi, ss.dayZhi, ss.hourGan, ss.hourZhi];
+    var cnt = {};
+    all.forEach(function (x) { if (x && x !== '?') cnt[x] = (cnt[x] || 0) + 1; });
+    return cnt;
+  }
+  function topSS(bz, n) {
+    var c = countSS(bz);
+    return Object.keys(c).sort(function (a, b) { return c[b] - c[a]; }).slice(0, n || 2);
+  }
+
+  // 性格
+  function personaText(bz) {
+    var s = bz.strength, dm = bz.dayMaster;
+    var strong = s.score >= 60 ? '偏强' : (s.score <= 40 ? '偏弱' : '中和');
+    var p = DM_PERSONA[dm];
+    var mod = strong === '偏强' ? p.strong : (strong === '偏弱' ? p.weak : '中和者，刚柔得济，能屈能伸。');
+    var top = topSS(bz, 2);
+    var trait = top.map(function (t) { return SS_TRAIT[t] || ''; }).join('');
+    return '日主属「' + dm + '」：' + p.core + mod +
+      (trait ? ('　命局中 ' + top.join('、') + ' 较显——' + trait) : '');
+  }
+  // 命运总论
+  function destinyText(bz) {
+    var s = bz.strength, dm = bz.dayMaster, c = countSS(bz);
+    var head = s.score >= 60 ? '日主得地得势、自身气足，能任财官，人生多能自立、可闯可守。'
+      : (s.score <= 40 ? '日主偏弱，宜借印比之力、依贵人组织，单打独斗则易疲，聚势方成。'
+      : '日主中和，随运而转，逢喜运则顺、逢忌运则蛰，重在审时。');
+    var body = '';
+    if (s.balance >= 70) body = '五行较匀，性情少偏，行事宜稳，起伏不剧。';
+    else if (s.balance >= 45) body = '五行略有偏倾，运程起伏稍显，宜就喜用而补、顺势而为。';
+    else body = '五行偏枯较明显，运程起伏较大，宜以喜用五行调和、固本培元。';
+    var extra = '';
+    if ((c['正官'] || 0) + (c['七杀'] || 0) > 0 && (c['正印'] || 0) + (c['偏印'] || 0) > 0)
+      extra = '官印相生，主有根基与名望之缘；';
+    else if ((c['正财'] || 0) + (c['偏财'] || 0) >= 2) extra = '财星有气，主务实生财之缘；';
+    else if ((c['食神'] || 0) + (c['伤官'] || 0) >= 2) extra = '食伤吐秀，主才艺立身之缘；';
+    return head + body + (extra ? (extra + '此乃命局所偏，运来则彰。') : '此乃命局所主，运来则彰。');
+  }
+  // 事业
+  function careerText(bz) {
+    var c = countSS(bz), s = bz.strength, lines = [];
+    if ((c['正官'] || 0) + (c['七杀'] || 0) > 0 && (c['正印'] || 0) + (c['偏印'] || 0) > 0)
+      lines.push('官印相生——最宜公职、管理、文教、法务等"以名以文立身"之途。');
+    if ((c['正财'] || 0) + (c['偏财'] || 0) >= 2)
+      lines.push('财星有气——宜商、宜金融实业、宜以资源与人脉生财。');
+    if ((c['食神'] || 0) + (c['伤官'] || 0) >= 2)
+      lines.push('食伤吐秀——宜技艺、创意、表达、自由职业，以才艺见长。');
+    if ((c['比肩'] || 0) + (c['劫财'] || 0) >= 2)
+      lines.push('比劫成群——宜合伙、团队、销售，借同辈之力成事。');
+    if (!lines.length) lines.push('十神均衡，宜依性之所近、循序渐进，不宜贸然转轨。');
+    if (s.score < 45) lines.push('唯身偏弱，初宜依托平台与长辈，待喜用大运助身再图进取。');
+    else if (s.score >= 60) lines.push('身强足以任事，可独当一面、担纲负责。');
+    return lines.join('　');
+  }
+  // 财运
+  function wealthText(bz) {
+    var c = countSS(bz), s = bz.strength, t = [];
+    var cai = (c['正财'] || 0) + (c['偏财'] || 0);
+    if (cai === 0) t.push('命局财星不显，正财非主打，宜以一技之长（食伤）生财、或以职位（官）护财，不宜押宝横财。');
+    else if (s.score >= 60) t.push('身强而财星有气，乃"身财两旺"之象，宜进取、宜理财积累，财来能守。');
+    else t.push('财星虽现而身偏弱，乃"财多身弱"之象，宜合作分财、稳进积小，切忌贪大冒进、独木难支。');
+    if ((c['偏财'] || 0) > 0) t.push('偏财透出，多有意外之得与人脉财机，宜广结善缘、留意机变。');
+    return t.join('　');
+  }
+  // 感情人际
+  function relationText(bz) {
+    var ss = bz.shishen, c = countSS(bz), s = bz.strength, sex = bz.raw.sex, t = [];
+    var sp = ss.dayZhi;
+    if (sex === '男') {
+      t.push('男以财星为妻星（正财正缘、偏财偏缘），日支为配偶宫。');
+      if ((c['正财'] || 0) + (c['偏财'] || 0) === 0) t.push('财星不显，姻缘宜迟、宜经人介绍，勿躁进。');
+      else t.push('财星有根，妻缘不薄；日支坐「' + sp + '」，配偶之象已露。');
+    } else {
+      t.push('女以官杀为夫星（正官正缘、七杀偏缘），日支为配偶宫。');
+      if ((c['正官'] || 0) + (c['七杀'] || 0) === 0) t.push('官星不显，姻缘宜缓、宜在喜用大运中遇人。');
+      else t.push('官杀有根，夫缘可期；日支坐「' + sp + '」，配偶之象已露。');
+    }
+    if ((c['比肩'] || 0) + (c['劫财'] || 0) >= 2) t.push('比劫偏旺，感情中须防"竞夺"之象（如第三者、朋辈之争），以诚以稳为先。');
+    if (s.score < 45) t.push('身偏弱，感情中易迁就、缺主见，宜择能护己、能共担之人。');
+    return t.join('　');
+  }
+
+  // 大运逐运详批
+  var DY_SS = {
+    '正官': '利于名望职位、规矩成事，宜就公职管理',
+    '七杀': '压力与机遇并存，宜闯宜担，以魄力破局',
+    '正印': '利于求学、得长辈贵人荫护，宜静修积累',
+    '偏印': '利于钻研冷门才学，宜走专精之路',
+    '正财': '利于稳定进财、勤劳所得，宜稳积',
+    '偏财': '利于机会之财、人脉生财，留意机变',
+    '食神': '利于才华流露、口福子息，宜以才艺立身',
+    '伤官': '利于创新表达，宜展所长，然谨言避锋',
+    '比肩': '利于同辈并肩、自力，宜合伙，防分财',
+    '劫财': '利于出手帮扶，然财易外流，明算账为上'
+  };
+  function dayunSentence(st, s) {
+    var key = st.ssGan !== '?' ? st.ssGan : st.ssZhi;
+    var dy = DY_SS[key] || '';
+    var base;
+    if (st.xiji === '喜') {
+      if (s.score >= 60) base = '〔喜〕喜用当令，且日主足以任之，正是大有可为之时。';
+      else if (s.score <= 40) base = '〔喜〕虽为喜运，日主尚弱，宜借势渐进、勿贪猛进。';
+      else base = '〔喜〕喜用得力，运程转顺，宜把握机遇。';
+    } else {
+      if (s.score >= 60) base = '〔忌〕忌神虽扰，日主强足以扛，守中为上、可化小凶。';
+      else if (s.score <= 40) base = '〔忌〕忌神叠加身弱，宜蛰伏养元、勿妄动，防灾耗是非。';
+      else base = '〔忌〕忌神当值，运程承压，宜守成蓄势。';
+    }
+    return base + (dy ? (' ' + dy + '。') : '');
+  }
+  function dayunDetail(bz) {
+    var du = bz.dayun, s = bz.strength, like = bz.strength.like, dg = bz.dayGan;
+    return du.steps.map(function (st) {
+      var wg = WX[st.gan], wz = WX[st.zhi];
+      var ssG = shishen(dg, st.gan), ssZ = shishenOfZhi(dg, st.zhi);
+      var xiji = (like.indexOf(wg) >= 0 || like.indexOf(wz) >= 0) ? '喜' : '忌';
+      return {
+        gan: st.gan, zhi: st.zhi, age: st.age,
+        wxGan: wg, wxZhi: wz, ssGan: ssG, ssZhi: ssZ, xiji: xiji,
+        desc: dayunSentence({ ssGan: ssG, ssZhi: ssZ, xiji: xiji }, s)
+      };
+    });
+  }
+  function dayunDetailText(bz) {
+    var du = bz.dayun;
+    var fav = dayunDetail(bz).filter(function (d) { return d.xiji === '喜'; }).length;
+    var head = '大运' + (du.forward ? '顺排' : '逆排') + '，约 ' + du.startAge + ' 岁 ' + du.startMonth +
+      ' 个月起运；十年一换，顺逆之间见人生起伏。下列逐运，〔喜〕者当把握、〔忌〕者宜守成。' +
+      (fav ? ('全运八步中有 ' + fav + ' 步为喜用之运，已属不错之命局。') : '全运八步喜用不多，宜借流年小运与自身勤勉补之。');
+    var lines = [head];
+    dayunDetail(bz).forEach(function (d, i) {
+      lines.push('第' + ['一','二','三','四','五','六','七','八'][i] + '运　' + d.gan + d.zhi +
+        '（' + d.age + '）　干' + d.gan + '（' + d.wxGan + '·' + d.ssGan + '）　支' + d.zhi +
+        '（' + d.wxZhi + '·' + d.ssZhi + '）：' + d.desc);
+    });
+    return lines.join('\n');
+  }
+
+  // 结构化人生推论
+  function lifeReading(bz) {
+    return {
+      personality: personaText(bz),
+      destiny: destinyText(bz),
+      career: careerText(bz),
+      wealth: wealthText(bz),
+      relationship: relationText(bz)
+    };
+  }
+  function lifeReadingText(bz) {
+    var r = lifeReading(bz);
+    return '【性格】\n' + r.personality + '\n\n【命运总论】\n' + r.destiny +
+      '\n\n【事业】\n' + r.career + '\n\n【财运】\n' + r.wealth +
+      '\n\n【感情人际】\n' + r.relationship;
+  }
+
   // ---- 同八字人数估算 ----
   // 合法八字组合：年60 × 月12（受年干约束） × 日60 × 时12（受日干约束）= 518400
   function sameBazi() {
@@ -262,6 +453,8 @@
   return {
     GAN: GAN, ZHI: ZHI, WX: WX, GAN_YIN: GAN_YIN, CYC: CYC,
     sheng: sheng, ke: ke, shishen: shishen, bazi: bazi, dayun: dayun,
-    interpret: interpret, sameBazi: sameBazi, fingerprint: fingerprint
+    interpret: interpret, sameBazi: sameBazi, fingerprint: fingerprint,
+    lifeReading: lifeReading, lifeReadingText: lifeReadingText,
+    dayunDetail: dayunDetail, dayunDetailText: dayunDetailText
   };
 });

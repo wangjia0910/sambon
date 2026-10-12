@@ -47,6 +47,10 @@
     var el = $('bazi-result');
     el.classList.remove('hidden');
     var text = (name ? ('【' + name + ' · ' + sex + '】\n') : '') + Bazi.interpret(currentBz);
+    // 人生推论（性格 / 命运 / 事业 / 财运 / 感情人际）
+    text += '\n\n【七 · 人生推论（性格 · 命运 · 事业 · 财运 · 感情人际）】\n' + Bazi.lifeReadingText(currentBz);
+    // 大运逐运详批
+    text += '\n\n【八 · 大运详批（十年一运，逐运解析）】\n' + Bazi.dayunDetailText(currentBz);
     // 八字指纹（同八字匹配串）+ 登录用户档案
     text += '\n\n【命纹指纹 · 同八字匹配串】\n' + Bazi.fingerprint(currentBz) +
       '\n（此四柱串即你的"八字指纹"。日后开启同八字社群，可凭此匹配同道中人；亦可用于关联同八字用户。）';
@@ -148,10 +152,20 @@
   }
 
   function renderConclusion(c) {
+    var solutionHtml = c.solution
+      ? '<div class="solution"><div class="sol-title">◈ 神算子解惑方案</div>' +
+        c.solution.split('\n\n').map(function (p) {
+          var idx = p.indexOf('　');
+          var head = idx > 0 ? p.slice(0, idx) : '';
+          var body = idx > 0 ? p.slice(idx + 1) : p;
+          return '<div class="sol-item"><b>' + head + '</b><span>' + body + '</span></div>';
+        }).join('') + '</div>'
+      : '';
     $('shen-box').innerHTML +=
       '<div class="shen-box fade" style="border-color:var(--accent)">' +
         '<div class="say" style="font-weight:600;color:var(--accent)">' + c.summary + '</div>' +
         '<div class="say" style="margin-top:10px">' + c.reading + '</div>' +
+        solutionHtml +
       '</div>';
     $('shen-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
