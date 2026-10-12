@@ -163,8 +163,9 @@
   }
   function dayun(y, m, d, mg, sex) {
     var yangYear = GAN_YIN[yearGZ(y).gan] === 1;
-    var male = sex === '男';
-    var forward = (yangYear && male) || (!yangYear && !male); // 阳男阴女顺，阴男阳女逆
+    // 阳男阴女顺，阴男阳女逆；未填性别时按传统通例（阳顺阴逆）
+    var male = sex !== '女';
+    var forward = (yangYear && male) || (!yangYear && !male);
     var birthT = Date.UTC(y, m - 1, d);
     // 收集出生年前后共三年的所有"节"，找紧邻出生日之后(顺)/之前(逆)的那一个
     var jies = [];
@@ -480,15 +481,21 @@
     var en = isEn(lang);
     var ss = bz.shishen, c = countSS(bz), s = bz.strength, sex = bz.raw.sex, t = [];
     var sp = SS(ss.dayZhi, lang);
+    var caiN = (c['正财'] || 0) + (c['偏财'] || 0);
+    var guanN = (c['正官'] || 0) + (c['七杀'] || 0);
     if (en) {
       if (sex === '男') {
         t.push('For men, wealth stars are the spouse (direct for the true match, indirect for the secondary), and the day branch is the spouse palace.');
-        if ((c['正财'] || 0) + (c['偏财'] || 0) === 0) t.push('With no wealth star showing, marriage may come late or through introduction — do not rush.');
+        if (caiN === 0) t.push('With no wealth star showing, marriage may come late or through introduction — do not rush.');
         else t.push('Wealth stars have root, so the match is not thin; the day branch sits on "' + sp + '", and the spouse’s image already shows.');
-      } else {
+      } else if (sex === '女') {
         t.push('For women, officer stars are the husband (direct for the true match, seven killings for the secondary), and the day branch is the spouse palace.');
-        if ((c['正官'] || 0) + (c['七杀'] || 0) === 0) t.push('With no officer star showing, let the match ripen slowly; you may meet them in a favorable cycle.');
+        if (guanN === 0) t.push('With no officer star showing, let the match ripen slowly; you may meet them in a favorable cycle.');
         else t.push('Officer stars have root, so the bond can be expected; the day branch sits on "' + sp + '", and the spouse’s image already shows.');
+      } else {
+        t.push('By old convention, wealth stars mark the spouse for men and officer stars for women; with gender unstated, both are read together.');
+        if (caiN + guanN > 0) t.push('Wealth or officer stars have root, so the bond is not thin; the day branch sits on "' + sp + '", and the spouse’s image already shows.');
+        else t.push('Neither has root — let the match ripen slowly; you may meet them in a favorable cycle.');
       }
       if ((c['比肩'] || 0) + (c['劫财'] || 0) >= 2) t.push('Peers run strong — in love, beware the "contest" (a third party, rivalry among friends); lead with honesty and steadiness.');
       if (s.score < 45) t.push('With a weak self, you tend to yield and lack a stand in love; choose someone who can shelter and share the load.');
@@ -496,12 +503,16 @@
     }
     if (sex === '男') {
       t.push('男以财星为妻星（正财正缘、偏财偏缘），日支为配偶宫。');
-      if ((c['正财'] || 0) + (c['偏财'] || 0) === 0) t.push('财星不显，姻缘宜迟、宜经人介绍，勿躁进。');
+      if (caiN === 0) t.push('财星不显，姻缘宜迟、宜经人介绍，勿躁进。');
       else t.push('财星有根，妻缘不薄；日支坐「' + sp + '」，配偶之象已露。');
-    } else {
+    } else if (sex === '女') {
       t.push('女以官杀为夫星（正官正缘、七杀偏缘），日支为配偶宫。');
-      if ((c['正官'] || 0) + (c['七杀'] || 0) === 0) t.push('官星不显，姻缘宜缓、宜在喜用大运中遇人。');
+      if (guanN === 0) t.push('官星不显，姻缘宜缓、宜在喜用大运中遇人。');
       else t.push('官杀有根，夫缘可期；日支坐「' + sp + '」，配偶之象已露。');
+    } else {
+      t.push('旧俗男以财星为妻、女以官杀为夫；生辰未填性别，故财官两参。');
+      if (caiN + guanN > 0) t.push('财官有根，缘法不薄；日支坐「' + sp + '」，配偶之象已露。');
+      else t.push('财官俱潜，姻缘宜缓，宜在喜用大运中遇人。');
     }
     if ((c['比肩'] || 0) + (c['劫财'] || 0) >= 2) t.push('比劫偏旺，感情中须防"竞夺"之象（如第三者、朋辈之争），以诚以稳为先。');
     if (s.score < 45) t.push('身偏弱，感情中易迁就、缺主见，宜择能护己、能共担之人。');

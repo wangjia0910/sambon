@@ -49,26 +49,23 @@
 
   // ===================== 八字 =====================
   function doBazi() {
-    var name = $('name').value.trim();
-    var sex = $('sex').value;
     var bd = $('bdate').value;
     var h = parseInt($('bhour').value, 10);
     if (!bd) { alert(t('请填写出生日期', 'Please enter your date of birth.')); return; }
     if (isNaN(h) || h < 0 || h > 23) { alert(t('小时请填 0~23', 'Hour must be 0–23.')); return; }
     var p = bd.split('-').map(Number);
-    currentBz = Bazi.bazi(p[0], p[1], p[2], h, sex);
+    currentBz = Bazi.bazi(p[0], p[1], p[2], h);
     Oracle.observe({ type: 'bazi', fingerprint: Bazi.fingerprint(currentBz) });
     var el = $('bazi-result');
     el.classList.remove('hidden');
     var L = currentLang;
-    var sexW = L === 'en' ? (sex === '男' ? 'Male' : 'Female') : sex;
-    var text = (name ? ('【' + name + ' · ' + sexW + '】\n') : '') + Bazi.interpret(currentBz, L);
+    var text = Bazi.interpret(currentBz, L);
     text += '\n\n' + (L === 'en'
       ? 'VII · Life Reading (Character · Destiny · Career · Wealth · Love & Relations)\n'
       : '【七 · 人生推论（性格 · 命运 · 事业 · 财运 · 感情人际）】\n') + Bazi.lifeReadingText(currentBz, L);
     text += '\n\n' + (L === 'en'
-      ? 'VIII · Fortune Cycles (ten years each, read one by one)\n'
-      : '【八 · 大运详批（十年一运，逐运解析）】\n') + Bazi.dayunDetailText(currentBz, L);
+      ? 'VIII · Fortune Cycles (ten years each, read one by one; direction follows the "yang forward, yin reverse" rule)\n'
+      : '【八 · 大运详批（十年一运，逐运解析；顺逆依「阳年顺、阴年逆」通例）】\n') + Bazi.dayunDetailText(currentBz, L);
     text += '\n\n' + (L === 'en' ? 'Chart Fingerprint\n' : '【命纹指纹 · 同八字匹配串】\n') + Bazi.fingerprint(currentBz) +
       (L === 'en'
         ? '\n(This four-pillar string is your chart fingerprint — for matching fellow travelers who share your chart.)'

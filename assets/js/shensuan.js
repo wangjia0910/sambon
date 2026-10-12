@@ -207,8 +207,9 @@
         : ('论事业，官杀' + (gi ? ('有 ' + gi + ' 现，宜就名位、担责任') : '不显，宜以才（食伤）或以财立身') + '。');
     }
     if (key === 'qing') {
-      var root = (bz.raw.sex === '男' && ((c['正财'] || 0) + (c['偏财'] || 0) > 0)) ||
-                 (bz.raw.sex === '女' && ((c['正官'] || 0) + (c['七杀'] || 0) > 0));
+      var caiN = (c['正财'] || 0) + (c['偏财'] || 0);
+      var guanN = (c['正官'] || 0) + (c['七杀'] || 0);
+      var root = bz.raw.sex === '男' ? caiN > 0 : (bz.raw.sex === '女' ? guanN > 0 : (caiN + guanN > 0));
       return en
         ? ('On love: the day branch (spouse palace) holds "' + ssEn(ss.dayZhi) + '" — ' + (root ? 'the bond has root; a match can be expected' : 'let it ripen slowly; you may meet them in a favorable cycle') + '.')
         : ('论情，日支（配偶宫）坐「' + ss.dayZhi + '」，' + (root ? '缘法有根，姻缘可期' : '缘法宜缓，宜在喜用大运中遇人') + '。');
