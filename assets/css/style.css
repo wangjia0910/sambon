@@ -1,100 +1,192 @@
 :root{
-  --bg:#fbf8f3; --card:#ffffff; --line:#e7ded2; --ink:#2c2a26; --mut:#7a7268;
-  --accent:#9a3b2e; --accent2:#8a6d3b; --good:#3b6d11; --warn:#993c1d;
+  --bg:#0c0a13;
+  --panel:rgba(30,24,44,0.72);
+  --panel-solid:#1c1628;
+  --ink:#ece3d2;
+  --mut:#a99e8c;
+  --gold:#c9a85a;
+  --gold-bright:#e6c878;
+  --cinnabar:#c23b2e;
+  --cinnabar-soft:#d9594a;
+  --line:rgba(201,168,90,0.30);
+  --line-soft:rgba(201,168,90,0.14);
+  --good:#8bbf6a;
+  --jade:#5fae9a;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);
-  font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;font-size:15px;line-height:1.75}
-a{color:var(--accent);text-decoration:none}
-.wrap{max-width:900px;margin:0 auto;padding:0 18px 80px}
-header{text-align:center;padding:40px 0 26px;border-bottom:1px solid var(--line);margin-bottom:30px}
-header .logo{font-size:40px;font-weight:600;letter-spacing:8px;color:var(--accent)}
-header .slogan{color:var(--mut);font-size:14px;letter-spacing:2px;margin-top:6px}
-section{margin-bottom:34px}
-h2{font-size:20px;font-weight:600;color:var(--accent);border-left:4px solid var(--accent2);
-  padding-left:10px;margin:0 0 14px}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 620px at 50% -12%, rgba(120,70,160,0.20), transparent 60%),
+    radial-gradient(900px 520px at 86% 8%, rgba(194,59,46,0.12), transparent 55%),
+    radial-gradient(900px 520px at 8% 22%, rgba(95,174,154,0.08), transparent 55%),
+    linear-gradient(180deg,#0c0a13 0%, #0e0b16 42%, #0a0811 100%);
+  background-attachment:fixed;
+  color:var(--ink);
+  font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;
+  font-size:15px;line-height:1.8;
+  min-height:100vh;
+}
+/* 星空层 */
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55;
+  background-image:
+    radial-gradient(1px 1px at 18% 28%, rgba(255,255,255,.6), transparent),
+    radial-gradient(1px 1px at 72% 62%, rgba(255,255,255,.4), transparent),
+    radial-gradient(1.6px 1.6px at 42% 82%, rgba(230,200,120,.5), transparent),
+    radial-gradient(1px 1px at 88% 22%, rgba(255,255,255,.35), transparent),
+    radial-gradient(1px 1px at 56% 14%, rgba(255,255,255,.3), transparent),
+    radial-gradient(1.4px 1.4px at 30% 55%, rgba(255,255,255,.3), transparent);
+  background-repeat:repeat;background-size:320px 320px}
+
+.wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 18px 80px}
+
+/* ---------- 头部 / 匾额 ---------- */
+.site-header{position:relative;z-index:2;text-align:center;padding:48px 0 16px}
+.plaque{display:inline-flex;align-items:center;gap:14px;
+  padding:14px 32px;border:2px solid var(--gold);border-radius:16px;
+  background:linear-gradient(180deg,rgba(40,30,58,.72),rgba(18,14,28,.72));
+  box-shadow:0 0 26px rgba(201,168,90,.28), inset 0 0 20px rgba(201,168,90,.12)}
+.plaque-title{font-family:"KaiTi","STKaiti","Kaiti SC","楷体",serif;
+  font-size:44px;font-weight:600;letter-spacing:16px;color:var(--gold-bright);
+  text-shadow:0 0 16px rgba(230,200,120,.5)}
+.emblem{font-size:32px;color:var(--gold);filter:drop-shadow(0 0 10px rgba(201,168,90,.6))}
+.slogan{color:var(--mut);font-size:14px;letter-spacing:3px;margin-top:14px}
+
+.topnav{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;
+  margin-top:22px;padding:10px 12px;border-top:1px solid var(--line-soft);
+  border-bottom:1px solid var(--line-soft);
+  position:sticky;top:0;z-index:10;
+  background:rgba(12,10,19,.82);backdrop-filter:blur(8px)}
+.topnav a{color:var(--gold);text-decoration:none;padding:6px 16px;font-size:14px;letter-spacing:2px;
+  border:1px solid transparent;border-radius:999px;transition:.25s}
+.topnav a:hover{background:rgba(201,168,90,.12);border-color:var(--line)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+
+/* ---------- 区块 / 殿额 ---------- */
+section{margin-bottom:42px;scroll-margin-top:84px}
+.hall-label{text-align:center;margin-bottom:10px}
+.hall-label span{display:inline-block;width:36px;height:36px;line-height:34px;
+  border:1px solid var(--gold);border-radius:50%;color:var(--gold-bright);
+  font-family:"KaiTi","STKaiti","楷体",serif;font-size:18px;
+  box-shadow:0 0 14px rgba(201,168,90,.22)}
+h2{font-family:"KaiTi","STKaiti","Kaiti SC","楷体",serif;
+  font-size:24px;font-weight:600;color:var(--gold-bright);text-align:center;
+  letter-spacing:5px;margin:0 0 18px;text-shadow:0 0 12px rgba(230,200,120,.22)}
 h3{font-size:16px;font-weight:600;color:var(--ink);margin:18px 0 6px}
 p{margin:8px 0;color:var(--ink)}
 .muted{color:var(--mut)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:18px}
-.kepu p{color:#3a3733}
-.kepu ul{margin:6px 0 6px 1.2em;padding:0}
-.kepu li{margin:4px 0}
-.row{display:flex;gap:12px;flex-wrap:wrap}
-.row>div{flex:1;min-width:150px}
-label{display:block;margin:10px 0 4px;color:var(--mut);font-size:13px}
-input,select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;
-  font-size:14px;background:#fff;color:var(--ink)}
-button{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 20px;
-  font-size:14px;cursor:pointer;margin:12px 8px 0 0}
-button.ghost{background:#fff;color:var(--accent);border:1px solid var(--accent)}
-button.sec{background:var(--accent2)}
-button.small{padding:7px 14px;font-size:13px;margin:6px 6px 0 0}
-pre{white-space:pre-wrap;font-family:"Menlo","Consolas",monospace;font-size:13.5px;
-  line-height:1.8;background:#faf6ef;border:1px solid var(--line);border-radius:10px;padding:14px 16px;color:#333}
-.gua-box{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.yaos{display:flex;flex-direction:column-reverse;gap:6px}
-.yao{width:54px;height:14px;border-radius:3px;background:var(--accent2)}
-.yao.yin{background:transparent;border:2px solid var(--accent2);height:10px}
-.yao.dong{outline:3px solid var(--accent);outline-offset:2px}
-.gua-meta{font-size:14px}
-.gua-meta b{color:var(--accent)}
-.pill{display:inline-block;background:#f1efe8;border:1px solid var(--line);border-radius:20px;
-  padding:3px 13px;margin:3px 5px 3px 0;font-size:13px}
-.shen-box{background:#faf6ef;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:10px}
-.shen-box .say{font-size:15px;line-height:1.9}
-.opts{margin-top:12px}
-.note{font-size:12.5px;color:var(--warn);background:#fbf0e9;border:1px solid #f0d8c8;
-  border-radius:10px;padding:12px 14px;margin-top:10px}
-.solution{margin-top:14px;background:#fff;border:1px solid var(--accent);border-radius:12px;
-  padding:14px 16px}
-.sol-title{font-weight:700;color:var(--accent);font-size:15px;margin-bottom:10px;
-  letter-spacing:.5px}
-.sol-item{display:flex;gap:10px;padding:8px 0;border-top:1px dashed #e8d9c2}
-.sol-item:first-of-type{border-top:none}
-.sol-item b{flex:0 0 92px;color:var(--ink);font-weight:600}
-.sol-item span{flex:1;line-height:1.85;color:#6b5a44}
-.footer{text-align:center;color:var(--mut);font-size:12px;margin-top:40px;
-  border-top:1px solid var(--line);padding-top:20px}
-.hidden{display:none}
-.fade{animation:fade .5s ease}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+a{color:var(--gold);text-decoration:none}
+a:hover{text-decoration:underline}
 
-/* 头部登录区 */
-header .bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
-header .logo{font-size:32px;font-weight:600;letter-spacing:8px;color:var(--accent)}
-.auth-area{display:flex;align-items:center;gap:10px}
-.welcome{color:var(--mut);font-size:13px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ---------- 卡片 ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:22px 24px;margin-bottom:18px;
+  box-shadow:0 10px 34px rgba(0,0,0,.4), inset 0 0 34px rgba(201,168,90,.04);
+  backdrop-filter:blur(4px);
+  position:relative}
+.card::before{content:"";display:block;height:2px;margin:-22px -24px 18px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.55}
 .kepu-teaser a{display:inline-block;margin-top:4px}
 
-/* 登录弹窗 */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;
-  justify-content:center;z-index:50;padding:16px}
+/* ---------- 表单 ---------- */
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>div{flex:1;min-width:150px}
+label{display:block;margin:10px 0 4px;color:var(--mut);font-size:13px;letter-spacing:1px}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+  font-size:14px;background:rgba(10,8,16,.6);color:var(--ink);outline:none;transition:.2s}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,90,.18)}
+
+/* ---------- 按钮 ---------- */
+button{font-family:inherit;border:none;border-radius:10px;padding:11px 22px;
+  font-size:14px;letter-spacing:2px;cursor:pointer;margin:12px 8px 0 0;transition:.22s}
+.btn-primary{background:linear-gradient(180deg,var(--cinnabar-soft),var(--cinnabar));color:#fff;
+  box-shadow:0 6px 18px rgba(194,59,46,.35)}
+.btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn-secondary{background:linear-gradient(180deg,var(--gold-bright),var(--gold));color:#2a1d10;
+  box-shadow:0 6px 18px rgba(201,168,90,.3)}
+.btn-secondary:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--gold);border:1px solid var(--gold)}
+.btn-ghost:hover{background:rgba(201,168,90,.12)}
+.btn-sm{padding:6px 14px;font-size:13px;margin:0}
+
+/* ---------- 卦象 ---------- */
+pre{white-space:pre-wrap;font-family:"Menlo","Consolas",monospace;font-size:13.5px;
+  line-height:1.85;background:rgba(8,6,12,.6);border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;color:#d9d0bd}
+.gua-box{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.yaos{display:flex;flex-direction:column-reverse;gap:8px}
+.yao{width:60px;height:15px;border-radius:3px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-bright));
+  box-shadow:0 0 10px rgba(201,168,90,.4)}
+.yao.yin{background:transparent;border:2px solid var(--gold);height:11px}
+.yao.dong{outline:3px solid var(--cinnabar);outline-offset:3px}
+.gua-meta{font-size:14px;line-height:1.9}
+.gua-meta b{color:var(--gold-bright)}
+.pill{display:inline-block;background:rgba(201,168,90,.12);border:1px solid var(--line);
+  border-radius:20px;padding:3px 13px;margin:3px 5px 3px 0;font-size:13px;color:var(--ink)}
+
+/* ---------- 神算子对话区 ---------- */
+.shen-box{background:rgba(20,16,30,.7);border:1px solid var(--line);border-radius:14px;
+  padding:18px 20px;margin-top:12px;box-shadow:inset 0 0 26px rgba(95,174,154,.05)}
+.shen-box .say{font-size:15px;line-height:1.95;color:var(--ink)}
+.opts{margin-top:12px}
+.opts button{margin:6px 6px 0 0}
+.note{font-size:12.5px;color:var(--cinnabar-soft);background:rgba(194,59,46,.1);
+  border:1px solid rgba(194,59,46,.3);border-radius:12px;padding:12px 14px;margin-top:12px}
+
+/* ---------- 五步推演 ---------- */
+.solution{margin-top:14px;background:rgba(20,16,30,.7);border:1px solid var(--gold);border-radius:14px;padding:16px 18px}
+.solution summary{cursor:pointer;font-weight:700;color:var(--gold-bright);font-size:15px;
+  letter-spacing:1px;outline:none;font-family:"KaiTi","STKaiti","楷体",serif}
+.solution summary::-webkit-details-marker{color:var(--gold)}
+.sol-item{display:flex;gap:12px;padding:9px 0;border-top:1px dashed var(--line-soft)}
+.sol-item:first-of-type{border-top:none}
+.sol-item b{flex:0 0 96px;color:var(--gold);font-weight:600}
+.sol-item span{flex:1;line-height:1.9;color:var(--ink)}
+
+/* ---------- 页脚 ---------- */
+.footer{text-align:center;color:var(--mut);font-size:12px;margin-top:46px;
+  border-top:1px solid var(--line-soft);padding-top:22px;letter-spacing:1px}
+
+/* ---------- 引言 ---------- */
+.hero{text-align:center;margin:22px 0 6px}
+.hero-incant{font-family:"KaiTi","STKaiti","楷体",serif;font-size:17px;letter-spacing:3px;
+  color:var(--gold);max-width:640px;margin:0 auto;line-height:2;opacity:.92;
+  text-shadow:0 0 14px rgba(201,168,90,.22)}
+
+/* ---------- 隐藏 / 动画 ---------- */
+.hidden{display:none}
+.fade{animation:fade .55s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- 登录区 ---------- */
+.auth-area{display:flex;align-items:center;gap:10px}
+.welcome{color:var(--mut);font-size:13px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---------- 弹窗 ---------- */
+.modal{position:fixed;inset:0;background:rgba(6,4,12,.72);display:flex;align-items:center;
+  justify-content:center;z-index:50;padding:16px;backdrop-filter:blur(3px)}
 .modal.hidden{display:none}
-.modal-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 26px;
-  max-width:380px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.22)}
-.modal-h{font-size:18px;font-weight:600;color:var(--accent);margin-bottom:6px}
-.lg-msg{font-size:13px;color:var(--warn);min-height:18px;margin:8px 0 0}
-.modal-btns{margin-top:14px}
+.modal-card{background:linear-gradient(180deg,#1c1628,#15101f);border:1px solid var(--gold);
+  border-radius:18px;padding:26px 28px;max-width:400px;width:100%;
+  box-shadow:0 18px 60px rgba(0,0,0,.55),0 0 30px rgba(201,168,90,.2)}
+.modal-h{font-family:"KaiTi","STKaiti","楷体",serif;font-size:20px;font-weight:600;
+  color:var(--gold-bright);margin-bottom:8px;letter-spacing:2px;text-align:center}
+.lg-msg{font-size:13px;color:var(--cinnabar-soft);min-height:18px;margin:8px 0 0}
+.modal-btns{margin-top:16px}
 .modal-btns button{margin:6px 6px 0 0}
 
-/* 大模型配置齿轮按钮 */
-.gear{background:#fff;color:var(--accent2);border:1px solid var(--accent2);
-  padding:7px 12px;font-size:13px;margin:0}
-.gear:hover{background:var(--accent2);color:#fff}
+/* ---------- 大模型齿轮按钮 ---------- */
+.gear{background:transparent;color:var(--gold);border:1px solid var(--gold);
+  padding:7px 13px;font-size:13px;letter-spacing:1px;margin:0;border-radius:999px}
+.gear:hover{background:rgba(201,168,90,.14)}
 
-/* 大模型解答区 */
+/* ---------- 大模型解答区 ---------- */
 .ai-note{font-size:12px;color:var(--mut);margin-top:8px}
-#aiText br{line-height:1.9}
+#aiText br{line-height:1.95}
 
-/* 传统五步推演折叠 */
-.solution{margin-top:14px;background:#fff;border:1px solid var(--accent2);border-radius:12px;
-  padding:14px 16px}
-.solution summary{cursor:pointer;font-weight:700;color:var(--accent2);font-size:15px;
-  letter-spacing:.5px;outline:none}
-.solution summary::-webkit-details-marker{color:var(--accent2)}
-.solution .sol-item{display:flex;gap:10px;padding:8px 0;border-top:1px dashed #e8d9c2}
-.solution[open] .sol-item{border-top:1px dashed #e8d9c2;margin-top:8px}
-.solution .sol-item:first-of-type{border-top:none}
-.solution .sol-item b{flex:0 0 92px;color:var(--ink);font-weight:600}
-.solution .sol-item span{flex:1;line-height:1.85;color:#6b5a44}
+/* ---------- 科普页微调 ---------- */
+.kepu p{color:var(--ink)}
+.kepu ul{margin:6px 0 6px 1.2em;padding:0}
+.kepu li{margin:4px 0;color:var(--ink)}

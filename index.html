@@ -8,29 +8,46 @@
 <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
-<div class="wrap">
+<div class="stars" aria-hidden="true"></div>
 
-  <header>
-    <div class="bar">
-      <div class="logo">三 宝 殿</div>
-      <div class="auth-area" id="authArea"></div>
-      <button class="gear" title="配置大模型" onclick="openAIConfig()">⚙ 大模型</button>
-    </div>
-    <div class="slogan">八字 · 六爻 · 神算子攀谈 — 观命盘、卜卦象、参心事</div>
-  </header>
+<header class="site-header">
+  <div class="plaque">
+    <span class="emblem" aria-hidden="true">☯</span>
+    <span class="plaque-title">三 宝 殿</span>
+  </div>
+  <p class="slogan">八字 · 六爻 · 神算子　—　观命盘　卜卦象　参心事</p>
+  <nav class="topnav">
+    <a href="#bazi-section">八字殿</a>
+    <a href="#liuyao-section">六爻殿</a>
+    <a href="#shen-section">神算子殿</a>
+    <a href="./kepu.html">基础科普</a>
+    <span class="nav-right">
+      <span id="authArea"></span>
+      <button class="gear" data-action="ai-config" title="配置大模型">⚙ 大模型</button>
+    </span>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <p class="hero-incant">天机隐于干支，卦象藏于爻变。客官既入三宝殿，且静心一念，听老朽为你参详。</p>
+  </section>
 
   <!-- ============ 基础科普入口 ============ -->
   <section id="kepu-teaser">
+    <div class="hall-label"><span>引</span></div>
     <h2>基础科普</h2>
     <div class="card kepu-teaser">
       <p>看不懂八字、六爻在算什么？我们单独开了一页，用大白话把<strong>天干地支、五行生克、十神、强弱喜用、大运流年、同八字人数</strong>，以及<strong>六爻起卦与白话解卦</strong>讲清楚。</p>
-      <a class="ghost" href="./kepu.html">→ 前往基础科普（详细通俗版）</a>
+      <a href="./kepu.html">→ 前往基础科普（详细通俗版）</a>
     </div>
   </section>
 
   <!-- ============ 八字推演 ============ -->
   <section id="bazi-section">
-    <h2>八字推演</h2>
+    <div class="hall-label"><span>壹</span></div>
+    <h2>八字殿 · 八字推演</h2>
     <div class="card">
       <div class="row">
         <div><label>姓名（选填）</label><input id="name" value="王佳佳"></div>
@@ -40,28 +57,30 @@
         <div><label>出生日期（公历）</label><input id="bdate" type="date" value="1990-05-20"></div>
         <div><label>出生小时（0~23）</label><input id="bhour" type="number" min="0" max="23" value="10"></div>
       </div>
-      <button onclick="doBazi()">排盘并看解读</button>
+      <button class="btn-primary" data-action="bazi">排盘并看解读</button>
     </div>
-    <pre id="bazi-result" class="hidden"></pre>
+    <pre id="bazi-result" class="hidden result-scroll"></pre>
   </section>
 
   <!-- ============ 六爻起卦 ============ -->
   <section id="liuyao-section">
-    <h2>六爻起卦</h2>
+    <div class="hall-label"><span>贰</span></div>
+    <h2>六爻殿 · 六爻起卦</h2>
     <div class="card">
       <p class="muted">心有所疑，静心一念，按下起卦。卦象随机生成，仅供参详；下方附"白话解卦"。</p>
-      <button class="sec" onclick="doGua()">虔诚起卦</button>
+      <button class="btn-secondary" data-action="gua">虔诚起卦</button>
       <div id="gua-result" class="hidden"></div>
     </div>
   </section>
 
   <!-- ============ 神算子攀谈 ============ -->
   <section id="shen-section">
-    <h2>神算子攀谈</h2>
+    <div class="hall-label"><span>叁</span></div>
+    <h2>神算子殿 · 神算子攀谈</h2>
     <div class="card">
       <p>神算子不急于断你何事。他先观你八字、再卜一卦，略陈观感（含<strong>白话解卦</strong>），便循循善诱，与你攀谈数语，终而点出<strong>你此来心中所悬之事</strong>。</p>
       <p class="muted">玩法：先完成上方「八字推演」与「六爻起卦」，再请神算子入局攀谈。<strong>神算子须登录后使用</strong>（免费演示账号，仅存本机浏览器）。若已配置大模型，神算子解惑将由大模型实时生成，更贴合你这一局。</p>
-      <button class="ghost" onclick="startShen()">请神算子参详</button>
+      <button class="btn-ghost" data-action="shen">请神算子参详</button>
       <div id="shen-box"></div>
     </div>
   </section>
@@ -71,7 +90,7 @@
     本站为静态站点，可部署于任意静态托管（含 Cloudflare Pages）。
   </div>
 
-</div>
+</main>
 
 <!-- ============ 大模型配置弹窗 ============ -->
 <div id="aiModal" class="modal hidden">
@@ -87,9 +106,9 @@
     <input id="aiModel" placeholder="如 gpt-4o-mini / deepseek-chat">
     <div id="aiMsg" class="lg-msg"></div>
     <div class="modal-btns">
-      <button onclick="saveAIConfig()">保存配置</button>
-      <button class="ghost" onclick="clearAIConfig()">清除</button>
-      <button class="ghost" onclick="closeAIConfig()">取消</button>
+      <button class="btn-primary" data-action="save-ai">保存配置</button>
+      <button class="btn-ghost" data-action="clear-ai">清除</button>
+      <button class="btn-ghost" data-action="close-ai">取消</button>
     </div>
   </div>
 </div>
@@ -103,9 +122,9 @@
     <label>密码</label><input id="lgPass" type="password" placeholder="至少 4 位">
     <div id="lgMsg" class="lg-msg"></div>
     <div class="modal-btns">
-      <button onclick="doLogin()">登录</button>
-      <button class="ghost" onclick="doRegister()">注册并登录</button>
-      <button class="ghost" onclick="closeLogin()">取消</button>
+      <button class="btn-primary" data-action="do-login">登录</button>
+      <button class="btn-ghost" data-action="do-register">注册并登录</button>
+      <button class="btn-ghost" data-action="close-login">取消</button>
     </div>
   </div>
 </div>

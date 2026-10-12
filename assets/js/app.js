@@ -1,4 +1,5 @@
-/* app.js — 三宝殿交互编排（依赖 Bazi / Liuyao / Auth / Shensuan 全局） */
+/* app.js — 三宝殿交互编排（依赖 Bazi / Liuyao / Auth / Shensuan / AI 全局）
+ * 事件统一走 data-action 委托，HTML 不再内联 onclick。 */
 (function () {
   'use strict';
   var currentBz = null, currentGua = null, shenState = {};
@@ -11,9 +12,9 @@
     if (Auth.isLogin()) {
       var m = Auth.me();
       a.innerHTML = '<span class="welcome">欢迎，' + m.name + '</span>' +
-        '<button class="ghost small" onclick="doLogout()">退出</button>';
+        '<button class="btn-ghost btn-sm" data-action="logout">退出</button>';
     } else {
-      a.innerHTML = '<button class="ghost small" onclick="openLogin()">登录 / 注册</button>';
+      a.innerHTML = '<button class="btn-ghost btn-sm" data-action="login">登录 / 注册</button>';
     }
   }
   function openLogin(note) {
@@ -126,9 +127,9 @@
     shenState = {};
     var opts = '';
     a.domains.forEach(function (d) {
-      opts += '<button class="small" onclick="shenPickDomain(\'' + d.key + '\')">' + d.label + '</button>';
+      opts += '<button class="btn-secondary btn-sm" data-action="pick-domain" data-key="' + d.key + '">' + d.label + '</button>';
     });
-    opts += '<button class="small ghost" onclick="shenFree()">都不是，我想直说</button>';
+    opts += '<button class="btn-ghost btn-sm" data-action="free">都不是，我想直说</button>';
     box.innerHTML =
       '<div class="shen-box fade">' +
         '<div class="say">' + a.opening + '</div>' +
@@ -142,7 +143,7 @@
     var subs = Shensuan.refine(key);
     var opts = '';
     subs.forEach(function (s) {
-      opts += '<button class="small" onclick="shenPickSub(\'' + s.key + '\')">' + s.label + '</button>';
+      opts += '<button class="btn-secondary btn-sm" data-action="pick-sub" data-key="' + s.key + '">' + s.label + '</button>';
     });
     $('shen-box').innerHTML +=
       '<div class="shen-box fade">' +
@@ -163,7 +164,7 @@
       '<div class="shen-box fade">' +
         '<div class="say">神算子微笑："客官但说无妨。"</div>' +
         '<div class="opts"><input id="freeText" placeholder="说来听听，你最牵挂的是何事？" style="max-width:340px">' +
-        '<button class="small" onclick="shenFreeSubmit()">禀上</button></div>' +
+        '<button class="btn-secondary btn-sm" data-action="free-submit">禀上</button></div>' +
       '</div>';
     $('shen-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
@@ -206,13 +207,13 @@
   function renderConclusion(c) {
     var aiOn = (typeof AI !== 'undefined') && AI.isConfigured();
     var aiBlock = aiOn
-      ? '<div class="shen-box fade" id="aiBox" style="border-color:var(--accent2)">' +
-          '<div class="say" style="font-weight:600;color:var(--accent2)">◈ 神算子大模型解惑（实时生成）</div>' +
+      ? '<div class="shen-box fade" id="aiBox" style="border-color:var(--gold)">' +
+          '<div class="say" style="font-weight:600;color:var(--gold-bright)">◈ 神算子大模型解惑（实时生成）</div>' +
           '<div class="say" id="aiText">神算子正在凝神参详，请稍候……（大模型推理中）</div>' +
           '<div class="ai-note" id="aiNote"></div>' +
         '</div>'
-      : '<div class="shen-box fade" style="border-color:var(--accent2)">' +
-          '<div class="say" style="font-weight:600;color:var(--accent2)">◈ 神算子大模型解惑（未启用）</div>' +
+      : '<div class="shen-box fade" style="border-color:var(--gold)">' +
+          '<div class="say" style="font-weight:600;color:var(--gold-bright)">◈ 神算子大模型解惑（未启用）</div>' +
           '<div class="say">尚未配置大模型。点击右上角「⚙ 大模型」填入你的 API 端点与密钥，神算子便能以大模型实时参详你这一局，给出更贴合现实的指引。</div>' +
         '</div>';
 
@@ -228,8 +229,8 @@
       : '';
 
     $('shen-box').innerHTML +=
-      '<div class="shen-box fade" style="border-color:var(--accent)">' +
-        '<div class="say" style="font-weight:600;color:var(--accent)">' + c.summary + '</div>' +
+      '<div class="shen-box fade" style="border-color:var(--cinnabar)">' +
+        '<div class="say" style="font-weight:600;color:var(--cinnabar-soft)">' + c.summary + '</div>' +
         '<div class="say" style="margin-top:10px">' + c.reading + '</div>' +
       '</div>' +
       aiBlock + solutionHtml;
@@ -237,25 +238,33 @@
     if (aiOn) aiResolve();
   }
 
-  // 暴露给内联 onclick
-  window.doBazi = doBazi;
-  window.doGua = doGua;
-  window.startShen = startShen;
-  window.shenPickDomain = shenPickDomain;
-  window.shenPickSub = shenPickSub;
-  window.shenFree = shenFree;
-  window.shenFreeSubmit = shenFreeSubmit;
-  window.openLogin = openLogin;
-  window.closeLogin = closeLogin;
-  window.doLogin = doLogin;
-  window.doRegister = doRegister;
-  window.doLogout = doLogout;
-  window.renderAuth = renderAuth;
-  window.openAIConfig = openAIConfig;
-  window.closeAIConfig = closeAIConfig;
-  window.saveAIConfig = saveAIConfig;
-  window.clearAIConfig = clearAIConfig;
+  // ---- 统一事件委托 ----
+  function dispatch(e) {
+    var t = e.target.closest('[data-action]');
+    if (!t) return;
+    var action = t.getAttribute('data-action');
+    var key = t.getAttribute('data-key') || '';
+    switch (action) {
+      case 'ai-config': openAIConfig(); break;
+      case 'bazi': doBazi(); break;
+      case 'gua': doGua(); break;
+      case 'shen': startShen(); break;
+      case 'pick-domain': shenPickDomain(key); break;
+      case 'pick-sub': shenPickSub(key); break;
+      case 'free': shenFree(); break;
+      case 'free-submit': shenFreeSubmit(); break;
+      case 'login': openLogin(); break;
+      case 'close-login': closeLogin(); break;
+      case 'do-login': doLogin(); break;
+      case 'do-register': doRegister(); break;
+      case 'logout': doLogout(); break;
+      case 'close-ai': closeAIConfig(); break;
+      case 'save-ai': saveAIConfig(); break;
+      case 'clear-ai': clearAIConfig(); break;
+    }
+  }
 
   // 初始化
+  document.addEventListener('click', dispatch);
   renderAuth();
 })();
