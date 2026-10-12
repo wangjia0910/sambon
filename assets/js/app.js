@@ -1,9 +1,38 @@
-/* app.js — 三宝殿交互编排（依赖 Bazi / Liuyao / Shensuan 全局） */
+/* app.js — 三宝殿交互编排（依赖 Bazi / Liuyao / Auth / Shensuan 全局） */
 (function () {
   'use strict';
   var currentBz = null, currentGua = null, shenState = {};
 
   function $(id) { return document.getElementById(id); }
+
+  // ---- 登录区渲染 ----
+  function renderAuth() {
+    var a = $('authArea'); if (!a) return;
+    if (Auth.isLogin()) {
+      var m = Auth.me();
+      a.innerHTML = '<span class="welcome">欢迎，' + m.name + '</span>' +
+        '<button class="ghost small" onclick="doLogout()">退出</button>';
+    } else {
+      a.innerHTML = '<button class="ghost small" onclick="openLogin()">登录 / 注册</button>';
+    }
+  }
+  function openLogin(note) {
+    $('lgMsg').textContent = note || '';
+    $('loginModal').classList.remove('hidden');
+    var n = $('lgName'); if (n) n.focus();
+  }
+  function closeLogin() { $('loginModal').classList.add('hidden'); }
+  function doLogin() {
+    var r = Auth.login($('lgName').value, $('lgPass').value);
+    $('lgMsg').textContent = r.msg;
+    if (r.ok) { closeLogin(); renderAuth(); }
+  }
+  function doRegister() {
+    var r = Auth.register($('lgName').value, $('lgPass').value);
+    $('lgMsg').textContent = r.msg;
+    if (r.ok) { closeLogin(); renderAuth(); }
+  }
+  function doLogout() { Auth.logout(); renderAuth(); }
 
   // ---- 八字 ----
   function doBazi() {
@@ -17,7 +46,17 @@
     currentBz = Bazi.bazi(p[0], p[1], p[2], h, sex);
     var el = $('bazi-result');
     el.classList.remove('hidden');
-    el.textContent = (name ? ('【' + name + ' · ' + sex + '】\n') : '') + Bazi.interpret(currentBz);
+    var text = (name ? ('【' + name + ' · ' + sex + '】\n') : '') + Bazi.interpret(currentBz);
+    // 八字指纹（同八字匹配串）+ 登录用户档案
+    text += '\n\n【命纹指纹 · 同八字匹配串】\n' + Bazi.fingerprint(currentBz) +
+      '\n（此四柱串即你的"八字指纹"。日后开启同八字社群，可凭此匹配同道中人；亦可用于关联同八字用户。）';
+    if (Auth.isLogin()) {
+      var m = Auth.me();
+      Auth.setProfile({ name: name || m.name, sex: sex, bdate: bd, bhour: h,
+        fingerprint: Bazi.fingerprint(currentBz), ts: Date.now() });
+      text += '\n\n已记入「' + m.name + '」的档案（登录用户专属）。';
+    }
+    el.textContent = text;
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
@@ -36,7 +75,8 @@
           '<div>卦名：<b>' + gua.name + '</b></div>' +
           '<div>上' + gua.upperName + '(' + gua.upperWX + ') 下' + gua.lowerName + '(' + gua.lowerWX + ')</div>' +
           '<div>' + (gua.dong >= 0 ? ('动爻第' + (gua.dong + 1) + '爻 → 变卦 ' + gua.bianName) : '静卦（无动爻）') + '</div>' +
-          '<div style="margin-top:8px;max-width:440px">卦辞："' + gua.desc + '"</div>' +
+          '<div style="margin-top:8px;max-width:520px">卦辞："' + gua.desc + '"</div>' +
+          '<div style="margin-top:8px;max-width:520px;color:var(--mut)">' + Liuyao.plain(gua) + '</div>' +
         '</div>' +
       '</div>';
   }
@@ -47,8 +87,9 @@
     $('gua-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  // ---- 神算子攀谈 ----
+  // ---- 神算子攀谈（须登录）----
   function startShen() {
+    if (!Auth.isLogin()) { openLogin('神算子攀谈需登录后使用，请先登录或注册（免费演示账号）。'); return; }
     var box = $('shen-box');
     if (!currentBz || !currentGua) {
       box.innerHTML = '<div class="note">请先完成「八字推演」与「六爻起卦」，神算子方能起局参详。</div>';
@@ -123,4 +164,13 @@
   window.shenPickSub = shenPickSub;
   window.shenFree = shenFree;
   window.shenFreeSubmit = shenFreeSubmit;
+  window.openLogin = openLogin;
+  window.closeLogin = closeLogin;
+  window.doLogin = doLogin;
+  window.doRegister = doRegister;
+  window.doLogout = doLogout;
+  window.renderAuth = renderAuth;
+
+  // 初始化
+  renderAuth();
 })();

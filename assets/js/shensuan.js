@@ -12,6 +12,14 @@
 
   var WX_ORGAN = { 木: '肝胆', 火: '心与小肠', 土: '脾胃', 金: '肺与大肠', 水: '肾与膀胱' };
 
+  // 白话解卦：优先调用 Liuyao.plain；Node 验证或缺模块时退化为内置简版
+  function guaPlain(gua) {
+    if (typeof Liuyao !== 'undefined' && Liuyao.plain) return Liuyao.plain(gua);
+    return '此卦「' + gua.name + '」' +
+      (gua.dong >= 0 ? ('，第 ' + (gua.dong + 1) + ' 爻发动，将变「' + gua.bianName + '」') : '，静卦无动爻') +
+      '。' + gua.desc;
+  }
+
   var DOMAIN_NAME = { cai: '财运', guan: '事业功名', qing: '姻缘情感', health: '身体安康', xue: '学业文书', ren: '人际子息' };
 
   var SUB_LABEL = {
@@ -60,6 +68,7 @@
     var opening = '老朽观客官八字：日主 ' + bz.dayGan + '（' + bz.dayMaster + '），强弱指数 ' + s.score +
       '/100，属 ' + strong + ' 之命；五行 ' + wxStr + '，' + missStr + '。喜用 ' + s.like.join('、') + '。' +
       '再观客官所起一卦，得「' + gua.name + '」，卦辞云："' + gua.desc + '"。' +
+      guaPlain(gua) +
       '此象叠而观之，客官眉间似有未决之心事——不妨道来，老朽为君参详。';
 
     var domains = domainScores(bz, gua).sort(function (a, b) { return b.score - a.score; }).slice(0, 5);
@@ -95,7 +104,7 @@
     var reading = '老朽细参：日主 ' + bz.dayGan + '（' + bz.dayMaster + '）' + strong +
       '，喜用 ' + s.like.join('、') + '。' +
       (organMissing.length ? ('命局 ' + organMissing.join('、') + ' 之气偏弱，宜加顾惜。') : '') +
-      '卦得「' + gua.name + '」——' + gua.desc + '。' + seg +
+      '卦得「' + gua.name + '」——' + gua.desc + '。' + guaPlain(gua) + seg +
       '客官所言"' + domainWord + '·' + subWord + '"，正与此象相印。' +
       '老朽进一言：命理者，天时之约也，运未至则守，运将至则动；' + s.like.join('、') +
       '为君之向，顺势而为可减蹉跎。此乃参详，吉凶在人，决断在君。';

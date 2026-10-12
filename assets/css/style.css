@@ -51,3 +51,21 @@ pre{white-space:pre-wrap;font-family:"Menlo","Consolas",monospace;font-size:13.5
 .hidden{display:none}
 .fade{animation:fade .5s ease}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* 头部登录区 */
+header .bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+header .logo{font-size:32px;font-weight:600;letter-spacing:8px;color:var(--accent)}
+.auth-area{display:flex;align-items:center;gap:10px}
+.welcome{color:var(--mut);font-size:13px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kepu-teaser a{display:inline-block;margin-top:4px}
+
+/* 登录弹窗 */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;
+  justify-content:center;z-index:50;padding:16px}
+.modal.hidden{display:none}
+.modal-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 26px;
+  max-width:380px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.22)}
+.modal-h{font-size:18px;font-weight:600;color:var(--accent);margin-bottom:6px}
+.lg-msg{font-size:13px;color:var(--warn);min-height:18px;margin:8px 0 0}
+.modal-btns{margin-top:14px}
+.modal-btns button{margin:6px 6px 0 0}

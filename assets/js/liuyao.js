@@ -69,8 +69,34 @@
     };
   }
 
+  // 八经卦白话意象（先天序值 0..7 = 坤艮坎巽震离兑乾）
+  var HEX_BAIHUA = {
+    坤: '大地，柔顺承载、厚德包容',
+    艮: '高山，静止止守、稳重有止',
+    坎: '流水，险陷流动、患难之中',
+    巽: '和风，顺入渐进、文书通达',
+    震: '春雷，震动奋起、行动有声',
+    离: '烈火，光明附丽、显耀文明',
+    兑: '泽水，喜悦口舌、交欢说辞',
+    乾: '苍天，刚健主动、尊贵首领'
+  };
+
+  // 白话解卦：把卦名、上下卦、卦辞翻成大白话
+  function plain(g) {
+    var s = '白话解卦：这卦叫「' + g.name + '」。上面是' + g.upperName + '（' + g.upperWX + '，' + HEX_BAIHUA[g.upperName] +
+      '），下面是' + g.lowerName + '（' + g.lowerWX + '，' + HEX_BAIHUA[g.lowerName] + '）。';
+    s += '卦辞大意："' + g.desc + '"。';
+    if (g.dong >= 0) {
+      s += ' 中间第 ' + (g.dong + 1) + ' 爻在"发动"（老阳或老阴），好比事情起了变化，会往「' + g.bianName +
+        '」那头转化——宜相机而动、顺势而转。';
+    } else {
+      s += ' 眼下没有动爻（静卦），事态暂稳，照着既有趋势走即可，不必妄动。';
+    }
+    return s;
+  }
+
   return {
     GUAS: GUAS, HEXWX: HEXWX, HEXNAME: HEXNAME,
-    cast: cast, nameOf: nameOf, descOf: descOf
+    cast: cast, nameOf: nameOf, descOf: descOf, plain: plain
   };
 });

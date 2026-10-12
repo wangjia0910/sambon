@@ -62,6 +62,22 @@
   }
   function shishenOfZhi(dayGan, zhi) { return shishen(dayGan, ZHI_BENQI[zhi]); }
 
+  // 十神生活化释义（用于详实解读，把"符号"翻成"人事"）
+  var SS_MEAN = {
+    '比肩': '同辈并肩、自力为主，朋友同侪之象',
+    '劫财': '同辈争财、慷慨好施，亦须防分夺',
+    '食神': '才华流露、口福子息，温和而能输出',
+    '伤官': '才思外露、叛逆创新，言辞锋利不羁',
+    '正财': '稳定进财、勤劳所得，男命亦主妻星',
+    '偏财': '流动之财、意外之得，男命亦主偏缘',
+    '正官': '规矩功名、职位声誉，女命亦主夫星',
+    '七杀': '威权压力、魄力挑战，女命亦主偏夫',
+    '正印': '荫护学业、文书贵人，母性之源',
+    '偏印': '冷门才学、偏业灵感，亦主孤僻'
+  };
+  // 五行 → 所主脏腑（仅作文化联想，非医学）
+  var ORGAN = { 木: '肝', 火: '心', 土: '脾胃', 金: '肺', 水: '肾' };
+
   // ---- 八字排盘 ----
   function bazi(y, m, d, h, sex) {
     var yg = yearGZ(y), mg = monthGZ(y, m), dg = dayGZ(y, m, d);
@@ -156,36 +172,96 @@
     return { forward: forward, days: days, startAge: startAge, startMonth: startMonth, steps: steps };
   }
 
-  // ---- 详实解读 ----
+  // ---- 详实解读（分章节）----
   function interpret(bz) {
     var lines = [];
     var s = bz.strength;
     var strong = s.score >= 60 ? '偏强' : (s.score <= 40 ? '偏弱' : '中和');
-    lines.push('【命盘总览】四柱：' + bz.yg.gan + bz.yg.zhi + ' ' + bz.mg.gan + bz.mg.zhi + ' ' +
-      bz.dg.gan + bz.dg.zhi + ' ' + bz.hg.gan + bz.zhis[3] + '。');
-    lines.push('日主为 ' + bz.dayGan + '（' + bz.dayMaster + '），强弱指数 ' + s.score + '/100，属' + strong + '之命。');
-    var wxOrder = ['木','火','土','金','水'];
-    var wxStr = wxOrder.map(function (w) { return w + bz.cnt[w]; }).join(' ');
-    lines.push('五行分布：' + wxStr + '。');
-    var missing = wxOrder.filter(function (w) { return bz.cnt[w] === 0; });
-    lines.push(missing.length ? ('五行缺：' + missing.join('、') + '。') : '五行俱全，无明显偏枯。');
-    lines.push('喜用五行：' + s.like.join('、') + '（趋吉补缺之向）。');
-    // 十神格局简述
+    var order = ['木', '火', '土', '金', '水'];
+
+    lines.push('【一 · 命盘总览】');
+    lines.push('四柱八字：' + bz.yg.gan + bz.yg.zhi + '（年）　' + bz.mg.gan + bz.mg.zhi + '（月）　' +
+      bz.dg.gan + bz.dg.zhi + '（日）　' + bz.hg.gan + bz.zhis[3] + '（时）。');
+    lines.push('日主即"我"：' + bz.dayGan + '（' + bz.dayMaster + '）。强弱指数 ' + s.score + '/100，属' + strong + '之命。');
+    lines.push('');
+
+    lines.push('【二 · 五行分布与偏枯】');
+    var wxStr = order.map(function (w) { return w + bz.cnt[w]; }).join('　');
+    lines.push('五行（天干、地支同计其本气）：' + wxStr + '。');
+    var missing = order.filter(function (w) { return bz.cnt[w] === 0; });
+    if (missing.length) {
+      lines.push('五行缺：' + missing.join('、') + '。于身体联想，所主' +
+        missing.map(function (w) { return ORGAN[w]; }).join('、') + '之气偏弱，宜加顾惜（仅为文化联想，非医学论断）。');
+    } else {
+      lines.push('五行俱全，无明显偏枯。');
+    }
+    lines.push('平衡度 ' + s.balance + '/100' +
+      (s.balance >= 70 ? '，五行尚匀。' : (s.balance >= 45 ? '，略有偏倾。' : '，偏枯明显，宜留心调和。')));
+    lines.push('');
+
+    lines.push('【三 · 喜用神与趋避】');
+    lines.push('喜用五行：' + s.like.join('、') + '。');
+    lines.push('偏弱之命，宜"生扶"——补足同类（比劫）与"生我"者（印）；偏强之命，宜"克泄耗"——以官杀约之、食伤泄之、财星耗之。');
+    lines.push('此乃古人"扶抑"之法的通俗表达：命局哪边缺，便往哪边补。');
+    lines.push('');
+
+    lines.push('【四 · 十神格局详析】');
     var ss = bz.shishen;
+    var pillars = [
+      ['年柱（祖上、幼年）', ss.yearGan, ss.yearZhi],
+      ['月柱（父母、事业根基）', ss.monthGan, ss.monthZhi],
+      ['日支（配偶、内心）', ss.dayZhi],
+      ['时柱（子女、晚年）', ss.hourGan, ss.hourZhi]
+    ];
+    pillars.forEach(function (o) {
+      var parts = [];
+      for (var i = 1; i < o.length; i++) { if (o[i] && o[i] !== '?') parts.push(o[i] + '（' + SS_MEAN[o[i]] + '）'); }
+      lines.push(o[0] + '：' + (parts.length ? parts.join('；') + '。' : '无显象。'));
+    });
     var allSS = [ss.yearGan, ss.yearZhi, ss.monthGan, ss.monthZhi, ss.dayZhi, ss.hourGan, ss.hourZhi];
-    var countSS = {};
-    allSS.forEach(function (x) { countSS[x] = (countSS[x] || 0) + 1; });
-    var top = Object.keys(countSS).sort(function (a, b) { return countSS[b] - countSS[a]; }).slice(0, 3);
-    lines.push('十神格局：以日主为轴，见 ' + top.join('、') + ' 较显，主其事象。');
-    // 大运
+    var cntSS = {};
+    allSS.forEach(function (x) { if (x && x !== '?') cntSS[x] = (cntSS[x] || 0) + 1; });
+    var top = Object.keys(cntSS).sort(function (a, b) { return cntSS[b] - cntSS[a]; }).slice(0, 3);
+    lines.push('综合来看，' + top.join('、') + ' 三象较显，主导命局气象与人生侧重。');
+    lines.push('');
+
+    lines.push('【五 · 大运走势】');
     var du = bz.dayun;
-    lines.push('大运：' + (du.forward ? '顺排' : '逆排') + '，约 ' + du.startAge + '岁' + du.startMonth + '个月起运；首运 ' +
-      du.steps[0].gan + du.steps[0].zhi + '（' + du.steps[0].age + '）。');
+    lines.push('大运' + (du.forward ? '顺排（阳年男 / 阴年女）' : '逆排（阴年男 / 阳年女）') +
+      '，约 ' + du.startAge + ' 岁 ' + du.startMonth + ' 个月起运。');
+    lines.push('前十步大运：' + du.steps.slice(0, 5).map(function (st) { return st.gan + st.zhi + '(' + st.age + ')'; }).join('，') + ' …');
+    lines.push('大运如季节轮转，十年一换；叠加逐年"流年"，方知某段顺逆、某年当动当守。');
+    lines.push('');
+
+    lines.push('【六 · 同八字之众】');
+    var sb = sameBazi();
+    lines.push('八字合法组合共 ' + sb.total.toLocaleString() + ' 局（60×12×60×12）。以当世人口计，与君同此八字者，全球约 ' +
+      sb.world.toLocaleString() + ' 人、中华大地约 ' + sb.china.toLocaleString() + ' 人。');
+    lines.push('同八字而命运各异，足见八字仅为天地一时之"编码"，绝非人生定数——运在人为。');
     return lines.join('\n');
+  }
+
+  // ---- 同八字人数估算 ----
+  // 合法八字组合：年60 × 月12（受年干约束） × 日60 × 时12（受日干约束）= 518400
+  function sameBazi() {
+    var TOTAL = 518400;
+    var WORLD = 8100000000, CHINA = 1410000000; // 约数，仅作量级示意
+    return {
+      total: TOTAL,
+      world: Math.round(WORLD / TOTAL),
+      china: Math.round(CHINA / TOTAL)
+    };
+  }
+
+  // ---- 八字指纹（四柱串，用于后期同八字社群匹配）----
+  function fingerprint(bz) {
+    return bz.yg.gan + bz.yg.zhi + '·' + bz.mg.gan + bz.mg.zhi + '·' +
+      bz.dg.gan + bz.dg.zhi + '·' + bz.hg.gan + bz.zhis[3];
   }
 
   return {
     GAN: GAN, ZHI: ZHI, WX: WX, GAN_YIN: GAN_YIN, CYC: CYC,
-    sheng: sheng, ke: ke, shishen: shishen, bazi: bazi, dayun: dayun, interpret: interpret
+    sheng: sheng, ke: ke, shishen: shishen, bazi: bazi, dayun: dayun,
+    interpret: interpret, sameBazi: sameBazi, fingerprint: fingerprint
   };
 });

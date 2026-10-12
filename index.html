@@ -11,45 +11,19 @@
 <div class="wrap">
 
   <header>
-    <div class="logo">三 宝 殿</div>
+    <div class="bar">
+      <div class="logo">三 宝 殿</div>
+      <div class="auth-area" id="authArea"></div>
+    </div>
     <div class="slogan">八字 · 六爻 · 神算子攀谈 — 观命盘、卜卦象、参心事</div>
   </header>
 
-  <!-- ============ 基础科普 ============ -->
-  <section id="kepu" class="kepu">
+  <!-- ============ 基础科普入口 ============ -->
+  <section id="kepu-teaser">
     <h2>基础科普</h2>
-
-    <div class="card">
-      <h3>一、八字是什么</h3>
-      <p>八字，又称"四柱"，是把一个人的<strong>出生年、月、日、时</strong>各配一个天干一个地支，共八个字。年柱、月柱、日柱、时柱，如同人生的时间坐标。</p>
-      <ul>
-        <li><strong>天干（10 个）</strong>：甲 乙 丙 丁 戊 己 庚 辛 壬 癸。</li>
-        <li><strong>地支（12 个）</strong>：子 丑 寅 卯 辰 巳 午 未 申 酉 戌 亥。</li>
-        <li>天干地支两两相配，60 一循环，称"六十甲子"。公历生辰按历法换算即得四柱。</li>
-      </ul>
-      <h3>二、五行与十神</h3>
-      <p>每个干支都归属<strong>五行（木火土金水）</strong>与阴阳。五行相生：木→火→土→金→水→木；相克：木克土、土克水、水克火、火克金、金克木。</p>
-      <p>以日柱天干为"我"（日主），其余七字按生克关系换算为<strong>十神</strong>：比肩/劫财（同我）、食神/伤官（我生）、正财/偏财（我克）、正官/七杀（克我）、正印/偏印（生我）。十神象征人生各领域——财主钱财、官杀主事业功名、印主学业文书、食伤主才华子息。</p>
-      <h3>三、日主强弱、喜用与大运</h3>
-      <p>看八字首重<strong>日主强弱</strong>：生我、助我者多则强，克我、泄我者多则弱。偏弱喜"生扶"（喜用神），偏强喜"克泄耗"。</p>
-      <p><strong>大运</strong>以十年为一运，从月柱顺排（阳年男/阴年女）或逆排（阴年男/阳年女），约三日出生算一岁起运。大运叠加流年，用来推断不同人生阶段的顺逆。</p>
-      <p class="muted">注：本站的年/月柱按公历月近似换算，未严格校正节气边界，属简化推演。</p>
-    </div>
-
-    <div class="card">
-      <h3>四、六爻（六十四卦）是什么</h3>
-      <p>六爻是《周易》占筮的一支，以三枚铜钱（或随机）摇出六爻，自下而上成一卦。每爻分阴阳（阳爻▇、阴爻▱），三爻成"经卦"（八卦：乾兑离震巽坎艮坤），上下两个经卦叠成"别卦"，共六十四卦。</p>
-      <ul>
-        <li><strong>起卦</strong>：六次随机得六爻，前三爻为下卦、后三爻为上卦。</li>
-        <li><strong>动爻与变卦</strong>：偶有动爻（老阳老阴），阴阳反转后另得一"变卦"，主事之转机。</li>
-        <li><strong>卦辞</strong>：每卦有其意象与断语（如"水火既济"事成而防反复、"地天泰"天地交泰）。</li>
-      </ul>
-      <p>六爻常用于"问一事之吉凶"，与八字"看一生格局"互补。</p>
-    </div>
-
-    <div class="note">
-      郑重声明：本站所有内容均属<strong>中国传统民俗文化与哲学的范畴</strong>，是古人用"阴阳五行、干支、八卦"这一套宇宙观去推演人生的民间实践。
-      它<strong>无任何科学依据</strong>，不可用于健康、财务、人生等重大决策。请当作文化了解与休闲娱乐，理性看待。
+    <div class="card kepu-teaser">
+      <p>看不懂八字、六爻在算什么？我们单独开了一页，用大白话把<strong>天干地支、五行生克、十神、强弱喜用、大运流年、同八字人数</strong>，以及<strong>六爻起卦与白话解卦</strong>讲清楚。</p>
+      <a class="ghost" href="./kepu.html">→ 前往基础科普（详细通俗版）</a>
     </div>
   </section>
 
@@ -74,7 +48,7 @@
   <section id="liuyao-section">
     <h2>六爻起卦</h2>
     <div class="card">
-      <p class="muted">心有所疑，静心一念，按下起卦。卦象随机生成，仅供参详。</p>
+      <p class="muted">心有所疑，静心一念，按下起卦。卦象随机生成，仅供参详；下方附"白话解卦"。</p>
       <button class="sec" onclick="doGua()">虔诚起卦</button>
       <div id="gua-result" class="hidden"></div>
     </div>
@@ -84,8 +58,8 @@
   <section id="shen-section">
     <h2>神算子攀谈</h2>
     <div class="card">
-      <p>神算子不急于断你何事。他先观你八字、再卜一卦，略陈观感，便循循善诱，与你攀谈数语，终而点出<strong>你此来心中所悬之事</strong>。</p>
-      <p class="muted">玩法：先完成上方「八字推演」与「六爻起卦」，再请神算子入局攀谈。</p>
+      <p>神算子不急于断你何事。他先观你八字、再卜一卦，略陈观感（含<strong>白话解卦</strong>），便循循善诱，与你攀谈数语，终而点出<strong>你此来心中所悬之事</strong>。</p>
+      <p class="muted">玩法：先完成上方「八字推演」与「六爻起卦」，再请神算子入局攀谈。<strong>神算子须登录后使用</strong>（免费演示账号，仅存本机浏览器）。</p>
       <button class="ghost" onclick="startShen()">请神算子参详</button>
       <div id="shen-box"></div>
     </div>
@@ -98,8 +72,25 @@
 
 </div>
 
+<!-- ============ 登录弹窗 ============ -->
+<div id="loginModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-h">三宝殿 · 入门</div>
+    <p class="muted">神算子攀谈需登录后使用。此为本机<strong>演示账号</strong>，仅存于你的浏览器，<strong>非真实安全机制</strong>（生产请改用 Cloudflare Access / Workers）。</p>
+    <label>用户名</label><input id="lgName" placeholder="起个名号">
+    <label>密码</label><input id="lgPass" type="password" placeholder="至少 4 位">
+    <div id="lgMsg" class="lg-msg"></div>
+    <div class="modal-btns">
+      <button onclick="doLogin()">登录</button>
+      <button class="ghost" onclick="doRegister()">注册并登录</button>
+      <button class="ghost" onclick="closeLogin()">取消</button>
+    </div>
+  </div>
+</div>
+
 <script src="./assets/js/bazi.js"></script>
 <script src="./assets/js/liuyao.js"></script>
+<script src="./assets/js/auth.js"></script>
 <script src="./assets/js/shensuan.js"></script>
 <script src="./assets/js/app.js"></script>
 </body>
