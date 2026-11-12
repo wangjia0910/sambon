@@ -149,7 +149,7 @@ async function main() {
 
   // ---- C-11 交付文件齐备 ----
   const required = ['README.md', 'CONTRACT.md', 'COMPLIANCE.md', 'docs/07-上线检查清单.md',
-    'docs/08-上线部署指导.md', 'docs/09-Cloudflare部署指导.md', 'package.json',
+    'docs/08-上线部署指导.md', 'docs/09-Cloudflare部署指导.md', 'docs/10-算法与区块链备案申报指导.md', 'package.json',
     'src/server.mjs', 'web/index.html', 'tools/site-selfcheck.mjs',
     'tests/smoke.mjs', 'tests/verify-local.mjs', 'tests/verify-site-selfcheck.mjs'];
   const missing = required.filter((f) => !existsSync(resolve(ROOT, f)));
@@ -175,7 +175,7 @@ async function main() {
   console.log(`L0 在线演示预览：${fail === 0 ? '通过（可发布/更新演示链接）' : `不通过（${fail} 项 FAIL）`}  PASS ${pass} / ${results.length}`);
   console.log(`L1 灰度 / L2 正式上线：${l1Go ? '需人工复核证据后判定' : 'No-Go'}  docs/07 已勾选 ${checked}/${total} 项；V1–V8 未完成，G6 不通过`);
   if (fail) console.log('失败项：' + results.filter((r) => !r.ok).map((r) => r.name).join(' | '));
-  console.log('提示：L0 通过 ≠ L1/L2 通过；结论以法务书面意见与备案回执为准（docs/08 §1）。');
+  console.log('提示：L0 通过 ≠ L1/L2 通过；结论以法务书面意见、V2-a 前置与 V2-b 备案编号为准（docs/08 §1、docs/10、契约 §11 D-11）。');
   process.exit(fail === 0 ? 0 : 1);
 }
 

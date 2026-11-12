@@ -1,8 +1,10 @@
-# 《三宝殿》Cloudflare Web 版部署指导 v1.1
+# 《三宝殿》Cloudflare Web 版部署指导 v1.2
 
 > 用户指令（2026-11-12）：**「只做 Web 版，在 Cloudflare 上线」**  
 > 基线：`CONTRACT.md` §11 D-10（产品形态收敛）、`docs/08-上线部署指导.md`、`docs/07-上线检查清单.md`  
 > **本文件是部署指导，不是上线许可。** V1–V8 仍为「未上线、不触发」。
+
+
 
 ---
 
@@ -101,12 +103,12 @@ Token 获取：Cloudflare Dashboard → My Profile → API Tokens → 「Create 
 
 ### 3.1 部署状态核验（Git 集成已连接后）
 
-| 看哪里                                    | 成功标志                                                           | 失败信号                                                                         |
-| -------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Workers & Pages → 项目 → **Deployments** | 最新一条 `Success`、分支 `main`、commit 与 `git rev-parse HEAD` 一致      | `Failed` / `Build failed` / 长时间卡在 `Building`                                 |
-| 构建日志                                   | 无 `npm ERR!`；若跑了构建，出现「共 8 个文件」                                 | `Missing script: "build"`、`ENOENT package.json`、`Output directory not found` |
+| 看哪里                                    | 成功标志                                                                                | 失败信号                                                                         |
+| -------------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Workers & Pages → 项目 → **Deployments** | 最新一条 `Success`、分支 `main`、commit 与 `git rev-parse HEAD` 一致                           | `Failed` / `Build failed` / 长时间卡在 `Building`                                 |
+| 构建日志                                   | 无 `npm ERR!`；若跑了构建，出现「共 8 个文件」                                                      | `Missing script: "build"`、`ENOENT package.json`、`Output directory not found` |
 | Deployment 详情 → Assets                 | 8 个文件：`index.html`、`cf-runtime.mjs`、`site-selfcheck.mjs`、`_headers`、`src/*.mjs` × 4 | 缺 `_headers` 或 `src/`，或出现旧命理页的 `assets/`、`kepu.html`                         |
-| 项目 → **Custom domains**                | `sambon.net` 状态 `Active`（证书已签发）                                | `Pending`，或提示域名已被其他项目占用                                                      |
+| 项目 → **Custom domains**                | `sambon.net` 状态 `Active`（证书已签发）                                                     | `Pending`，或提示域名已被其他项目占用                                                      |
 
 **四类常见失败与处置**
 
@@ -124,11 +126,11 @@ Token 获取：Cloudflare Dashboard → My Profile → API Tokens → 「Create 
 
 > **本机硬阻塞（2026-11-12 实测）**：无 `CLOUDFLARE_API_TOKEN` / Account ID，可用连接器里也没有 Cloudflare；公司网络对 `api.cloudflare.com`、`*.pages.dev`、`sambon.net` 的直连与代理均返回 `000`（`github.com` 与 `git ls-remote` 正常）。因此 Cloudflare **账号内的点击、证书签发只能由你在控制台完成**；代码侧已全部就绪并推送，无需再改。
 
-| 步骤 | 位置 | 操作 | 完成标志 |
-| --- | --- | --- | --- |
-| **1 确认部署** | Workers & Pages → 项目 → **Deployments** | 看最新一条；若 `Failed`，按 §3.1 四类失败处置 | `Success`、分支 `main`、commit 与最新一次 push 一致 |
-| **2 绑定域名** | 项目 → **Custom domains** → Add | 添加 `sambon.net` 与 `www.sambon.net`；提示被占用则先到旧命理 Pages 项目解绑（详见 §4） | 状态 `Active`、证书已签发；Zone 开启 Always Use HTTPS |
-| **3 一键验收** | 打开 `https://sambon.net` → DevTools Console | 执行下方命令 | 输出 `PASS 10 / FAIL 0` |
+| 步骤         | 位置                                         | 操作                                                               | 完成标志                                       |
+| ---------- | ------------------------------------------ | ---------------------------------------------------------------- | ------------------------------------------ |
+| **1 确认部署** | Workers & Pages → 项目 → **Deployments**     | 看最新一条；若 `Failed`，按 §3.1 四类失败处置                                   | `Success`、分支 `main`、commit 与最新一次 push 一致   |
+| **2 绑定域名** | 项目 → **Custom domains** → Add              | 添加 `sambon.net` 与 `www.sambon.net`；提示被占用则先到旧命理 Pages 项目解绑（详见 §4） | 状态 `Active`、证书已签发；Zone 开启 Always Use HTTPS |
+| **3 一键验收** | 打开 `https://sambon.net` → DevTools Console | 执行下方命令                                                           | 输出 `PASS 10 / FAIL 0`                      |
 
 **一键验收命令**（也可先在 `<project>.pages.dev` 上跑）：
 
@@ -138,7 +140,7 @@ const r = await import('/site-selfcheck.mjs').then(m => m.run()); console.log(r)
 
 脚本随产物部署在 `cloudflare/site-selfcheck.mjs`，10 项覆盖：页面演示声明与运行时引导层、`/api/config` 权重版本与降级标记、8 个红线路径 404、端到端闭环到 `SETTLED`、结算 200/10/4/204、账本守恒、事件回放 ⊆ 契约 §4、成果 PII 脱敏、个性化开关服务端强制中性排序、重复 `event_id` 幂等。本地已用浏览器式运行时验证 `node tests/verify-site-selfcheck.mjs`（7/7，脚本本身 10/10）。把控制台输出或 `r.results` 发我即可判定成败，不用截图。
 
-**站点可达 ≠ 平台正式运营**：当前仍是 **L0 演示预览**（内存存储、刷新归零、虚构数据、无账号与资金）。要对外称「正式上线 / 开放注册」，须先完成 `docs/07` 九组清单（当前 **0/26**）与 **V1–V8**；其中 V2 的「算法推荐服务备案 + 区块链信息服务备案」属长周期外部流程，建议最先启动。G1–G7 闸门与回滚触发线见 `docs/08`。
+**站点可达 ≠ 平台正式运营**：当前仍是 **L0 演示预览**（内存存储、刷新归零、虚构数据、无账号与资金）。要对外称「正式上线 / 开放注册」，须先完成 `docs/07` 九组清单（当前 **0/29**）与 **V1–V8**。V2 的「算法推荐服务备案 + 区块链信息服务备案」按契约 §11 **D-11** 拆为 V2-a（上线前前置）/ V2-b（上线后 10 个工作日内提交），**最先启动的是前置准备，不是正式提交**；2026-11-09 起两类备案统一走 `https://beian.cac.gov.cn` 新系统，旧入口停用。**特别注意**：按新系统答疑，「区块链信息服务服务器部署在境外」「未按规定完成 ICP 备案」会直接影响备案申请，当前 Cloudflare Pages 形态两条均命中，因此本部署**只能作为 L0 演示预览，不能作为 L1/L2 正式运营载体**；详见 `docs/10` §0 / §1.3。G1–G7 闸门与回滚触发线见 `docs/08`。
 
 ---
 
@@ -151,13 +153,12 @@ const r = await import('/site-selfcheck.mjs').then(m => m.run()); console.log(r)
 
 > 若该域名此前绑定过旧命理项目，绑定前先确认旧 Pages 项目已解绑或删除，避免同名域冲突。
 
-
-
 ---
 
 ## 5. 部署后验收（**必须在浏览器里测，不能用 curl 测 `/api/*`**）
 
 静态版的 `/api/*` 请求被浏览器引导层拦截并在页面内计算，**不会到达 Cloudflare 边缘**；用 `curl https://<站点>/api/config` 得到 404 是预期行为，不代表故障。
+
 
 | #   | 检查                                                                                | 期望                                                                            |
 | --- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
