@@ -33,7 +33,7 @@
 - **阶段 C 新增断言覆盖范围**：事件名收敛与人工兜底（运行期事件类型 ⊆ 契约 §4 登记表）、未成年人 / 举报钩子占位、反向流水冲正、用户榜 `net_sbc` 计入口径、Merkle 载荷零 PII 扫描、成果正文 PII 脱敏、驳回任务下架、Top-K 分批参数。
 - **独立本地验证**：`node tests/verify-local.mjs` —— 主代理另行编写的 **32 项断言**（A–H 八组，不复用自检实现、基准取自 `CONTRACT.md` v0.2），覆盖白盒规则单测、端到端积分数值勾稽、并发抢单、个性化开关、争议人工兜底、合规红线、静态页、性能与重启重置；期望 `PASS 32 / FAIL 0`、退出码 0。完整报告见 `docs/06-本地测试验证报告.md`。
 - **上线准入自检**：`node tests/predeploy-check.mjs` —— 聚合上述两套测试与静态红线扫描（**12 项门禁**，含 Cloudflare 静态版一致性复跑），输出 **L0 在线演示预览**准入门禁与 **L1/L2** 判定（当前恒为 No-Go，除非 `docs/07` 九组清单真实勾选并附证据）；分层定义、部署手册与改造清单见 `docs/08-上线部署指导.md`。
-- **Cloudflare 静态 Web 版**：`node tools/build-cloudflare.mjs` 生成 `cloudflare/` 产物（Pages 直接上传或 Git 集成，输出目录 `cloudflare`）；`node tests/verify-cloudflare.mjs` 验证浏览器运行时与 Node 服务同序列口径一致（**14 项断言**）。静态版 `/api/*` 由页面内运行时计算，**不能用 curl 测 API**，详见 `docs/09` §5。
+- **Cloudflare 静态 Web 版**：`node tools/build-cloudflare.mjs` 生成 `cloudflare/` 产物（Pages 直接上传或 Git 集成，输出目录 `cloudflare`）；`node tests/verify-cloudflare.mjs` 验证浏览器运行时与 Node 服务同序列口径一致（**14 项断言**）。静态版 `/api/*` 由页面内运行时计算，**不能用 curl 测 API**；线上站点可在浏览器控制台执行 `await import('/site-selfcheck.mjs').then(m => m.run())` 一键跑 10 项验收（详见 `docs/09` §3.2 / §5）。
 - 自检通过后，任一 `task_id` 均可通过 `GET /api/events`（支持 `?task_id=`）完整回放「发布 → 推送批次与分数 → 接单 → 验收 → 积分流水 → 榜单变更」。
 
 ## 目录结构（按 CONTRACT §2 文件归属）
@@ -56,12 +56,14 @@
 - `tests/verify-local.mjs` — 主代理整合：独立本地验证脚本（**32 项断言**，自起停服务）
 - `tests/predeploy-check.mjs` — 主代理整合：上线准入自检（聚合两套测试与红线扫描）
 - `tests/verify-cloudflare.mjs` — 主代理整合：Cloudflare 静态版跨实现一致性验证（**14 项断言**）
+- `tests/verify-site-selfcheck.mjs` — 主代理整合：站点一键自检脚本的浏览器式运行时验证（**7 项断言**）
 - `src/hash.mjs` — 研发：零依赖 SHA-256（Node / 浏览器 / Workers 通用，Merkle 跨平台对账）
 - `tools/`（主代理整合）
   - `tools/build-cloudflare.mjs` — 生成 `cloudflare/` 纯静态产物
   - `tools/cf-runtime.mjs` — 浏览器运行时源文件（mock req/res，调用共用 `handle()`）
+  - `tools/site-selfcheck.mjs` — 站点一键自检（部署后浏览器控制台 `import('/site-selfcheck.mjs')` 即用，10 项）
 - `cloudflare/`（**构建产物，勿直接改**，`src/` 子目录须与根 `src/` 逐字节一致）
-  - `index.html`、`cf-runtime.mjs`、`_headers`、`src/domain|store|server|hash.mjs`
+  - `index.html`、`cf-runtime.mjs`、`site-selfcheck.mjs`、`_headers`、`src/domain|store|server|hash.mjs`（共 8 个文件）
 - `docs/`
   - `docs/01-产品需求与路线图.md` — 产品：PRD（v0.3，阶段 C 同步契约 v0.2 裁决）
   - `docs/02-技术架构与接口契约.md` — 研发

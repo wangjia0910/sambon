@@ -120,8 +120,8 @@ async function main() {
 
   // ── A. 产物构建与同源性 ──────────────────────────────────────────
   const build = spawnSync(process.execPath, ['tools/build-cloudflare.mjs'], { cwd: ROOT, encoding: 'utf8' });
-  const need = ['index.html', 'cf-runtime.mjs', '_headers', ...SRC_FILES.map((f) => `src/${f}`)];
-  check('CF-01 构建脚本成功且 7 个产物齐备', build.status === 0 && need.every((f) => existsSync(join(OUT, f))),
+  const need = ['index.html', 'cf-runtime.mjs', 'site-selfcheck.mjs', '_headers', ...SRC_FILES.map((f) => `src/${f}`)];
+  check('CF-01 构建脚本成功且 8 个产物齐备', build.status === 0 && need.every((f) => existsSync(join(OUT, f))),
     `exit=${build.status} 文件=${need.filter((f) => existsSync(join(OUT, f))).length}/${need.length}`);
 
   const same = SRC_FILES.every((f) => sha(join(ROOT, 'src', f)) === sha(join(OUT, 'src', f)));

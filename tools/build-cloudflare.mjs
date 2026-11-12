@@ -61,6 +61,10 @@ const HEADERS = `# Cloudflare Pages 响应头：确保 ESM 模块以正确 MIME 
   Content-Type: text/javascript; charset=utf-8
   X-Content-Type-Options: nosniff
 
+/site-selfcheck.mjs
+  Content-Type: text/javascript; charset=utf-8
+  X-Content-Type-Options: nosniff
+
 /index.html
   Cache-Control: no-store
   X-Content-Type-Options: nosniff
@@ -84,12 +88,14 @@ if (html.includes('__installSambonRuntime')) throw new Error('web/index.html 不
 writeFileSync(join(OUT, 'index.html'), html.replace('</head>', BOOTSTRAP + '</head>'), 'utf8');
 
 writeFileSync(join(OUT, 'cf-runtime.mjs'), readFileSync(join(ROOT, 'tools/cf-runtime.mjs')), 'utf8');
+// 站点一键自检：部署后在浏览器控制台 import('/site-selfcheck.mjs') 即可跑验收
+writeFileSync(join(OUT, 'site-selfcheck.mjs'), readFileSync(join(ROOT, 'tools/site-selfcheck.mjs')), 'utf8');
 for (const f of SRC_FILES) {
   writeFileSync(join(OUT, 'src', f), readFileSync(join(ROOT, 'src', f)), 'utf8');
 }
 writeFileSync(join(OUT, '_headers'), HEADERS, 'utf8');
 
-const files = ['index.html', 'cf-runtime.mjs', '_headers', ...SRC_FILES.map((f) => `src/${f}`)];
+const files = ['index.html', 'cf-runtime.mjs', 'site-selfcheck.mjs', '_headers', ...SRC_FILES.map((f) => `src/${f}`)];
 console.log('=== Cloudflare Pages 静态产物 ===');
 for (const f of files) {
   const p = join(OUT, f);

@@ -1,7 +1,7 @@
 # 《三宝殿》Cloudflare Web 版部署指导 v1.1
 
-> 用户指令（2026-11-12）：**「只做 Web 版，在 Cloudflare 上线」**
-> 基线：`CONTRACT.md` §11 D-10（产品形态收敛）、`docs/08-上线部署指导.md`、`docs/07-上线检查清单.md`
+> 用户指令（2026-11-12）：**「只做 Web 版，在 Cloudflare 上线」**  
+> 基线：`CONTRACT.md` §11 D-10（产品形态收敛）、`docs/08-上线部署指导.md`、`docs/07-上线检查清单.md`  
 > **本文件是部署指导，不是上线许可。** V1–V8 仍为「未上线、不触发」。
 
 ---
@@ -18,11 +18,11 @@
 
 ## 1. 为什么必须改成静态 Web 版
 
-| Cloudflare 能力 | 能否直接跑原项目 | 原因 |
-|---|---|---|
-| Pages 静态托管 | ❌ 原项目无根目录 `index.html`，且 `/api/*` 无后端 | 需要入口页 + API 承载 |
-| Pages Functions / Workers | ❌ | 原 `src/server.mjs` 用 `node:http` 起服务；Workers 不提供 `createServer` |
-| Cloudflare Containers | ✅ 但要容器与计费 | 超出「只做 Web 版」范围 |
+| Cloudflare 能力             | 能否直接跑原项目                              | 原因                                                              |
+| ------------------------- | ------------------------------------- | --------------------------------------------------------------- |
+| Pages 静态托管                | ❌ 原项目无根目录 `index.html`，且 `/api/*` 无后端 | 需要入口页 + API 承载                                                  |
+| Pages Functions / Workers | ❌                                     | 原 `src/server.mjs` 用 `node:http` 起服务；Workers 不提供 `createServer` |
+| Cloudflare Containers     | ✅ 但要容器与计费                             | 超出「只做 Web 版」范围                                                  |
 
 **改造方式**（已完成，见 `src/hash.mjs`、`src/server.mjs` 顶部平台适配、`tools/cf-runtime.mjs`）：
 
@@ -43,6 +43,7 @@
 cloudflare/                      ← Cloudflare Pages 的「输出目录 / 上传目录」
 ├── index.html                   ← web/index.html + 注入的浏览器运行时引导层
 ├── cf-runtime.mjs               ← 浏览器运行时（mock req/res，调用共用 handle）
+├── site-selfcheck.mjs           ← 站点一键自检（浏览器控制台 import 即用，见 §3.2）
 ├── _headers                     ← .mjs 的 JavaScript MIME + no-store 等响应头
 └── src/
     ├── domain.mjs               ← 规则 / 权重 / 状态机 / 脱敏（与 src/ 逐字节一致）
@@ -87,12 +88,12 @@ Token 获取：Cloudflare Dashboard → My Profile → API Tokens → 「Create 
 
 在 Cloudflare Dashboard → Create → Pages → **Connect to Git**，选择 `wangjia0910/sambon`：
 
-| 配置项 | 值 |
-|---|---|
-| Production branch | `main` |
-| Build command | **留空**（`cloudflare/` 产物已提交进仓库） |
-| Output directory | `cloudflare` |
-| Root directory | `/` |
+| 配置项               | 值                              |
+| ----------------- | ------------------------------ |
+| Production branch | `main`                         |
+| Build command     | **留空**（`cloudflare/` 产物已提交进仓库） |
+| Output directory  | `cloudflare`                   |
+| Root directory    | `/`                            |
 
 若不想把产物提交进仓库，可把 Build command 设为 `node tools/build-cloudflare.mjs`，Output directory 仍是 `cloudflare`；此时需把 `cloudflare/` 加入 `.gitignore`。**两种只能选一种**，否则会出现「构建前产物被清空、构建后又重新生成」的重复。
 
@@ -100,24 +101,44 @@ Token 获取：Cloudflare Dashboard → My Profile → API Tokens → 「Create 
 
 ### 3.1 部署状态核验（Git 集成已连接后）
 
-| 看哪里 | 成功标志 | 失败信号 |
-|---|---|---|
-| Workers & Pages → 项目 → **Deployments** | 最新一条 `Success`、分支 `main`、commit 与 `git rev-parse HEAD` 一致 | `Failed` / `Build failed` / 长时间卡在 `Building` |
-| 构建日志 | 无 `npm ERR!`；若跑了构建，出现「共 7 个文件」 | `Missing script: "build"`、`ENOENT package.json`、`Output directory not found` |
-| Deployment 详情 → Assets | 7 个文件：`index.html`、`cf-runtime.mjs`、`_headers`、`src/*.mjs` × 4 | 缺 `_headers` 或 `src/`，或出现旧命理页的 `assets/`、`kepu.html` |
-| 项目 → **Custom domains** | `sambon.net` 状态 `Active`（证书已签发） | `Pending`，或提示域名已被其他项目占用 |
+| 看哪里                                    | 成功标志                                                           | 失败信号                                                                         |
+| -------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Workers & Pages → 项目 → **Deployments** | 最新一条 `Success`、分支 `main`、commit 与 `git rev-parse HEAD` 一致      | `Failed` / `Build failed` / 长时间卡在 `Building`                                 |
+| 构建日志                                   | 无 `npm ERR!`；若跑了构建，出现「共 8 个文件」                                 | `Missing script: "build"`、`ENOENT package.json`、`Output directory not found` |
+| Deployment 详情 → Assets                 | 8 个文件：`index.html`、`cf-runtime.mjs`、`site-selfcheck.mjs`、`_headers`、`src/*.mjs` × 4 | 缺 `_headers` 或 `src/`，或出现旧命理页的 `assets/`、`kepu.html`                         |
+| 项目 → **Custom domains**                | `sambon.net` 状态 `Active`（证书已签发）                                | `Pending`，或提示域名已被其他项目占用                                                      |
 
 **四类常见失败与处置**
 
-| 症状 | 根因 | 修复 |
-|---|---|---|
-| 日志 `npm ERR! Missing script` / `ENOENT package.json` | 预填构建命令但当时没有 build 脚本 | 已由根 `package.json` 兜底；或把 Build command **清空** |
-| 构建成功但打开是 404 / 白屏，浏览器里 `/api/*` 报错 | Output directory 填成 `web/` 或留空 | 改成 `cloudflare`，保存后 Retry deployment |
-| 打开是旧命理页（八字六爻 / 神算子） | 绑错分支，或 `sambon.net` 仍指向旧 Pages 项目 | Production branch 改 `main`；到旧项目 Custom domains 解绑 `sambon.net` 后重新绑定 |
-| 控制台 ESM MIME 报错（`Failed to load module script`） | `_headers` 未随产物上传或不在产物根目录 | 确认 7 个文件齐全、`_headers` 位于上传目录根部 |
+| 症状                                                   | 根因                                | 修复                                                                   |
+| ---------------------------------------------------- | --------------------------------- | -------------------------------------------------------------------- |
+| 日志 `npm ERR! Missing script` / `ENOENT package.json` | 预填构建命令但当时没有 build 脚本              | 已由根 `package.json` 兜底；或把 Build command **清空**                        |
+| 构建成功但打开是 404 / 白屏，浏览器里 `/api/*` 报错                   | Output directory 填成 `web/` 或留空    | 改成 `cloudflare`，保存后 Retry deployment                                 |
+| 打开是旧命理页（八字六爻 / 神算子）                                  | 绑错分支，或 `sambon.net` 仍指向旧 Pages 项目 | Production branch 改 `main`；到旧项目 Custom domains 解绑 `sambon.net` 后重新绑定 |
+| 控制台 ESM MIME 报错（`Failed to load module script`）      | `_headers` 未随产物上传或不在产物根目录         | 确认 8 个文件齐全、`_headers` 位于上传目录根部                                       |
 
-> 每次 `git push origin main` 会自动触发一次新部署，**不需要在控制台手动 Retry**；若确需重试，先在 Build settings 核对 Production branch / Build command / Output directory / Root directory 四项再点 Retry。
+> 每次 `git push origin main` 会自动触发一次新部署，**不需要在控制台手动 Retry**；若确需重试，先在 Build settings 核对 Production branch / Build command / Output directory / Root directory 四项再点 Retry。  
 > 站点最终验收必须在浏览器里做（§5 B-1～B-8）。从公司网络用 `curl` 测 `*.pages.dev` / `sambon.net` 可能被 DNS 或代理拦截，**不能据此判定部署失败**。
+
+### 3.2 真实上线 · 用户侧三步（主代理无法代做）
+
+> **本机硬阻塞（2026-11-12 实测）**：无 `CLOUDFLARE_API_TOKEN` / Account ID，可用连接器里也没有 Cloudflare；公司网络对 `api.cloudflare.com`、`*.pages.dev`、`sambon.net` 的直连与代理均返回 `000`（`github.com` 与 `git ls-remote` 正常）。因此 Cloudflare **账号内的点击、证书签发只能由你在控制台完成**；代码侧已全部就绪并推送，无需再改。
+
+| 步骤 | 位置 | 操作 | 完成标志 |
+| --- | --- | --- | --- |
+| **1 确认部署** | Workers & Pages → 项目 → **Deployments** | 看最新一条；若 `Failed`，按 §3.1 四类失败处置 | `Success`、分支 `main`、commit 与最新一次 push 一致 |
+| **2 绑定域名** | 项目 → **Custom domains** → Add | 添加 `sambon.net` 与 `www.sambon.net`；提示被占用则先到旧命理 Pages 项目解绑（详见 §4） | 状态 `Active`、证书已签发；Zone 开启 Always Use HTTPS |
+| **3 一键验收** | 打开 `https://sambon.net` → DevTools Console | 执行下方命令 | 输出 `PASS 10 / FAIL 0` |
+
+**一键验收命令**（也可先在 `<project>.pages.dev` 上跑）：
+
+```js
+const r = await import('/site-selfcheck.mjs').then(m => m.run()); console.log(r);
+```
+
+脚本随产物部署在 `cloudflare/site-selfcheck.mjs`，10 项覆盖：页面演示声明与运行时引导层、`/api/config` 权重版本与降级标记、8 个红线路径 404、端到端闭环到 `SETTLED`、结算 200/10/4/204、账本守恒、事件回放 ⊆ 契约 §4、成果 PII 脱敏、个性化开关服务端强制中性排序、重复 `event_id` 幂等。本地已用浏览器式运行时验证 `node tests/verify-site-selfcheck.mjs`（7/7，脚本本身 10/10）。把控制台输出或 `r.results` 发我即可判定成败，不用截图。
+
+**站点可达 ≠ 平台正式运营**：当前仍是 **L0 演示预览**（内存存储、刷新归零、虚构数据、无账号与资金）。要对外称「正式上线 / 开放注册」，须先完成 `docs/07` 九组清单（当前 **0/26**）与 **V1–V8**；其中 V2 的「算法推荐服务备案 + 区块链信息服务备案」属长周期外部流程，建议最先启动。G1–G7 闸门与回滚触发线见 `docs/08`。
 
 ---
 
@@ -130,22 +151,24 @@ Token 获取：Cloudflare Dashboard → My Profile → API Tokens → 「Create 
 
 > 若该域名此前绑定过旧命理项目，绑定前先确认旧 Pages 项目已解绑或删除，避免同名域冲突。
 
+
+
 ---
 
 ## 5. 部署后验收（**必须在浏览器里测，不能用 curl 测 `/api/*`**）
 
 静态版的 `/api/*` 请求被浏览器引导层拦截并在页面内计算，**不会到达 Cloudflare 边缘**；用 `curl https://<站点>/api/config` 得到 404 是预期行为，不代表故障。
 
-| # | 检查 | 期望 |
-|---|---|---|
-| B-1 | 打开站点 | 显示「三宝殿 · 初版闭环操作台（演示）」，控制台无 ESM MIME 报错 |
-| B-2 | 页面初始化自动请求 `/api/config` | 配置面板显示 `weight_version=v1.0`、算法 `degraded=true`、个性化开关可见 |
-| B-3 | 发布 → 审核 → 推送 → 接单 → 提交 → 验收 | 到达 `SETTLED`；赏金 200 → 服务费 10 → 质量奖励 4 → 入账 204 |
-| B-4 | 账本与事件 | `balance_check.balanced=true`；按 `task_id` 回放 18 条事件、14 种类型，全部 ⊆ 契约 §4 |
-| B-5 | 成果正文填手机号 / 证件号 | 预览为 `[已脱敏]`，无 ≥6 位连续数字残留 |
-| B-6 | 浏览器控制台执行 `fetch('/api/sbc/transfer',{method:'POST',body:'{}'}).then(r=>r.status)` | `404`（红线接口不存在） |
-| B-7 | 关闭个性化推荐后再次推送 | 中性排序（`mode=neutral`、分数为 `null`），`/api/config` 可见 `personalized_enabled=false` |
-| B-8 | 刷新页面 | 数据回到初始状态（内存存储，符合演示口径） |
+| #   | 检查                                                                                | 期望                                                                            |
+| --- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| B-1 | 打开站点                                                                              | 显示「三宝殿 · 初版闭环操作台（演示）」，控制台无 ESM MIME 报错                                        |
+| B-2 | 页面初始化自动请求 `/api/config`                                                           | 配置面板显示 `weight_version=v1.0`、算法 `degraded=true`、个性化开关可见                       |
+| B-3 | 发布 → 审核 → 推送 → 接单 → 提交 → 验收                                                       | 到达 `SETTLED`；赏金 200 → 服务费 10 → 质量奖励 4 → 入账 204                                |
+| B-4 | 账本与事件                                                                             | `balance_check.balanced=true`；按 `task_id` 回放 18 条事件、14 种类型，全部 ⊆ 契约 §4         |
+| B-5 | 成果正文填手机号 / 证件号                                                                    | 预览为 `[已脱敏]`，无 ≥6 位连续数字残留                                                      |
+| B-6 | 浏览器控制台执行 `fetch('/api/sbc/transfer',{method:'POST',body:'{}'}).then(r=>r.status)` | `404`（红线接口不存在）                                                                |
+| B-7 | 关闭个性化推荐后再次推送                                                                      | 中性排序（`mode=neutral`、分数为 `null`），`/api/config` 可见 `personalized_enabled=false` |
+| B-8 | 刷新页面                                                                              | 数据回到初始状态（内存存储，符合演示口径）                                                         |
 
 本地等价验证（无需 Cloudflare）：`node tests/verify-cloudflare.mjs`，14 项断言覆盖 B-2～B-7。
 
@@ -189,14 +212,14 @@ node src/server.mjs                      # 本地 Node 版，http://127.0.0.1:87
 
 ## 9. 交付物索引
 
-| 用途 | 文件 |
-|---|---|
-| 本指导 | `docs/09-Cloudflare部署指导.md` |
-| 上线分层与 L1/L2 阻断 | `docs/08-上线部署指导.md` |
-| 上线检查清单 | `docs/07-上线检查清单.md` |
-| 产物构建脚本 | `tools/build-cloudflare.mjs` |
-| 浏览器运行时（源） | `tools/cf-runtime.mjs` |
-| 产物目录 | `cloudflare/` |
-| 静态版独立验证 | `tests/verify-cloudflare.mjs` |
-| 零依赖 SHA-256 | `src/hash.mjs` |
-| 产品形态裁决 | `CONTRACT.md` §11 D-10 |
+| 用途             | 文件                            |
+| -------------- | ----------------------------- |
+| 本指导            | `docs/09-Cloudflare部署指导.md`   |
+| 上线分层与 L1/L2 阻断 | `docs/08-上线部署指导.md`           |
+| 上线检查清单         | `docs/07-上线检查清单.md`           |
+| 产物构建脚本         | `tools/build-cloudflare.mjs`  |
+| 浏览器运行时（源）      | `tools/cf-runtime.mjs`        |
+| 产物目录           | `cloudflare/`                 |
+| 静态版独立验证        | `tests/verify-cloudflare.mjs` |
+| 零依赖 SHA-256    | `src/hash.mjs`                |
+| 产品形态裁决         | `CONTRACT.md` §11 D-10        |

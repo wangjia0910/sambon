@@ -47,7 +47,8 @@ async function main() {
   const mjs = [
     'src/domain.mjs', 'src/store.mjs', 'src/server.mjs', 'src/hash.mjs',
     'tests/smoke.mjs', 'tests/verify-local.mjs', 'tests/verify-cloudflare.mjs', 'tests/predeploy-check.mjs',
-    'tools/build-cloudflare.mjs', 'tools/cf-runtime.mjs', 'cloudflare/cf-runtime.mjs',
+    'tests/verify-site-selfcheck.mjs', 'tools/build-cloudflare.mjs', 'tools/cf-runtime.mjs',
+    'tools/site-selfcheck.mjs', 'cloudflare/cf-runtime.mjs', 'cloudflare/site-selfcheck.mjs',
   ];
   const badSyntax = mjs.filter((f) => !existsSync(resolve(ROOT, f)) || runNode('--check', [f]).code !== 0);
   check('C-01 全量 .mjs 语法检查（含 Cloudflare 产物与工具链）', badSyntax.length === 0,
@@ -148,16 +149,19 @@ async function main() {
 
   // ---- C-11 交付文件齐备 ----
   const required = ['README.md', 'CONTRACT.md', 'COMPLIANCE.md', 'docs/07-上线检查清单.md',
-    'docs/08-上线部署指导.md', 'src/server.mjs', 'web/index.html',
-    'tests/smoke.mjs', 'tests/verify-local.mjs'];
+    'docs/08-上线部署指导.md', 'docs/09-Cloudflare部署指导.md', 'package.json',
+    'src/server.mjs', 'web/index.html', 'tools/site-selfcheck.mjs',
+    'tests/smoke.mjs', 'tests/verify-local.mjs', 'tests/verify-site-selfcheck.mjs'];
   const missing = required.filter((f) => !existsSync(resolve(ROOT, f)));
   check('C-11 上线相关交付文件齐备', missing.length === 0, missing.length ? `缺少 ${missing.join(', ')}` : `${required.length} 个关键文件在位`);
 
   // ---- C-12 Cloudflare 静态 Web 版（会自动重建产物并做跨实现比对）----
   const cf = runNode(resolve(ROOT, 'tests/verify-cloudflare.mjs'));
-  check('C-12 Cloudflare 静态版跨实现一致性（14 项断言）',
-    cf.code === 0 && /PASS 14\s*\/\s*FAIL 0/.test(cf.out) && !/^FAIL\s/m.test(cf.out),
-    `exit=${cf.code} ${(cf.out.match(/PASS \d+ \/ FAIL \d+ \/ 共 \d+ 项/) || ['结果未解析'])[0]}`);
+  const ss = runNode(resolve(ROOT, 'tests/verify-site-selfcheck.mjs'));
+  check('C-12 Cloudflare 静态版一致性（14 项）+ 站点自检脚本（7 项）',
+    cf.code === 0 && /PASS 14\s*\/\s*FAIL 0/.test(cf.out) && !/^FAIL\s/m.test(cf.out) &&
+    ss.code === 0 && /PASS 7\s*\/\s*FAIL 0/.test(ss.out) && !/^FAIL\s/m.test(ss.out),
+    `cf=${cf.code} selfcheck=${ss.code} ${(ss.out.match(/PASS \d+ \/ FAIL \d+ \/ 共 \d+ 项/) || ['结果未解析'])[0]}`);
 
   // ---- L1 / L2 判定：只读 docs/07 真实勾选状态 ----
   const checklist = read('docs/07-上线检查清单.md');
