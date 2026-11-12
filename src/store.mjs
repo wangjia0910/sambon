@@ -7,7 +7,7 @@
  * 口径来源：CONTRACT.md §4/§5/§10 与方案 §4.1.4、§5.2。
  */
 
-import { createHash, randomUUID } from 'node:crypto';
+import { sha256Hex, uuid } from './hash.mjs';
 import {
   SUBJECTS,
   WEIGHT_VERSION,
@@ -32,7 +32,7 @@ import {
 const ECO_POOL_INIT = 500;          // 生态激励池初始注入（虚构）
 const LEDGER_VERSION = 'ledger-v0.1';
 
-const sha256 = (s) => createHash('sha256').update(String(s)).digest('hex');
+const sha256 = (s) => sha256Hex(String(s));
 
 /**
  * 事件 payload 脱敏（阶段 C 收敛：键白名单 + 自由文本统一剥离）。
@@ -313,7 +313,7 @@ export class MemoryStore {
   // -- 基础读写 -------------------------------------------------------------
 
   nextId(prefix) {
-    return `${prefix}-${randomUUID().slice(0, 8)}`;
+    return `${prefix}-${uuid().slice(0, 8)}`;
   }
 
   getUser(id) {

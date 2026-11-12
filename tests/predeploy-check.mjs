@@ -44,9 +44,14 @@ async function main() {
   console.log('=== 《三宝殿》上线准入自检（docs/08 §6）===\n');
 
   // ---- C-01 语法 ----
-  const mjs = ['src/domain.mjs', 'src/store.mjs', 'src/server.mjs', 'tests/smoke.mjs', 'tests/verify-local.mjs'];
-  const badSyntax = mjs.filter((f) => runNode('--check', [f]).code !== 0);
-  check('C-01 五个 .mjs 语法检查', badSyntax.length === 0, badSyntax.length ? `失败: ${badSyntax.join(', ')}` : '5/5 通过');
+  const mjs = [
+    'src/domain.mjs', 'src/store.mjs', 'src/server.mjs', 'src/hash.mjs',
+    'tests/smoke.mjs', 'tests/verify-local.mjs', 'tests/verify-cloudflare.mjs', 'tests/predeploy-check.mjs',
+    'tools/build-cloudflare.mjs', 'tools/cf-runtime.mjs', 'cloudflare/cf-runtime.mjs',
+  ];
+  const badSyntax = mjs.filter((f) => !existsSync(resolve(ROOT, f)) || runNode('--check', [f]).code !== 0);
+  check('C-01 全量 .mjs 语法检查（含 Cloudflare 产物与工具链）', badSyntax.length === 0,
+    badSyntax.length ? `失败: ${badSyntax.join(', ')}` : `${mjs.length}/${mjs.length} 通过`);
 
   // ---- C-02 / C-03 两套既有测试（不复用实现，直接复跑取真实结果）----
   const smoke = runNode(resolve(ROOT, 'tests/smoke.mjs'));
@@ -147,6 +152,12 @@ async function main() {
     'tests/smoke.mjs', 'tests/verify-local.mjs'];
   const missing = required.filter((f) => !existsSync(resolve(ROOT, f)));
   check('C-11 上线相关交付文件齐备', missing.length === 0, missing.length ? `缺少 ${missing.join(', ')}` : `${required.length} 个关键文件在位`);
+
+  // ---- C-12 Cloudflare 静态 Web 版（会自动重建产物并做跨实现比对）----
+  const cf = runNode(resolve(ROOT, 'tests/verify-cloudflare.mjs'));
+  check('C-12 Cloudflare 静态版跨实现一致性（14 项断言）',
+    cf.code === 0 && /PASS 14\s*\/\s*FAIL 0/.test(cf.out) && !/^FAIL\s/m.test(cf.out),
+    `exit=${cf.code} ${(cf.out.match(/PASS \d+ \/ FAIL \d+ \/ 共 \d+ 项/) || ['结果未解析'])[0]}`);
 
   // ---- L1 / L2 判定：只读 docs/07 真实勾选状态 ----
   const checklist = read('docs/07-上线检查清单.md');

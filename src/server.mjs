@@ -9,11 +9,20 @@
  *       结算、争议裁定、处罚保留人工兜底；模型不直判；关闭个性化由服务端强制生效。
  */
 
-import { createServer } from 'node:http';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { resolve } from 'node:path';
-import { randomUUID } from 'node:crypto';
+// 平台适配：Node 侧按需加载内置模块；浏览器 / Workers 侧只加载纯 JS 编排逻辑。
+// 这样同一个 server.mjs 可被本地 Node 服务与 Cloudflare Pages 静态版共同 import，
+// 业务 handler、状态机、积分规则、权重口径完全共用一份实现（不复制、不改写）。
+const IS_NODE = typeof process !== 'undefined' && Boolean(process.versions?.node);
+let createServer = null;
+let readFileSync = null;
+let fileURLToPath = null;
+let resolve = null;
+if (IS_NODE) {
+  ({ createServer } = await import('node:http'));
+  ({ readFileSync } = await import('node:fs'));
+  ({ fileURLToPath } = await import('node:url'));
+  ({ resolve } = await import('node:path'));
+}
 
 import {
   canTransition,
@@ -44,8 +53,8 @@ import {
 } from './domain.mjs';
 import { createStore } from './store.mjs';
 
-const PORT = Number(process.env.PORT || 8787);
-const INDEX_PATH = fileURLToPath(new URL('../web/index.html', import.meta.url));
+const PORT = Number((IS_NODE && process.env.PORT) || 8787);
+const INDEX_PATH = IS_NODE ? fileURLToPath(new URL('../web/index.html', import.meta.url)) : '';
 
 const store = createStore();
 
@@ -80,7 +89,7 @@ function withIdempotency(eventId, fn) {
 
 /** 生成记账用的 event_id（客户端未提供时自行生成，仍保证只追加一次） */
 function ledgerEventId(eventId) {
-  return eventId || `EVT-${randomUUID().slice(0, 12)}`;
+  return eventId || `EVT-${globalThis.crypto.randomUUID().slice(0, 12)}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -805,6 +814,7 @@ const ROUTES = [
 
 let indexHtmlCache = null;
 function getIndexHtml() {
+  if (!IS_NODE || !readFileSync) return null;
   if (indexHtmlCache === null) {
     try { indexHtmlCache = readFileSync(INDEX_PATH, 'utf8'); } catch { indexHtmlCache = null; }
   }
@@ -833,13 +843,13 @@ function reply(res, status, body) {
   const text = JSON.stringify(body);
   res.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
-    'Content-Length': Buffer.byteLength(text),
+    'Content-Length': new TextEncoder().encode(text).length,
     'Cache-Control': 'no-store',
   });
   res.end(text);
 }
 
-async function handle(req, res) {
+export async function handle(req, res) {
   let pathname = '/';
   let query = {};
   try {
@@ -854,7 +864,7 @@ async function handle(req, res) {
   if (req.method === 'GET' && (pathname === '/' || pathname === '/index.html')) {
     const html = getIndexHtml();
     if (html === null) return reply(res, 404, R.notFound('操作台页面不存在').body);
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': Buffer.byteLength(html) });
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': new TextEncoder().encode(html).length });
     return res.end(html);
   }
 
@@ -883,16 +893,16 @@ async function handle(req, res) {
 }
 
 export function createAppServer() {
+  if (!IS_NODE || !createServer) throw new Error('createAppServer 仅可在 Node.js 环境调用');
   return createServer((req, res) => { handle(req, res).catch(() => {}); });
 }
 
-const server = createAppServer();
+// 浏览器 / Workers 侧不创建 HTTP 服务器，仅复用 handle() 编排逻辑。
+export const server = IS_NODE ? createAppServer() : null;
 
-const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isMain) {
+const isMain = IS_NODE && process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain && server) {
   server.listen(PORT, () => {
     console.log(`[sambon-prototype] listening on http://127.0.0.1:${PORT}`);
   });
 }
-
-export { server };
