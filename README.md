@@ -7,7 +7,7 @@
 ## 本仓库是什么
 
 - 本仓库是 **《三宝殿》项目初版：可运行的最小闭环原型 + 评审文档**。目标只有一个——**跑通一条完整链路**（发布 → 推送 → 接单 → 验收 → 结算），证明架构口径可落地，而不是实现全部 P0 功能（CONTRACT §0）。
-- **产品形态（本轮起收敛为 Web 单端）**：用户 2026-11-12 指令「只做 Web 版，在 Cloudflare 上线」；`sambon.net` Web 站为唯一交付形态 —— **Cloudflare Pages 纯静态演示版 + 同源本地 Node 原型**（见 `docs/09-Cloudflare部署指导.md`）。方案 v1.0 的「微信小程序 + APP 先行、P3 智能硬件」作为历史基线保留、不再列入本轮交付范围，差异登记于 `CONTRACT.md` §11 **D-10**，方案文档不改写；服务地域按 §11 **D-12** 定为**海外（中国境外）**，Cloudflare 全球边缘部署，两项中国境内备案不作为上线闸门（见 `docs/11`）。
+- **产品形态（本轮起收敛为 Web 单端）**：用户 2026-11-12 指令「只做 Web 版，在 Cloudflare 上线」；`sambon.net` Web 站为唯一交付形态 —— **Cloudflare Pages 生产系统（Pages Functions + D1）＋ L0 静态演示版 ＋ 同源本地 Node 原型**（生产系统见 `docs/12-生产系统架构与部署.md`，静态版见 `docs/09-Cloudflare部署指导.md`）。方案 v1.0 的「微信小程序 + APP 先行、P3 智能硬件」作为历史基线保留、不再列入本轮交付范围，差异登记于 `CONTRACT.md` §11 **D-10**，方案文档不改写；服务地域按 §11 **D-12** 定为**海外（中国境外）**，Cloudflare 全球边缘部署，两项中国境内备案不作为上线闸门（见 `docs/11`）；生产系统落地与上线通道见 §11 **D-13**。
 - **定位覆盖声明**：本仓库定位已整体**覆盖原命理项目定位**，由命理类项目改为悬赏互助平台；**本仓库不再包含任何命理、占卜、测算及相关内容**。
 - **协作基线**：`CONTRACT.md` **v0.2（阶段 C 定稿）**（三智能体协作契约，唯一共同基线）与 `三宝殿项目方案_v1.0.md`（v1.0 评审方案，只读基线）。术语、状态机、事件名、权重数值、接口路径一律以 `CONTRACT.md` v0.2 为准；与方案冲突时以方案为准并登记差异，口径裁决以 §11 裁决表为最终依据。
 
@@ -34,6 +34,8 @@
 - **独立本地验证**：`node tests/verify-local.mjs` —— 主代理另行编写的 **32 项断言**（A–H 八组，不复用自检实现、基准取自 `CONTRACT.md` v0.2），覆盖白盒规则单测、端到端积分数值勾稽、并发抢单、个性化开关、争议人工兜底、合规红线、静态页、性能与重启重置；期望 `PASS 32 / FAIL 0`、退出码 0。完整报告见 `docs/06-本地测试验证报告.md`。
 - **上线准入自检**：`node tests/predeploy-check.mjs` —— 聚合上述两套测试与静态红线扫描（**12 项门禁**，含 Cloudflare 静态版一致性复跑），输出 **L0 在线演示预览**准入门禁与 **L1/L2** 判定（当前恒为 No-Go，除非 `docs/07` 九组清单真实勾选并附证据）；分层定义、部署手册与改造清单见 `docs/08-上线部署指导.md`。
 - **Cloudflare 静态 Web 版**：`node tools/build-cloudflare.mjs` 生成 `cloudflare/` 产物（Pages 直接上传或 Git 集成，输出目录 `cloudflare`）；`node tests/verify-cloudflare.mjs` 验证浏览器运行时与 Node 服务同序列口径一致（**14 项断言**）。静态版 `/api/*` 由页面内运行时计算，**不能用 curl 测 API**；线上站点可在浏览器控制台执行 `await import('/site-selfcheck.mjs').then(m => m.run())` 一键跑 10 项验收（详见 `docs/09` §3.2 / §5）。
+- **生产系统（D-13，本轮新增）**：`functions/api/[[path]].js` + `prod/lib/*` 为真实后端（会话 / CSRF / RBAC / D1 事务 / 幂等 / 账本哈希链 / GDPR），`prod/site/*` 为生产前端；`npm run build` 生成 `cloudflare/` 产物与 Functions 依赖副本，`npm run test:production` 跑 **75 项**独立回归（真实 SQL，见 `tests/verify-production.mjs`）。**上线 = `git push origin main` → Cloudflare Git 集成自动部署**；唯一一次性动作是在控制台绑定名为 `DB` 的 D1 数据库，未绑定时站点明确降级为演示模式并禁用写操作。完整部署、验收与边界见 `docs/12`。
+- **L0 / 生产两条通道并存**：`/` 重写到生产台 `prod.html`；`/index.html`、`/demo.html` 仍是浏览器内 mock 的 L0 演示台。二者互不干扰，既有回归（20/20、32/32、14/14、7/7、12/12）未破坏。
 - 自检通过后，任一 `task_id` 均可通过 `GET /api/events`（支持 `?task_id=`）完整回放「发布 → 推送批次与分数 → 接单 → 验收 → 积分流水 → 榜单变更」。
 
 ## 目录结构（按 CONTRACT §2 文件归属）
@@ -46,24 +48,33 @@
   - `三宝殿项目方案_v1.0.md` — 只读基线：v1.0 评审方案
   - `COMPLIANCE.md` — 法务：合规声明
   - `package.json` — 主代理整合：构建命令兜底（**零 dependencies**，`npm run build` 重建 `cloudflare/` 产物）
+  - `schema.sql` — 由 `prod/lib/schema.js` 导出的 D1 表结构（勿手改）
   - `.gitignore` — 主代理整合
-- `src/`（研发）
-  - `src/domain.mjs` — 状态机、积分规则、推送打分（领域逻辑）
+- `src/`（研发，L0 原型）
+  - `src/domain.mjs` — 状态机、积分规则、推送打分（**领域口径唯一真源**，生产系统复用）
   - `src/store.mjs` — 内存存储与事件流
   - `src/server.mjs` — HTTP 服务入口（CONTRACT §8）
-- `web/index.html` — 研发：静态操作台
+  - `src/hash.mjs` — 零依赖 SHA-256（Node / 浏览器 / Workers 通用）
+- `functions/`（**生产后端，D-13**；Cloudflare Git 集成自动编译）
+  - `functions/api/[[path]].js` — Pages Functions catch-all 入口
+  - `prod/lib/api.js` — 26 个端点的编排、账本、事件、人工闸门
+  - `prod/lib/{auth,db,response,schema}.js` — 认证 / D1 适配 / 响应 / 表结构真源
+  - `prod/lib/{domain,hash}.js` — 由根 `src/` 逐字节同步的**生成副本，勿手改**
+- `prod/site/`（**生产前端，D-13**）：`index.html` → `prod.html`、`app.js`、`styles.css`、`legal.html`；`prod/wrangler.toml` 为 Wrangler 模板
+- `web/index.html` — 研发：L0 静态操作台
 - `tests/smoke.mjs` — 研发：自检用例（**20 项断言**）
 - `tests/verify-local.mjs` — 主代理整合：独立本地验证脚本（**32 项断言**，自起停服务）
-- `tests/predeploy-check.mjs` — 主代理整合：上线准入自检（聚合两套测试与红线扫描）
+- `tests/predeploy-check.mjs` — 主代理整合：L0 上线准入自检（12 项门禁）
 - `tests/verify-cloudflare.mjs` — 主代理整合：Cloudflare 静态版跨实现一致性验证（**14 项断言**）
 - `tests/verify-site-selfcheck.mjs` — 主代理整合：站点一键自检脚本的浏览器式运行时验证（**7 项断言**）
-- `src/hash.mjs` — 研发：零依赖 SHA-256（Node / 浏览器 / Workers 通用，Merkle 跨平台对账）
+- `tests/verify-production.mjs` — 主代理整合：**生产系统独立回归（75 项）**；`tests/d1-mock.js` 用 `node:sqlite` 模拟 D1、执行真实 SQL
 - `tools/`（主代理整合）
-  - `tools/build-cloudflare.mjs` — 生成 `cloudflare/` 纯静态产物
+  - `tools/build-cloudflare.mjs` — 生成 `cloudflare/` 产物（L0 八件套 + 生产前端 + `_redirects`）、同步 `prod/lib` 生成副本、导出 `schema.sql`
   - `tools/cf-runtime.mjs` — 浏览器运行时源文件（mock req/res，调用共用 `handle()`）
   - `tools/site-selfcheck.mjs` — 站点一键自检（部署后浏览器控制台 `import('/site-selfcheck.mjs')` 即用，10 项）
 - `cloudflare/`（**构建产物，勿直接改**，`src/` 子目录须与根 `src/` 逐字节一致）
-  - `index.html`、`cf-runtime.mjs`、`site-selfcheck.mjs`、`_headers`、`src/domain|store|server|hash.mjs`（共 8 个文件）
+  - L0 八件套：`index.html`、`cf-runtime.mjs`、`site-selfcheck.mjs`、`_headers`、`src/domain|store|server|hash.mjs`
+  - 生产系统：`prod.html`、`app.js`、`styles.css`、`legal.html`、`_redirects`、`demo.html`（共 15 个文件）
 - `docs/`
   - `docs/01-产品需求与路线图.md` — 产品：PRD（v0.3，阶段 C 同步契约 v0.2 裁决）
   - `docs/02-技术架构与接口契约.md` — 研发
@@ -76,6 +87,7 @@
   - `docs/09-Cloudflare部署指导.md` — 主代理整合：Web 单端形态、静态产物、三条部署路径、**Git 集成部署状态核验（§3.1）**、验收与回滚
   - `docs/10-算法与区块链备案申报指导.md` — 主代理整合：**D-12 归档稿**（境内两项备案申报口径、D-11 时序裁决、材料清单与法定期限，仅在复评触发、决定进入境内市场时恢复适用）
   - `docs/11-境外发布合规基线.md` — 主代理整合：**境外版生效基线**：地域适用判定与复评闸门、V2-O 六组上线前置、GDPR/ePrivacy/DSA/AI Act/CCPA 等目标市场义务与量化验收
+  - `docs/12-生产系统架构与部署.md` — 主代理整合：**生产系统（D-13）**：Pages Functions + D1 架构、P0 改造对照、Git 自动部署与 D1 一次性绑定、接口与角色矩阵、安全合规设计、75 项回归与运维边界
 - `review/`（**阶段 B 过程快照，原始意见不改**）
   - `review/product-review.md` — 产品交叉评审
   - `review/engineering-review.md` — 研发交叉评审
@@ -101,12 +113,14 @@
 | 上线检查清单                   | `docs/07-上线检查清单.md`（九组可勾选项，当前 0/29，G6 不通过）                                       | 法务           |
 | Cloudflare Web 版部署指导       | `docs/09-Cloudflare部署指导.md`（静态产物、三条部署路径、B-1～B-8 验收、回滚）                          | 主代理整合      |
 | Cloudflare 静态版一致性验证      | `tests/verify-cloudflare.mjs`（14 项断言，浏览器运行时 vs Node 服务 15 组字段全一致）                  | 主代理整合      |
+| 生产系统架构与部署（D-13）        | `docs/12-生产系统架构与部署.md`（Functions + D1、自动部署、D1 绑定、验收与边界）                              | 主代理整合      |
+| 生产系统独立回归                  | `tests/verify-production.mjs`（75 项，真实 SQL / D1 mock）                                               | 主代理整合      |
 | 境外发布合规基线（生效）           | `docs/11-境外发布合规基线.md`（D-12 地域判定、V2-O 六组、复评触发条件、目标市场义务与验收）                      | 主代理整合      |
 | 境内备案申报指导（归档）           | `docs/10-算法与区块链备案申报指导.md`（V2-a / V2-b、D-11、13 条整改勾稽、法定期限表；仅在复评触发时恢复）        | 主代理整合      |
 
 ## 状态与边界（项目初版 ≠ 生产系统）
 
-- **不接**真实支付、**不接**真实大模型、**不接**公链；**不采集**真实 PII；**不做**生产部署（CONTRACT §0）。代码托管于 GitHub 仓库，**仅作版本管理，不等于发布或上线**；本轮已发布 **L0 在线演示预览链接**（虚构数据、无真实用户与资金、可逆可下线，远端验收 6/6，见 `docs/08` §2.4）；**Cloudflare Pages 静态 Web 版**同属 L0，产物在 `cloudflare/`（见 `docs/09`）；`wangjia0910/sambon` 已在 Cloudflare 完成 **Connect to Git** 连接，`main` 分支每次 push 自动触发部署，产物目录须为 `cloudflare`、构建命令留空（根 `package.json` 提供兜底）。二者**均不属于生产部署，不得表述为平台已上线**；按契约 §11 **D-12**（用户 2026-11-12 指令「部署在 Cloudflare 无需备案，面向海外」），服务地域定为**中国境外（海外）**：算法规定 §2 / 区块链规定 §2 的适用范围均为「在中华人民共和国境内」，故**算法推荐服务备案、区块链信息服务备案、ICP 备案与配套境内安全评估报告不作为境外版上线闸门**；`docs/10` 与 D-11 归档为**境内市场触发式预案**（复评条件见 `docs/11` §1.3）。境外版仍以 **V2-O 境外发布合规基线六组**为 G6 一票否决项，当前 `docs/07` 0/29 未完成；法务结论维持「有条件通过、未触发一票否决」。准入门禁与操作见 `docs/08-上线部署指导.md`、`tests/predeploy-check.mjs`。
+- **不接**真实支付、**不接**真实大模型、**不接**公链；**不采集**真实 PII；**已交付可部署的生产系统代码（D-13），但 G1–G7 / V1–V8 / V2-O 未核销，不构成正式运营许可**。代码托管于 GitHub 仓库，**仅作版本管理，不等于发布或上线**；本轮已发布 **L0 在线演示预览链接**（虚构数据、无真实用户与资金、可逆可下线，远端验收 6/6，见 `docs/08` §2.4）；**Cloudflare Pages 静态 Web 版**同属 L0，产物在 `cloudflare/`（见 `docs/09`）；`wangjia0910/sambon` 已在 Cloudflare 完成 **Connect to Git** 连接，`main` 分支每次 push 自动触发部署，产物目录须为 `cloudflare`、构建命令留空（根 `package.json` 提供兜底）。二者**均不构成正式运营许可，不得表述为平台已上线**；按 **D-13**，Cloudflare 站点主入口已改为 Pages Functions + D1 生产系统（代码已自动部署，D1 绑定为一次性控制台动作），但其状态仍为「生产系统演示环境」，`docs/07` 仍 0/29、L1/L2 仍 No-Go；按契约 §11 **D-12**（用户 2026-11-12 指令「部署在 Cloudflare 无需备案，面向海外」），服务地域定为**中国境外（海外）**：算法规定 §2 / 区块链规定 §2 的适用范围均为「在中华人民共和国境内」，故**算法推荐服务备案、区块链信息服务备案、ICP 备案与配套境内安全评估报告不作为境外版上线闸门**；`docs/10` 与 D-11 归档为**境内市场触发式预案**（复评条件见 `docs/11` §1.3）。境外版仍以 **V2-O 境外发布合规基线六组**为 G6 一票否决项，当前 `docs/07` 0/29 未完成；法务结论维持「有条件通过、未触发一票否决」。准入门禁与操作见 `docs/08-上线部署指导.md`、`tests/predeploy-check.mjs`。
 - 链相关能力仅做「本地 Merkle 摘要 + 可插拔锚定接口」演示，零 PII、零任务正文上链（CONTRACT §10）。
 - 结算、争议裁定、账号处罚保留**人工兜底**，模型不得直判；必须提供「关闭个性化推荐」开关，关闭后按时间 + 距离做中性排序；该开关初版为**进程级全局单例**（服务端强制），账号级按 `user_id` 隔离列 P1，初版不得宣称已实现账号级（CONTRACT v0.2 §11 D-06）。
 - **所有演示数据均为虚构样例**，不得出现真实个人信息；联系方式一律虚拟号占位，日志与事件脱敏。

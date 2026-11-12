@@ -1,0 +1,33 @@
+# 《三宝殿》生产系统 · Wrangler 配置模板（可选）
+#
+# 重要：现有 Cloudflare Pages 项目已通过「Connect to Git」自动部署，
+# 每次 git push origin main 即自动构建，**不需要**本文件即可部署代码。
+# 本文件仅用于：
+#   ① 本地 wrangler pages dev 联调；
+#   ② 需要脚本化创建 / 迁移 D1 时（wrangler d1 create / d1 execute）。
+#
+# 若要把本文件放到仓库根供 Git 集成读取，必须先把 database_id 填成真实值，
+# 否则 Pages 构建可能因绑定不完整而失败。推荐做法：D1 绑定在控制台完成
+# （Settings → Functions → D1 database bindings，变量名固定为 DB）。
+#
+# 使用步骤见 docs/12-生产系统架构与部署.md §3。
+
+name = "sambon-production"
+compatibility_date = "2026-11-12"
+pages_build_output_dir = "cloudflare"
+
+# 首次使用：npx wrangler d1 create sambon-prod
+# 把返回的 database_id 填到下面，再执行：
+# npx wrangler d1 execute sambon-prod --file=schema.sql --remote
+[[d1_databases]]
+binding = "DB"
+database_name = "sambon-prod"
+# database_id = "<填 wrangler d1 create 返回的 UUID>"
+
+[vars]
+# 生产环境请在 Pages 项目 Settings → Environment variables 中配置（不要用 vars 明文保存密钥）：
+# ADMIN_BOOTSTRAP_TOKEN  = 首名管理员引导令牌，仅首次创建 admin 时使用，之后建议移除
+# INITIAL_SBC            = 新账号平台内贡献积分初始额度（默认 1000，非资产、不可兑付）
+# PBKDF2_ITERATIONS      = 口令派生轮数（默认 120000，不建议下调）
+# RATE_LIMIT_DISABLED    = 仅本地回归使用，生产必须留空
+# COOKIE_SECURE          = 仅本地 http 联调可设 false，生产必须留空（强制 Secure）

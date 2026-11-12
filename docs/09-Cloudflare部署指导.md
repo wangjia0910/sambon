@@ -4,6 +4,12 @@
 > 基线：`CONTRACT.md` §11 D-10（产品形态收敛）、`docs/08-上线部署指导.md`、`docs/07-上线检查清单.md`  
 > 地域口径（2026-11-12）：按契约 §11 **D-12**，服务**面向海外（中国境外）**、Cloudflare 部署；两项中国境内备案、ICP 备案与境内安全评估报告**不作为境外版上线闸门**，改以 `docs/11` 的 **V2-O 六组**为 G6 门槛；`docs/10` / D-11 归档为境内触发式预案。
 > **本文件是部署指导，不是上线许可。** V1–V8 仍为「未上线、不触发」；站点仍属 L0 演示预览。
+>
+> **D-13 补注（2026-11-12，务必先读）**：本文件 §1–§8 描述的是 **L0 纯静态演示版**的历史实现与验收口径，作为过程基线保留。用户随后要求「开发适用于 Cloudflare 部署的生产系统并上线」，本轮已新增 **Pages Functions + D1 生产系统**（`functions/`、`prod/site/`、`docs/12`），并由 `cloudflare/_redirects` 把站点主入口 `/` 重写到生产台 `prod.html`；L0 演示台改由 `/index.html`、`/demo.html` 访问。因此：
+> - §1 表格中「Pages Functions / Workers ❌」指的是**旧 `src/server.mjs` 不能直接搬上云**，生产系统已重写编排与持久化（业务口径仍复用 `src/domain.mjs`），并非 Pages Functions 不可用；
+> - §5「静态版 `/api/*` 用 curl 测会 404」只对 **L0 演示页**成立；生产台的 `/api/*` 由 Pages Functions 在边缘真实处理，可直接用 curl 测 `GET /api/health`（期望 `mode=production`）；
+> - Git 集成的 Production branch / Build command / Output directory 四项配置**不变**（`main` / 留空或 `npm run build` / `cloudflare`），`git push origin main` 会自动编译 `functions/` 并上传 15 个静态文件；
+> - 唯一新增的一次性动作是在控制台绑定名为 `DB` 的 D1 数据库，未绑定时生产台显示演示横幅并禁用写操作，详见 `docs/12` §3。
 
 
 
