@@ -1,0 +1,13 @@
+{
+  "name": "sambon-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "三宝殿 · 悬赏互助平台 Web 演示原型（零第三方依赖）",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "build": "node tools/build-cloudflare.mjs",
+    "test": "node tests/smoke.mjs && node tests/verify-local.mjs && node tests/verify-cloudflare.mjs",
+    "check": "node tests/predeploy-check.mjs"
+  }
+}

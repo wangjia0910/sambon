@@ -1,4 +1,4 @@
-# 《三宝殿》Cloudflare Web 版部署指导 v1.0
+# 《三宝殿》Cloudflare Web 版部署指导 v1.1
 
 > 用户指令（2026-11-12）：**「只做 Web 版，在 Cloudflare 上线」**
 > 基线：`CONTRACT.md` §11 D-10（产品形态收敛）、`docs/08-上线部署指导.md`、`docs/07-上线检查清单.md`
@@ -12,6 +12,7 @@
 - Cloudflare 侧采用 **Pages 纯静态 Web 版**：产物目录 `cloudflare/`，无需服务器、无需数据库、无需 Workers 计费，**单端口长驻 Node 进程在 Pages 上跑不了**，因此不是把 `src/server.mjs` 直接搬上云。
 - 业务口径**没有第二套实现**：`cloudflare/src/*.mjs` 由 `src/*.mjs` 逐字节复制，浏览器运行时直接调用共用的 `handle()`。`tests/verify-cloudflare.mjs` 用同一请求序列对比浏览器运行时与 Node 服务，**14 项断言全绿、15 组字段完全一致**。
 - 仍是 **L0 演示预览**：虚构数据、内存存储（刷新即重置）、无真实支付 / 大模型 / 公链 / 账号；不得表述为「平台已上线」。
+- **部署状态（2026-11-12）**：用户已在 Cloudflare 控制台完成 **Connect to Git** 连接（`wangjia0910/sambon` → 分支 `main`），后续每次 `git push origin main` 自动触发部署。本轮已加固构建命令兜底并推送一次用于触发部署；线上结果需在 Deployments 页面或站点链接核验，见 §3.1。
 
 ---
 
@@ -94,6 +95,29 @@ Token 获取：Cloudflare Dashboard → My Profile → API Tokens → 「Create 
 | Root directory | `/` |
 
 若不想把产物提交进仓库，可把 Build command 设为 `node tools/build-cloudflare.mjs`，Output directory 仍是 `cloudflare`；此时需把 `cloudflare/` 加入 `.gitignore`。**两种只能选一种**，否则会出现「构建前产物被清空、构建后又重新生成」的重复。
+
+**构建命令兜底（2026-11-12 加固）**：仓库根新增 `package.json`（`private: true`、**零 dependencies**、`scripts.build = node tools/build-cloudflare.mjs`）。即使 Cloudflare 预填了 `npm run build` 或 `npm install && npm run build`，也不会因缺 `package.json` / 缺脚本而失败，产物会被重新生成到 `cloudflare/`。构建命令留空时该文件不参与，仍直接使用已提交的产物。**Output directory 仍必须填 `cloudflare`**，兜底解决不了目录填错。
+
+### 3.1 部署状态核验（Git 集成已连接后）
+
+| 看哪里 | 成功标志 | 失败信号 |
+|---|---|---|
+| Workers & Pages → 项目 → **Deployments** | 最新一条 `Success`、分支 `main`、commit 与 `git rev-parse HEAD` 一致 | `Failed` / `Build failed` / 长时间卡在 `Building` |
+| 构建日志 | 无 `npm ERR!`；若跑了构建，出现「共 7 个文件」 | `Missing script: "build"`、`ENOENT package.json`、`Output directory not found` |
+| Deployment 详情 → Assets | 7 个文件：`index.html`、`cf-runtime.mjs`、`_headers`、`src/*.mjs` × 4 | 缺 `_headers` 或 `src/`，或出现旧命理页的 `assets/`、`kepu.html` |
+| 项目 → **Custom domains** | `sambon.net` 状态 `Active`（证书已签发） | `Pending`，或提示域名已被其他项目占用 |
+
+**四类常见失败与处置**
+
+| 症状 | 根因 | 修复 |
+|---|---|---|
+| 日志 `npm ERR! Missing script` / `ENOENT package.json` | 预填构建命令但当时没有 build 脚本 | 已由根 `package.json` 兜底；或把 Build command **清空** |
+| 构建成功但打开是 404 / 白屏，浏览器里 `/api/*` 报错 | Output directory 填成 `web/` 或留空 | 改成 `cloudflare`，保存后 Retry deployment |
+| 打开是旧命理页（八字六爻 / 神算子） | 绑错分支，或 `sambon.net` 仍指向旧 Pages 项目 | Production branch 改 `main`；到旧项目 Custom domains 解绑 `sambon.net` 后重新绑定 |
+| 控制台 ESM MIME 报错（`Failed to load module script`） | `_headers` 未随产物上传或不在产物根目录 | 确认 7 个文件齐全、`_headers` 位于上传目录根部 |
+
+> 每次 `git push origin main` 会自动触发一次新部署，**不需要在控制台手动 Retry**；若确需重试，先在 Build settings 核对 Production branch / Build command / Output directory / Root directory 四项再点 Retry。
+> 站点最终验收必须在浏览器里做（§5 B-1～B-8）。从公司网络用 `curl` 测 `*.pages.dev` / `sambon.net` 可能被 DNS 或代理拦截，**不能据此判定部署失败**。
 
 ---
 
