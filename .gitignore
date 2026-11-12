@@ -1,0 +1,21 @@
+# 运行时数据（内存存储，重启重置；本地调试产物不入库）
+data/
+*.log
+*.tmp
+
+# Node
+node_modules/
+npm-debug.log*
+.npm/
+
+# 编辑器与系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 本地环境
+.env
+.env.*
+
+# 注：.workbuddy/ 为项目相关数据，不属于临时缓存，禁止删除或忽略

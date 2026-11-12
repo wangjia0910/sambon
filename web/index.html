@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>三宝殿 · 初版闭环操作台（演示）</title>
+<style>
+  :root {
+    --bg: #f6f8fb; --card: #ffffff; --ink: #1f2933; --muted: #6b7785;
+    --line: #e3e9f0; --brand: #2f6f5e; --brand-soft: #e8f3ef;
+    --accent: #b06a2c; --danger: #b4473c; --ok: #2f7d4f;
+    --chip: #eef2f7; --shadow: 0 1px 3px rgba(31,41,51,.06), 0 6px 18px rgba(31,41,51,.04);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 14px/1.55 "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  }
+  header {
+    background: var(--card); border-bottom: 1px solid var(--line);
+    padding: 14px 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+    position: sticky; top: 0; z-index: 5;
+  }
+  header h1 { font-size: 17px; margin: 0; letter-spacing: .5px; }
+  header h1 small { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 8px; }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+  .badge {
+    background: var(--chip); border: 1px solid var(--line); border-radius: 20px;
+    padding: 3px 11px; font-size: 12px; color: var(--muted);
+  }
+  .badge b { color: var(--ink); font-weight: 600; }
+  .badge.warn { background: #fdf4e8; border-color: #f0dcc0; color: var(--accent); }
+  .badge.on { background: var(--brand-soft); border-color: #cfe6dc; color: var(--brand); }
+  main { max-width: 1240px; margin: 20px auto 60px; padding: 0 20px; }
+  .grid { display: grid; grid-template-columns: 280px 1fr; gap: 18px; align-items: start; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 18px; box-shadow: var(--shadow); margin-bottom: 16px;
+  }
+  .card h2 { font-size: 14px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .n {
+    width: 20px; height: 20px; border-radius: 50%; background: var(--brand); color: #fff;
+    font-size: 11px; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .card h3 { font-size: 13px; margin: 14px 0 8px; color: var(--muted); }
+  label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 4px; }
+  input, select, textarea {
+    width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px;
+    background: #fff; color: var(--ink); font: inherit; font-size: 13px; outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--brand); }
+  textarea { resize: vertical; min-height: 54px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+  .row > div { flex: 1 1 130px; min-width: 0; }
+  button {
+    background: var(--brand); color: #fff; border: 1px solid var(--brand); border-radius: 6px;
+    padding: 7px 13px; font: inherit; font-size: 13px; cursor: pointer; margin: 8px 6px 0 0;
+  }
+  button:hover { filter: brightness(1.06); }
+  button.ghost { background: #fff; color: var(--brand); }
+  button.grey { background: #fff; color: var(--muted); border-color: var(--line); }
+  button.warn { background: var(--accent); border-color: var(--accent); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .privacy {
+    background: #f2f8f5; border: 1px dashed #bcd9cd; color: var(--brand);
+    border-radius: 6px; padding: 8px 10px; font-size: 12px; margin-top: 10px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; background: #fafbfd; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .chip {
+    display: inline-block; background: var(--chip); border-radius: 4px; padding: 1px 6px;
+    margin: 1px 3px 1px 0; font-size: 11px; color: #46535f;
+  }
+  .chip.g { background: var(--brand-soft); color: var(--brand); }
+  .state { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 11px; background: var(--chip); }
+  .state.s { background: #e6f2ea; color: var(--ok); }
+  .state.w { background: #fdf1e6; color: var(--accent); }
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+  .tabs button {
+    background: transparent; color: var(--muted); border: none; border-bottom: 2px solid transparent;
+    border-radius: 0; margin: 0; padding: 7px 12px;
+  }
+  .tabs button.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
+  pre {
+    background: #f8fafc; border: 1px solid var(--line); border-radius: 6px; padding: 10px;
+    font: 11px/1.5 Consolas, Menlo, monospace; white-space: pre-wrap; word-break: break-all;
+    max-height: 300px; overflow: auto; margin: 8px 0 0;
+  }
+  #log {
+    background: #1f2933; color: #d7e2ea; border-radius: 8px; padding: 10px 12px;
+    font: 11px/1.6 Consolas, Menlo, monospace; max-height: 170px; overflow: auto;
+  }
+  #log .ok { color: #8fd6a8; } #log .err { color: #f2a49b; } #log .dim { color: #8b9aa7; }
+  .side-title { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .cur { background: var(--brand-soft); border: 1px solid #cfe6dc; border-radius: 6px; padding: 8px 10px; font-size: 12px; }
+  .cur code { color: var(--brand); font-weight: 600; }
+  .flow { font-size: 11px; color: var(--muted); line-height: 1.9; }
+  .flow b { color: var(--brand); font-weight: 600; }
+</style>
+</head>
+<body>
+<header>
+  <h1>三宝殿 · 初版闭环操作台 <small>sambon.net · 最小闭环原型（演示数据全部虚构）</small></h1>
+  <div class="badges" id="badges"><span class="badge">配置加载中…</span></div>
+</header>
+
+<main>
+<div class="grid">
+  <!-- 左侧：角色与上下文 -->
+  <div>
+    <div class="card">
+      <div class="side-title">当前任务</div>
+      <div class="cur">task_id：<code id="curTask">（尚未发布）</code><br />状态：<span id="curState">—</span></div>
+      <label>演示发布方</label>
+      <select id="publisher"></select>
+      <label>演示接单人</label>
+      <select id="solver"></select>
+      <div class="hint">角色仅为演示选择，不对应任何真实身份。</div>
+    </div>
+
+    <div class="card">
+      <div class="side-title">闭环顺序</div>
+      <div class="flow">
+        <b>1</b> 发布任务（合规预检）<br />
+        <b>2</b> 平台审核（冻结赏金+5%服务费）<br />
+        <b>3</b> 触发推送（Top-K / 分数 / 理由码）<br />
+        <b>4</b> 接单（原子锁，仅一人）<br />
+        <b>5</b> 提交成果<br />
+        <b>6</b> 验收 / 驳回 / 超时自动验收<br />
+        <b>7</b> 结算 → 榜单 / 流水 / 事件回放
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="side-title">合规开关</div>
+      <button id="btnPersonalOff" class="warn">关闭个性化推荐</button>
+      <button id="btnPersonalOn" class="ghost">开启个性化推荐</button>
+      <div class="hint" id="personalHint">关闭后服务端强制按「时间 + 距离」中性排序。</div>
+      <div class="side-title" style="margin-top:12px">合规钩子（占位，未上线）</div>
+      <div class="hint" id="hooksHint">加载中…</div>
+      <button id="btnReport" class="grey">举报入口（占位）</button>
+    </div>
+
+    <div class="card">
+      <div class="side-title">请求日志</div>
+      <div id="log"><span class="dim">等待操作…</span></div>
+    </div>
+  </div>
+
+  <!-- 右侧：操作区 -->
+  <div>
+    <div class="card">
+      <h2><span class="n">1</span>发布任务 <small style="color:var(--muted);font-weight:400">合规预检 + 余额校验</small></h2>
+      <div class="row">
+        <div style="flex:2 1 240px"><label>标题</label><input id="fTitle" value="整理社区活动资料（演示）" /></div>
+        <div><label>类目</label><input id="fCategory" value="资料整理" /></div>
+        <div><label>赏金 SBC</label><input id="fBounty" type="number" value="200" min="1" /></div>
+        <div><label>时效（小时）</label><input id="fDeadline" type="number" value="48" min="1" /></div>
+      </div>
+      <label>任务描述</label>
+      <textarea id="fDesc">演示用：整理一份社区活动签到表与资料清单，纯虚构样例，不涉及任何真实个人信息。</textarea>
+      <div class="row">
+        <div style="flex:2 1 240px"><label>验收标准</label><input id="fCriteria" value="资料清单完整、格式清晰、按时提交" /></div>
+        <div><label>形态</label><select id="fOnline"><option value="true">线上任务</option><option value="false">线下任务</option></select></div>
+        <div><label>服务半径 km</label><input id="fRadius" type="number" value="10" min="1" /></div>
+        <div><label>技能要求（逗号分隔）</label><input id="fSkills" value="资料整理" /></div>
+      </div>
+      <div class="privacy">
+        联系方式：平台虚拟号占位（系统自动分配，无需也不允许填写真实号码 / 证件信息）。<br />
+        未成年人限制：发布与接单前置准入钩子占位（布尔校验，不采集生日 / 证件 / 真实姓名）。<br />
+        举报入口：任务详情与榜单条目提供入口占位，处置留痕可在事件流回放。
+      </div>
+      <button id="btnPublish">发布任务</button>
+      <button id="btnDryCompliance" class="grey">试一下违禁词拦截</button>
+      <div class="hint" id="publishHint">发布后状态 PENDING_REVIEW；赏金在审核通过时冻结。</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">2</span>平台审核</h2>
+      <button id="btnApprove">审核通过（冻结赏金+服务费）</button>
+      <button id="btnReject" class="grey">审核驳回</button>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">3</span>触发推送 <small style="color:var(--muted);font-weight:400">Top-K 候选 / 分数 / reason_codes</small></h2>
+      <div class="row">
+        <div><label>Top-K</label><input id="dTopK" type="number" value="12" min="1" /></div>
+        <div><label>首批 batch_size</label><input id="dBatch" type="number" value="8" min="1" /></div>
+        <div><label>扩量上限</label><input id="dExpand" type="number" value="30" min="1" /></div>
+        <div><label>供需比</label><input id="dSupply" type="number" value="1.4" step="0.1" /></div>
+        <div style="flex:0 0 auto"><label>&nbsp;</label><label style="display:inline"><input id="dDry" type="checkbox" style="width:auto" /> dry_run 不落库</label></div>
+      </div>
+      <button id="btnDispatch">触发推送</button>
+      <div id="dispatchMeta" class="hint"></div>
+      <div id="dispatchTable"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">4</span>接单 <small style="color:var(--muted);font-weight:400">原子锁，非竞赛制仅一人成功</small></h2>
+      <button id="btnAccept">以当前接单人身份接单</button>
+      <button id="btnConcurrent" class="grey">模拟 4 人并发抢单</button>
+      <div class="hint" id="acceptHint"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">5</span>提交成果</h2>
+      <label>成果说明（演示，事件日志中不存正文）</label>
+      <input id="fResult" value="已整理完成资料清单与签到表（虚构演示成果）" />
+      <button id="btnSubmit">提交成果</button>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">6</span>验收与结算</h2>
+      <div class="row">
+        <div><label>评价分（≥4.5 触发额外 2% 奖励，上限 50 SBC）</label><input id="fRating" type="number" value="4.8" min="0" max="5" step="0.1" /></div>
+        <div><label>驳回理由</label><input id="fRejectReason" value="资料格式需调整" /></div>
+      </div>
+      <button id="btnVerify">验收通过并结算</button>
+      <button id="btnAutoVerify" class="ghost">超时自动验收（手动触发）</button>
+      <button id="btnRejectSubmit" class="grey">驳回（≤2 次）</button>
+      <button id="btnDispute" class="warn">发起争议（全额托管）</button>
+      <div class="hint" id="verifyHint"></div>
+    </div>
+
+    <div class="card">
+      <h2>数据视图 <small style="color:var(--muted);font-weight:400">榜单 / 流水 / 事件回放 / 配置</small></h2>
+      <div class="tabs" id="tabs">
+        <button data-tab="tasks" class="active">任务榜</button>
+        <button data-tab="users">用户榜</button>
+        <button data-tab="ledger">积分流水</button>
+        <button data-tab="events">事件流</button>
+        <button data-tab="config">配置状态</button>
+      </div>
+      <div id="tabTools"></div>
+      <div id="tabBody"><div class="hint">点击「刷新」加载数据。</div></div>
+    </div>
+  </div>
+</div>
+</main>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const BASE = '';
+let currentTaskId = null;
+let currentState = '—';
+let activeTab = 'tasks';
+
+function eid(prefix) { return prefix + '-' + (crypto.randomUUID ? crypto.randomUUID().slice(0, 8) : Math.random().toString(36).slice(2)); }
+
+function logLine(kind, text) {
+  const box = $('log');
+  const line = document.createElement('div');
+  line.className = kind;
+  line.textContent = '[' + new Date().toLocaleTimeString('zh-CN') + '] ' + text;
+  if (box.querySelector('.dim')) box.innerHTML = '';
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function api(method, path, body) {
+  try {
+    const resp = await fetch(BASE + path, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    const json = await resp.json();
+    logLine(json.ok ? 'ok' : 'err', method + ' ' + path + ' → ' + resp.status + (json.error ? ' ' + json.error.code : ''));
+    return json;
+  } catch (e) {
+    logLine('err', method + ' ' + path + ' 失败：' + e.message);
+    return { ok: false, error: { code: 'NETWORK', message: e.message } };
+  }
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function stateChip(s) {
+  const cls = ['SETTLED', 'PUBLISHED', 'ACCEPTED', 'SUBMITTED'].includes(s) ? 's' : ['DISPUTED', 'DISPATCHING'].includes(s) ? 'w' : '';
+  return '<span class="state ' + cls + '">' + esc(s) + '</span>';
+}
+
+function setTask(t) {
+  if (!t) return;
+  currentTaskId = t.task_id;
+  currentState = t.state;
+  $('curTask').textContent = t.task_id;
+  $('curState').innerHTML = stateChip(t.state);
+}
+
+// ---------- 配置 ----------
+async function loadConfig() {
+  const r = await api('GET', '/api/config');
+  if (!r.ok) { $('badges').innerHTML = '<span class="badge warn">配置不可用</span>'; return; }
+  const c = r.data;
+  $('badges').innerHTML =
+    '<span class="badge">权重版本 <b>' + esc(c.weight_version) + '</b></span>' +
+    '<span class="badge">榜单版本 <b>' + esc(c.rank_weight_version) + '</b></span>' +
+    '<span class="badge warn">算法降级 <b>' + (c.algorithm.degraded ? '规则兜底' : '正常') + '</b></span>' +
+    '<span class="badge ' + (c.personalized_enabled ? 'on' : '') + '">个性化 <b>' + (c.personalized_enabled ? '开启' : '关闭·中性排序') + '</b></span>' +
+    '<span class="badge">SBC 转让/兑换 <b>不提供</b></span>';
+  const pub = $('publisher'), sol = $('solver');
+  const pubVal = pub.value, solVal = sol.value;
+  pub.innerHTML = ''; sol.innerHTML = '';
+  c.demo_users.forEach((u) => {
+    const o = document.createElement('option');
+    o.value = u.user_id; o.textContent = u.name + '（' + u.role + '，可用 ' + u.available + ' SBC）';
+    if (u.role === 'publisher') pub.appendChild(o);
+    if (u.role === 'solver' && !u.user_id.includes('WU')) sol.appendChild(o.cloneNode(true));
+  });
+  if (pubVal) pub.value = pubVal;
+  if (solVal) sol.value = solVal;
+  $('personalHint').textContent = c.personalized_enabled
+    ? '当前：个性化开启，推送使用规则版打分（LLM 已降级）。'
+    : '当前：已关闭，服务端强制按「时间 + 距离」中性排序。';
+  const h = c.compliance || {};
+  $('hooksHint').textContent =
+    '未成年人限制钩子：' + (h.minor_restriction_hook ? '已保留（占位）' : '缺失') +
+    '；举报入口钩子：' + (h.report_entry_hook ? '已保留（占位）' : '缺失') +
+    '。二者为上线一票否决项 V8 的占位，不采集真实身份信息。';
+}
+
+$('btnReport').onclick = () => {
+  logLine('dim', '举报入口（占位）：§8 无独立举报端点，本轮仅保留入口钩子；真实举报与 24h 处置为上线一票否决项 V8。');
+  alert('举报入口（演示占位）\n\n本轮不新增 CONTRACT §8 之外的接口，也不采集任何真实个人信息。\n真实举报通道与 24h 处置流程列为上线一票否决项（V8），由客户端与运营后台在上线前实现。');
+};
+
+// ---------- 1 发布 ----------
+$('btnPublish').onclick = async () => {
+  const body = {
+    publisher_id: $('publisher').value,
+    title: $('fTitle').value,
+    description: $('fDesc').value,
+    category: $('fCategory').value,
+    bounty: Number($('fBounty').value),
+    deadline_hours: Number($('fDeadline').value),
+    acceptance_criteria: $('fCriteria').value,
+    online: $('fOnline').value === 'true',
+    radius_km: Number($('fRadius').value),
+    required_skills: $('fSkills').value.split(/[,，]/).map((s) => s.trim()).filter(Boolean),
+    event_id: eid('EVT-PUB'),
+  };
+  const r = await api('POST', '/api/tasks', body);
+  if (r.ok) {
+    setTask(r.data.task);
+    $('publishHint').textContent = '发布成功：' + r.data.task.task_id + '，虚拟号=' + r.data.task.virtual_contact +
+      '，合规预检通过，LLM 抽取 degraded=' + r.data.task.structure.degraded;
+    await refreshTab();
+  } else $('publishHint').textContent = '发布失败：' + (r.error && r.error.message);
+};
+
+$('btnDryCompliance').onclick = async () => {
+  const r = await api('POST', '/api/tasks', {
+    publisher_id: $('publisher').value, title: '演示：代考刷单引流',
+    description: '含违禁词测试', category: '资料整理', bounty: 10,
+    acceptance_criteria: '无', event_id: eid('EVT-BLOCK'),
+  });
+  $('publishHint').textContent = r.ok ? '异常：违禁词未被拦截' : '预期拦截生效：' + r.error.code + ' / ' + r.error.message;
+};
+
+// ---------- 2 审核 ----------
+async function review(decision) {
+  if (!currentTaskId) return alert('请先发布任务');
+  const r = await api('POST', '/api/tasks/' + currentTaskId + '/review', { decision, event_id: eid('EVT-REV') });
+  if (r.ok) { setTask(r.data.task); $('publishHint').textContent = '审核完成：' + r.data.task.state + (r.data.freeze ? '，冻结 ' + r.data.freeze.total + ' SBC（赏金 ' + r.data.freeze.bounty + ' + 服务费 ' + r.data.freeze.service_fee + '）' : ''); }
+  else $('publishHint').textContent = '审核失败：' + r.error.code + ' / ' + r.error.message;
+  await refreshTab();
+}
+$('btnApprove').onclick = () => review('approve');
+$('btnReject').onclick = () => review('reject');
+
+// ---------- 3 推送 ----------
+$('btnDispatch').onclick = async () => {
+  if (!currentTaskId) return alert('请先发布任务');
+  const body = {
+    top_k: Number($('dTopK').value), batch_size: Number($('dBatch').value),
+    expand_to: Number($('dExpand').value), supply_ratio: Number($('dSupply').value),
+    dry_run: $('dDry').checked, event_id: eid('EVT-DSP'),
+  };
+  const r = await api('POST', '/api/tasks/' + currentTaskId + '/dispatch', body);
+  if (!r.ok) { $('dispatchMeta').textContent = '推送失败：' + r.error.code + ' / ' + r.error.message; return; }
+  const d = r.data;
+  $('dispatchMeta').innerHTML =
+    'dispatch_id=<b>' + esc(d.dispatch_id || '（dry_run 未生成）') + '</b> · mode=<b>' + esc(d.mode) +
+    '</b> · weight_version=<b>' + esc(d.weight_version) + '</b> · 算法降级=<b>' + (d.algorithm_degraded ? '是（推送不中断）' : '否') +
+    '</b> · 候选 ' + d.candidates.length + ' 人 · 硬过滤 ' + d.filtered_out.length + ' 人' +
+    (d.dry_run ? ' · <b>dry_run 未落库</b>' : '');
+  let html = '<table><thead><tr><th>名次</th><th>接单人</th><th>分数</th><th>批次</th><th>reason_codes（可解释）</th></tr></thead><tbody>';
+  d.candidates.forEach((c) => {
+    html += '<tr><td>' + c.rank + '</td><td>' + esc(c.name) + '</td><td class="num">' +
+      (c.score === null ? '—（中性）' : c.score) + '</td><td>' + c.batch + '</td><td>' +
+      c.reason_codes.map((x) => '<span class="chip ' + (x.startsWith('NEUTRAL') ? 'g' : '') + '">' + esc(x) + '</span>').join('') +
+      '</td></tr>';
+  });
+  html += '</tbody></table>';
+  if (d.filtered_out.length) html += '<div class="hint">硬过滤：' + d.filtered_out.map((f) => esc(f.name) + ' → ' + esc(f.reason_code)).join('；') + '</div>';
+  if (d.batches) html += '<div class="hint">分批节奏：' + d.batches.map((b) => '第' + b.batch + '批 ' + b.size + ' 人' + (b.note ? '（' + esc(b.note) + '）' : '')).join(' → ') + '</div>';
+  if (d.llm_hint) html += '<div class="hint">LLM 语义建议（degraded=' + d.llm_hint.degraded + '，仅作附加特征）：' + esc(d.llm_hint.hint) + '</div>';
+  $('dispatchTable').innerHTML = html;
+  if (!d.dry_run) setTask({ task_id: currentTaskId, state: 'DISPATCHING' });
+  await loadConfig();
+};
+
+// ---------- 4 接单 ----------
+$('btnAccept').onclick = async () => {
+  if (!currentTaskId) return alert('请先发布任务');
+  const r = await api('POST', '/api/tasks/' + currentTaskId + '/accept', { solver_id: $('solver').value, event_id: eid('EVT-ACC') });
+  if (r.ok) { setTask(r.data.task); $('acceptHint').textContent = '接单成功：' + r.data.task.solver_id + '，托管 ' + r.data.escrow_total + ' SBC（裁定前不转付）'; }
+  else $('acceptHint').textContent = '接单失败：' + r.error.code + ' / ' + r.error.message;
+  await refreshTab();
+};
+
+$('btnConcurrent').onclick = async () => {
+  if (!currentTaskId) return alert('请先发布任务');
+  const ids = [...$('solver').options].map((o) => o.value);
+  const results = await Promise.all(ids.map((sid, i) =>
+    api('POST', '/api/tasks/' + currentTaskId + '/accept', { solver_id: sid, event_id: eid('EVT-CON-' + i) })));
+  const wins = results.filter((r) => r.ok).length;
+  $('acceptHint').textContent = '并发 ' + results.length + ' 人抢单：成功 ' + wins + ' 人，失败 ' + (results.length - wins) + ' 人（原子锁 + 先到先得）';
+  if (wins === 1) setTask({ task_id: currentTaskId, state: 'ACCEPTED' });
+  await refreshTab();
+};
+
+// ---------- 5 提交 ----------
+$('btnSubmit').onclick = async () => {
+  if (!currentTaskId) return alert('请先发布任务');
+  const r = await api('POST', '/api/tasks/' + currentTaskId + '/submit', {
+    solver_id: $('solver').value, content: $('fResult').value, event_id: eid('EVT-SUB'),
+  });
+  if (r.ok) setTask(r.data.task);
+  $('verifyHint').textContent = r.ok ? '成果已提交：' + r.data.task.state : '提交失败：' + r.error.code + ' / ' + r.error.message;
+  await refreshTab();
+};
+
+// ---------- 6 验收 / 争议 ----------
+async function verify(decision, extra) {
+  if (!currentTaskId) return alert('请先发布任务');
+  const body = Object.assign({ decision, event_id: eid('EVT-VER') }, extra || {});
+  const r = await api('POST', '/api/tasks/' + currentTaskId + '/verify', body);
+  if (r.ok) {
+    setTask(r.data.task);
+    const s = r.data.settlement;
+    $('verifyHint').textContent = s
+      ? '结算完成：赏金 ' + s.bounty + ' + 服务费 ' + s.service_fee + ' + 奖励 ' + s.quality_bonus.amount + '；流水号 ' + s.ledger_entries.join(',')
+      : r.data.note;
+  } else $('verifyHint').textContent = '验收失败：' + r.error.code + ' / ' + r.error.message;
+  await refreshTab();
+}
+$('btnVerify').onclick = () => verify('approve', { rating: Number($('fRating').value) });
+$('btnAutoVerify').onclick = () => verify('auto_accept', { rating: Number($('fRating').value) });
+$('btnRejectSubmit').onclick = () => verify('reject', { reason: $('fRejectReason').value });
+$('btnDispute').onclick = async () => {
+  if (!currentTaskId) return alert('请先发布任务');
+  const r = await api('POST', '/api/tasks/' + currentTaskId + '/dispute', { action: 'open', event_id: eid('EVT-DIS') });
+  if (r.ok) { setTask(r.data.task); $('verifyHint').textContent = '争议已发起：全额托管 ' + r.data.escrow_total + ' SBC，裁定前不转付；模型 decision=null'; }
+  else $('verifyHint').textContent = '争议失败：' + r.error.code + ' / ' + r.error.message;
+  await refreshTab();
+};
+
+// ---------- 个性化开关 ----------
+async function setPersonal(enabled) {
+  const r = await api('POST', '/api/preferences/personalized', { enabled, event_id: eid('EVT-PREF') });
+  await loadConfig();
+  if (r.ok) $('personalHint').textContent = r.data.note + '（服务端强制：' + r.data.enforcement + '）';
+  await refreshTab();
+}
+$('btnPersonalOff').onclick = () => setPersonal(false);
+$('btnPersonalOn').onclick = () => setPersonal(true);
+
+// ---------- 数据视图 ----------
+$('tabs').onclick = (e) => {
+  if (e.target.tagName !== 'BUTTON') return;
+  activeTab = e.target.dataset.tab;
+  [...$('tabs').children].forEach((b) => b.classList.toggle('active', b === e.target));
+  refreshTab();
+};
+
+function toolsHtml() {
+  if (activeTab === 'ledger') {
+    const opts = [...$('publisher').options, ...$('solver').options].map((o) => '<option value="' + o.value + '">' + esc(o.textContent) + '</option>').join('');
+    return '<select id="ledgerUser" style="max-width:320px">' + opts + '</select> <button id="btnRefresh" class="ghost">刷新</button>';
+  }
+  if (activeTab === 'events') {
+    return '<input id="eventTask" style="max-width:320px;display:inline-block" value="' + esc(currentTaskId || '') + '" placeholder="task_id（留空查全部）" /> <button id="btnRefresh" class="ghost">回放</button>';
+  }
+  return '<button id="btnRefresh" class="ghost">刷新</button>';
+}
+
+function renderTable(headers, rows) {
+  return '<table><thead><tr>' + headers.map((h) => '<th>' + h + '</th>').join('') + '</tr></thead><tbody>' + rows.join('') + '</tbody></table>';
+}
+
+async function refreshTab() {
+  $('tabTools').innerHTML = toolsHtml();
+  const btn = $('btnRefresh');
+  if (btn) btn.onclick = refreshTab;
+  const box = $('tabBody');
+  box.innerHTML = '<div class="hint">加载中…</div>';
+
+  if (activeTab === 'tasks') {
+    const r = await api('GET', '/api/leaderboard/tasks');
+    if (!r.ok) { box.textContent = '加载失败'; return; }
+    const rows = r.data.items.map((t) => '<tr><td>' + t.rank + '</td><td>' + esc(t.title) + '</td><td>' + stateChip(t.state) +
+      '</td><td class="num">' + t.bounty + '</td><td class="num">' + (t.rank_score === null ? '—（中性）' : t.rank_score) + '</td><td>' +
+      (t.top_factors ? t.top_factors.map((f) => '<span class="chip">' + esc(f.factor) + ' ' + f.contribution + '</span>').join('') : (t.reason_codes || []).join(', ')) + '</td></tr>');
+    box.innerHTML = renderTable(['#', '任务', '状态', '赏金', 'RankScore', 'Top3 影响因子 / 理由'], rows) +
+      '<div class="hint">版本 ' + esc(r.data.rank_weight_version) + ' · ' + esc(r.data.note || '六维自然排序，付费置顶不参与') + '</div>';
+    return;
+  }
+
+  if (activeTab === 'users') {
+    const r = await api('GET', '/api/leaderboard/users');
+    if (!r.ok) { box.textContent = '加载失败'; return; }
+    const rows = r.data.items.map((u) => '<tr><td>' + u.rank + '</td><td>' + esc(u.name) + '</td><td class="num">' + u.net_sbc +
+      '</td><td class="num">' + u.completed_count + '</td><td class="num">' + u.weighted_rating + '</td><td class="num">' + u.on_time_rate +
+      '</td><td class="num">' + u.rank_score + '</td></tr>');
+    box.innerHTML = renderTable(['#', '接单人', '净获得 SBC', '完成单量', '加权评价', '准时率', 'RankScore'], rows) +
+      '<div class="hint">' + esc(r.data.note) + '</div>';
+    return;
+  }
+
+  if (activeTab === 'ledger') {
+    const uid = ($('ledgerUser') && $('ledgerUser').value) || $('publisher').value;
+    const r = await api('GET', '/api/ledger/' + encodeURIComponent(uid));
+    if (!r.ok) { box.textContent = '加载失败'; return; }
+    const d = r.data;
+    const rows = d.entries.map((e) => '<tr><td class="num">' + e.seq + '</td><td>' + esc(e.task_id || '—') + '</td><td>' + esc(e.subject) +
+      '</td><td class="num">' + e.delta + '</td><td class="num">' + e.before + ' → ' + e.after + '</td><td>' + esc(e.memo) + '</td><td title="' + esc(e.hash) + '">' + esc(e.hash.slice(0, 10)) + '…</td></tr>');
+    box.innerHTML = '<div class="hint">用户 <b>' + esc(d.name) + '</b> · 可用 <b>' + d.available +
+      '</b> SBC · 信用分 ' + d.credit_score + ' · 流水 ' + d.entries.length + ' 条 · 账本守恒 <b style="color:' +
+      (d.balance_check.balanced ? 'var(--ok)' : 'var(--danger)') + '">' + (d.balance_check.balanced ? '平衡 ✓' : '不平衡 ✗') +
+      '</b>（总额 ' + d.balance_check.total + ' / 应 ' + d.balance_check.expected + '）· Merkle 根 ' + esc(d.merkle.root.slice(0, 16)) + '…</div>' +
+      renderTable(['#', 'task_id', '科目', '变动', '前后余额', '规则说明', '流水哈希'], rows) +
+      '<pre>' + esc(JSON.stringify(d.subjects, null, 2)) + '</pre>';
+    return;
+  }
+
+  if (activeTab === 'events') {
+    const tid = $('eventTask') ? $('eventTask').value.trim() : '';
+    const r = await api('GET', '/api/events' + (tid ? '?task_id=' + encodeURIComponent(tid) : ''));
+    if (!r.ok) { box.textContent = '加载失败'; return; }
+    const rows = r.data.events.map((e) => '<tr><td class="num">' + e.seq + '</td><td>' + esc(e.ts) + '</td><td><b>' + esc(e.type) +
+      '</b></td><td>' + esc(e.task_id || '—') + '</td><td>' + esc(e.actor) + '</td><td>' + esc(JSON.stringify(e.payload)) + '</td></tr>');
+    box.innerHTML = '<div class="hint">共 ' + r.data.count + ' 条事件' + (tid ? '（task_id=' + esc(tid) + ' 全链路回放）' : '（全量）') + '，事件日志已脱敏（零 PII / 零任务正文）。</div>' +
+      renderTable(['#', '时间', '事件', 'task_id', '产生方', '载荷（脱敏）'], rows);
+    return;
+  }
+
+  if (activeTab === 'config') {
+    const r = await api('GET', '/api/config');
+    if (!r.ok) { box.textContent = '加载失败'; return; }
+    box.innerHTML = '<pre>' + esc(JSON.stringify(r.data, null, 2)) + '</pre>';
+  }
+}
+
+// ---------- 启动 ----------
+(async function init() {
+  await loadConfig();
+  await refreshTab();
+  logLine('dim', '操作台就绪。所有演示数据均为虚构样例；SBC 为平台内贡献积分凭证，不可转让、不可兑付法币。');
+})();
+</script>
+</body>
+</html>
