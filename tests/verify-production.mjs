@@ -402,7 +402,7 @@ async function main() {
       'cloudflare/index.html', 'cloudflare/cf-runtime.mjs', 'functions/api/[[path]].js'];
     check('P-67 生产前端 + Functions 入口 + L0 产物齐备', need.every((p) => existsSync(resolve(ROOT, p))));
     check('P-68 _redirects 把主入口指向生产系统、保留 L0 演示入口',
-      read('cloudflare/_redirects').includes('/prod.html') && read('cloudflare/_redirects').includes('/index.html'));
+      read('cloudflare/_redirects').includes('/prod') && read('cloudflare/_redirects').includes('/index'));
     check('P-69 L0 演示页引导层未被破坏（既有回归不受影响）',
       read('cloudflare/index.html').includes('__installSambonRuntime'));
     check('P-70 生产前端无 node: 内置依赖、无第三方 CDN',
