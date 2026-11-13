@@ -54,6 +54,7 @@ class Client {
       headers['x-csrf-token'] = this.csrf || '';
     }
     if (opts.origin) headers.origin = opts.origin;
+    if (opts.headers) Object.assign(headers, opts.headers); // V3：GPC / Cron-Secret 等自定义头
     if (body !== undefined) headers['content-type'] = 'application/json';
     const req = new Request(`http://localhost${path}`, {
       method,
@@ -428,6 +429,279 @@ async function main() {
     const routes = JSON.parse(read('cloudflare/_routes.json'));
     check('P-74 _routes.json 仅把 /api/* 交给 Functions（静态资源不走 Worker）',
       routes.version === 1 && routes.include.length === 1 && routes.include[0] === '/api/*');
+  }
+
+  // ================================================================== V3 完全体（D-14）
+  // 独立环境，避免与 [1]～[12] 的限流 / 擦除 / 结算状态互相干扰。
+  const v3env = makeEnv({ EMAIL_VERIFICATION_DEV_ECHO: 'true', CRON_SECRET: 'test-cron-secret' });
+  const va = new Client(); va.env = v3env.env;
+  const vp = new Client(); vp.env = v3env.env;
+  const vs = new Client(); vs.env = v3env.env;
+  const vs2 = new Client(); vs2.env = v3env.env;
+  const vsum = (sql, params = []) => v3env.raw._query(sql, params);
+  const vTables = () => vsum("SELECT name FROM sqlite_master WHERE type='table'").map((r) => r.name);
+
+  // ------------------------------------------------------------------ 13. 表结构与老库迁移
+  console.log('\n[13] V3 表结构、v1.0 老库幂等迁移');
+  {
+    // v3env 是全新库，先发一个只读请求触发 ensureSchema 自举，再检查表结构
+    await dispatch(new Request('http://localhost/api/health'), v3env.env);
+    const t = vTables();
+    const need = ['email_verifications', 'notifications', 'dispatch_feedback', 'metrics', 'risk_flags', 'backups'];
+    check('P-75 v2.0 新增 6 张表齐备', need.every((x) => t.includes(x)), `${t.length} 张表`);
+    const cols = vsum("SELECT name FROM pragma_table_info('users')").map((r) => r.name);
+    check('P-76 users 扩展列齐备', ['email_verified', 'locale', 'gpc_enabled', 'failed_logins', 'locked_until', 'last_seen_at', 'password_changed_at'].every((c) => cols.includes(c)));
+    // 模拟一个只有 v1.0 列的旧库，ensureSchema 必须自动补列且重复执行不报错
+    const legacy = createD1Mock();
+    await legacy.exec(`CREATE TABLE users (
+      user_id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL,
+      salt TEXT NOT NULL, role TEXT NOT NULL, display_name TEXT NOT NULL,
+      available_sbc REAL NOT NULL DEFAULT 0, credit_score REAL NOT NULL DEFAULT 100,
+      personalized_enabled INTEGER NOT NULL DEFAULT 1, stats_json TEXT NOT NULL DEFAULT '{}',
+      banned INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, deleted_at TEXT)`);
+    const lenv = { ...BASE_ENV, DB: legacy };
+    const h1 = await dispatch(new Request('http://localhost/api/health'), lenv);
+    const h2 = await dispatch(new Request('http://localhost/api/health'), lenv);
+    const cols2 = legacy._query("SELECT name FROM pragma_table_info('users')").map((r) => r.name);
+    check('P-77 v1.0 老库自动补列且幂等（升级无需重建库）',
+      h1.status === 200 && h2.status === 200 && ['email_verified', 'gpc_enabled', 'locked_until'].every((c) => cols2.includes(c)));
+    const sv = legacy._query("SELECT value FROM meta WHERE key = 'schema_version'");
+    check('P-78 schema_version 升级为 v2.0', sv[0]?.value === 'sambon-prod-schema-v2.0');
+  }
+
+  // ------------------------------------------------------------------ 14. 账号安全与邮箱验证
+  console.log('\n[14] 邮箱验证、GPC、口令策略与登录锁定');
+  {
+    const boot = await va.call('POST', '/api/admin/bootstrap',
+      { bootstrap_token: 'test-bootstrap-token', email: 'v3admin@sambon.net', password: 'AdminPass123!', display_name: 'V3 Admin' });
+    const lg = await va.login(v3env.env, 'v3admin@sambon.net', 'AdminPass123!');
+    check('P-79 V3 环境管理员引导与登录成功', boot.status === 201 && lg.status === 200);
+
+    const rp = await vp.call('POST', '/api/auth/register',
+      { email: 'v3pub@sambon.net', password: 'PublisherPass123!', display_name: 'V3 Publisher', role: 'publisher', locale: 'en' });
+    vp.csrf = rp.data?.session?.csrf_token || null;
+    check('P-80 注册返回验证状态与本地 dev_token（生产不回显）',
+      rp.status === 201 && rp.data?.verification_required === false && typeof rp.data?.dev_token === 'string' && rp.data.dev_token.length >= 32);
+    const notes = await vp.call('GET', '/api/me/notifications');
+    const vn = (notes.data?.items || []).find((x) => x.kind === 'EMAIL_VERIFICATION');
+    check('P-81 验证令牌经通知队列完整送达（未被长数字脱敏吃掉）',
+      !!vn && vn.body.includes(rp.data.dev_token) && !vn.body.includes('[redacted]'));
+    const okv = await vp.call('POST', '/api/auth/verify-email', { token: rp.data.dev_token });
+    const me = await vp.call('GET', '/api/auth/me');
+    check('P-82 邮箱验证成功且账号状态落库',
+      okv.status === 200 && okv.data?.verified === true && me.data?.user?.email_verified === true);
+    const badTok = await vp.call('POST', '/api/auth/verify-email', { token: 'not-a-real-token' });
+    check('P-83 无效验证令牌 400（不抛 500）', badTok.status === 400 && badTok.error?.code === 'VERIFICATION_FAILED');
+    // 注册端点会下发 Set-Cookie，必须用独立客户端，否则会覆盖 vp 的会话导致后续 CSRF 全失效
+    const vx = new Client(); vx.env = v3env.env;
+    const disp = await vx.call('POST', '/api/auth/register',
+      { email: 'someone@mailinator.com', password: 'WhateverPass123!', display_name: 'Temp', role: 'solver' });
+    check('P-84 一次性邮箱域名被拒绝', disp.status === 400 && disp.error?.code === 'DISPOSABLE_EMAIL');
+    const gpc = await vx.call('POST', '/api/auth/register',
+      { email: 'v3gpc@sambon.net', password: 'GpcPass123!', display_name: 'GPC User', role: 'solver' },
+      { headers: { 'sec-gpc': '1' } });
+    check('P-85 GPC 信号在注册时即关闭个性化并留痕',
+      gpc.status === 201 && gpc.data?.user?.personalized_enabled === false && gpc.data?.user?.gpc_enabled === true);
+    const strict = makeEnv({ ENFORCE_STRONG_PASSWORD: 'true' });
+    const weak = await dispatch(new Request('http://localhost/api/auth/register', {
+      method: 'POST', headers: { host: 'localhost', 'content-type': 'application/json' },
+      body: JSON.stringify({ email: 'weak@sambon.net', password: 'aaaaaaaaaaaa', display_name: 'Weak', role: 'solver' }),
+    }), strict.env);
+    check('P-86 开启强口令策略后弱口令 422', weak.status === 422);
+    const lock = makeEnv({});
+    const lc = new Client(); lc.env = lock.env;
+    await lc.call('POST', '/api/auth/register',
+      { email: 'lock@sambon.net', password: 'LockPass123!', display_name: 'Lock', role: 'solver' });
+    const st = [];
+    for (let i = 0; i < 6; i += 1) {
+      st.push((await lc.login(lock.env, 'lock@sambon.net', 'WrongPass123!')).status);
+    }
+    check('P-87 连续失败 5 次后账号临时锁定 423',
+      st.slice(0, 5).every((s) => s === 401) && st[5] === 423, st.join(','));
+
+    const sr = await vs.call('POST', '/api/auth/register',
+      { email: 'v3sol@sambon.net', password: 'SolverPass123!', display_name: 'V3 Solver', role: 'solver' });
+    vs.csrf = sr.data?.session?.csrf_token || null;
+    const sr2 = await vs2.call('POST', '/api/auth/register',
+      { email: 'v3sol2@sambon.net', password: 'SolverPass123!', display_name: 'V3 Solver 2', role: 'solver' });
+    vs2.csrf = sr2.data?.session?.csrf_token || null;
+    check('P-88 两名接单人注册成功（并发抢单用例准备）', sr.status === 201 && sr2.status === 201);
+  }
+
+  // ------------------------------------------------------------------ 15. 通知 / 埋点 / 撤回
+  console.log('\n[15] 通知中心、曝光回执与任务撤回');
+  let cancelTaskId = null;
+  let frozenTaskId = null;
+  let reviewTaskId = null;
+  {
+    const mkTask = async (tag, { doReview = true, doDispatch = true } = {}) => {
+      const r = await vp.call('POST', '/api/tasks', {
+        title: `V3 任务 ${tag}`, description: '完成一项可验收的线上协助工作',
+        category: 'general', bounty: 200, acceptance_criteria: '提交可核验的成果说明',
+        online: true, radius_km: 10, required_skills: ['design'], deadline_hours: 72,
+        event_id: eid(`v3-${tag}`),
+      });
+      const id = r.data?.task?.task_id;
+      if (doReview) await va.call('POST', `/api/tasks/${id}/review`, { decision: 'approve', event_id: eid(`rev-${tag}`) });
+      if (doDispatch) await va.call('POST', `/api/tasks/${id}/dispatch`, { dry_run: false, top_k: 5, batch_size: 5, event_id: eid(`disp-${tag}`) });
+      return id;
+    };
+
+    cancelTaskId = await mkTask('cancel', { doReview: false, doDispatch: false });
+    frozenTaskId = await mkTask('frozen', { doDispatch: false });
+    reviewTaskId = await mkTask('review');
+
+    const notes = await vp.call('GET', '/api/me/notifications');
+    check('P-89 任务审核后发布方收到通知（写操作副作用自动入队）',
+      (notes.data?.items || []).some((x) => x.kind === 'TASK_UPDATE'));
+    const read = await vp.call('POST', '/api/me/notifications/read', { all: true });
+    const unread = await vp.call('GET', '/api/me/notifications?unread=true');
+    check('P-90 通知可批量标记已读', read.status === 200 && (unread.data?.items || []).length === 0);
+
+    const fb = await vs.call('POST', `/api/tasks/${reviewTaskId}/feedback`, { kind: 'EXPOSED', event_id: eid('fb-exposed') });
+    const evs = await vp.call('GET', `/api/events?task_id=${reviewTaskId}`);
+    check('P-91 曝光回执 201 且写入 DispatchExposed（D-07 P1 落地）',
+      fb.status === 201 && (evs.data?.events || []).some((e) => e.type === 'DispatchExposed'));
+    const fbig = await vs.call('POST', `/api/tasks/${reviewTaskId}/feedback`, { kind: 'IGNORED', event_id: eid('fb-ignored') });
+    check('P-92 忽略回执同样可记录', fbig.status === 201);
+
+    const c1 = await vp.call('POST', `/api/tasks/${cancelTaskId}/cancel`, { reason: 'publisher_withdrawn', event_id: eid('cancel1') });
+    check('P-93 未冻结任务可撤回（PENDING_REVIEW→REJECTED）',
+      c1.status === 200 && ['REJECTED', 'CANCELLED'].includes(c1.data?.task?.state));
+    const before = (await vp.call('GET', '/api/auth/me')).data.user.available_sbc;
+    const c2 = await vp.call('POST', `/api/tasks/${frozenTaskId}/cancel`, { reason: 'no_longer_needed', event_id: eid('cancel2') });
+    const after = (await vp.call('GET', '/api/auth/me')).data.user.available_sbc;
+    const total = vsum('SELECT SUM(delta) AS s FROM ledger_entries')[0]?.s ?? -1;
+    check('P-94 已冻结任务撤回全额原路退回（含 5% 服务费）且账本守恒',
+      c2.status === 200 && c2.data?.task?.state === 'CANCELLED' && after > before && Math.abs(Number(total)) < 1e-6,
+      `before=${before} after=${after} sum=${total}`);
+    const denied = await vs2.call('POST', `/api/tasks/${reviewTaskId}/cancel`, { reason: 'x', event_id: eid('cancel3') });
+    check('P-95 非发布方撤回被拒绝 403', denied.status === 403);
+  }
+
+  // ------------------------------------------------------------------ 16. 并发抢单 CAS
+  console.log('\n[16] 并发抢单：version CAS 与账本守恒');
+  let concurrentTaskId = null;
+  {
+    const created = await vp.call('POST', '/api/tasks', {
+      title: 'V3 并发抢单任务', description: '验证同一任务只能被接单一次',
+      category: 'general', bounty: 200, acceptance_criteria: '提交成果', online: true,
+      radius_km: 10, required_skills: [], deadline_hours: 72, event_id: eid('v3-concurrent'),
+    });
+    concurrentTaskId = created.data?.task?.task_id;
+    await va.call('POST', `/api/tasks/${concurrentTaskId}/review`, { decision: 'approve', event_id: eid('rev-concurrent') });
+    await va.call('POST', `/api/tasks/${concurrentTaskId}/dispatch`, { dry_run: false, top_k: 5, batch_size: 5, event_id: eid('disp-concurrent') });
+    const [r1, r2] = await Promise.all([
+      vs.call('POST', `/api/tasks/${concurrentTaskId}/accept`, { event_id: eid('acc-a') }),
+      vs2.call('POST', `/api/tasks/${concurrentTaskId}/accept`, { event_id: eid('acc-b') }),
+    ]);
+    const statuses = [r1.status, r2.status];
+    const escrowLegs = vsum('SELECT COUNT(*) AS n FROM ledger_entries WHERE task_id = ? AND memo LIKE ?', [concurrentTaskId, 'escrow:%'])[0]?.n;
+    const total = vsum('SELECT SUM(delta) AS s FROM ledger_entries')[0]?.s ?? -1;
+    check('P-96 两个并发接单只有一个成功，另一个被 409 拦下',
+      statuses.filter((s) => s === 200).length === 1 && statuses.filter((s) => s === 409).length === 1, statuses.join(','));
+    check('P-97 败者未留下孤立托管流水（仅 2 条腿）', Number(escrowLegs) === 2, `legs=${escrowLegs}`);
+    check('P-98 并发后账本五科目仍守恒', Math.abs(Number(total)) < 1e-6, `sum=${total}`);
+    const st = vsum('SELECT state, solver_id FROM tasks WHERE task_id = ?', [concurrentTaskId])[0];
+    check('P-99 任务最终只有一个接单人且状态 ACCEPTED', st?.state === 'ACCEPTED' && !!st?.solver_id);
+  }
+
+  // ------------------------------------------------------------------ 17. 运维 / 灾备 / 定时任务 / 红线
+  console.log('\n[17] 运维总览、指标、备份、锚定、定时任务与红线');
+  {
+    const cfg = await va.call('GET', '/api/config');
+    check('P-100 LLM / 通知未配置时降级如实暴露且模型不决策',
+      cfg.data?.algorithm_degraded === true && cfg.data?.llm?.model_decision === null
+      && cfg.data?.notify?.degraded === true && cfg.data?.default_locale === 'en');
+    check('P-101 能力矩阵声明完全体功能（i18n / cron / backup / anchor / CAS）',
+      ['i18n', 'llm_adapter', 'backup', 'anchor', 'concurrent_cas', 'dispatch_feedback', 'task_cancel']
+        .every((k) => cfg.data?.features?.[k] === true));
+
+    const ops = await va.call('GET', '/api/admin/ops');
+    check('P-102 运维总览含全部组件状态与 schema 版本',
+      ops.status === 200 && ops.data?.components?.db?.status === 'configured'
+      && !!ops.data?.components?.llm && !!ops.data?.components?.notify
+      && !!ops.data?.components?.cron && !!ops.data?.components?.security
+      && ops.data?.schema_version === 'sambon-prod-schema-v2.0');
+    const metrics = await va.call('GET', '/api/admin/metrics?window_minutes=60');
+    check('P-103 指标含账本守恒与哈希链校验',
+      metrics.status === 200 && metrics.data?.ledger_integrity?.balanced === true
+      && metrics.data?.ledger_integrity?.hash_chain_valid === true);
+    const audit = await va.call('GET', '/api/admin/audit?limit=50');
+    check('P-104 审计日志可查询且含人工动作留痕',
+      audit.status === 200 && audit.data?.count > 0 && Array.isArray(audit.data?.items));
+    const backup = await va.call('GET', '/api/admin/backup');
+    const bkRows = vsum('SELECT COUNT(*) AS n FROM backups')[0]?.n;
+    check('P-105 平台级备份导出含校验和、表数据与留痕',
+      backup.status === 200 && /^[0-9a-f]{64}$/.test(backup.data?.sha256 || '')
+      && backup.data?.row_count > 0 && !!backup.data?.tables?.users && Number(bkRows) >= 1);
+    const anchor = await va.call('POST', '/api/admin/anchor', { event_id: eid('anchor') });
+    check('P-106 人工锚定返回 Merkle 根且声明零 PII / 未接公链',
+      anchor.status === 200 && /^[0-9a-f]{64}$/.test(anchor.data?.merkle_root || '')
+      && anchor.data?.pii_on_chain === false && anchor.data?.balanced === true);
+
+    const noSecret = await va.call('POST', '/api/admin/cron', { dry_run: true, event_id: eid('cron-nosecret') });
+    check('P-107 cron 缺少密钥 403', noSecret.status === 403 && noSecret.error?.code === 'INVALID_CRON_SECRET');
+    const cron = await va.call('POST', '/api/admin/cron', { dry_run: false, event_id: eid('cron-run') },
+      { headers: { 'x-cron-secret': 'test-cron-secret' } });
+    check('P-108 cron 带密钥执行 5 个作业且返回结构化计数',
+      cron.status === 200 && Array.isArray(cron.data?.ran) && cron.data.ran.length === 5
+      && !!cron.data?.counts && cron.data?.mode === 'http_triggered');
+    const cronNoCfg = makeEnv({ CRON_SECRET: '' });
+    const cronC = new Client(); cronC.env = cronNoCfg.env;
+    const c503 = await cronC.call('POST', '/api/admin/cron', { dry_run: true });
+    check('P-109 未配置 CRON_SECRET 时端点 503（不留后门）', c503.status === 503);
+
+    // 超时任务只生成「待人工确认」工单，绝不自动结算
+    const solverId = vsum('SELECT solver_id FROM tasks WHERE task_id = ?', [concurrentTaskId])[0]?.solver_id;
+    const winner = solverId === vsum('SELECT user_id FROM users WHERE email = ?', ['v3sol@sambon.net'])[0]?.user_id ? vs : vs2;
+    await winner.call('POST', `/api/tasks/${concurrentTaskId}/submit`, { content: '成果说明，联系电话 13800138000', event_id: eid('submit-v3') });
+    await v3env.raw.exec(`UPDATE tasks SET created_at = '2020-01-01T00:00:00.000Z' WHERE task_id = '${concurrentTaskId}'`);
+    await va.call('POST', '/api/admin/cron', { dry_run: false, event_id: eid('cron-overdue') },
+      { headers: { 'x-cron-secret': 'test-cron-secret' } });
+    const stillSubmitted = vsum('SELECT state FROM tasks WHERE task_id = ?', [concurrentTaskId])[0]?.state;
+    const dueFlag = vsum("SELECT COUNT(*) AS n FROM risk_flags WHERE flag = 'AUTO_VERIFY_DUE'")[0]?.n;
+    check('P-110 超时任务只生成人工确认工单，不自动验收 / 不自动结算',
+      stillSubmitted === 'SUBMITTED' && Number(dueFlag) >= 1, `state=${stillSubmitted} flags=${dueFlag}`);
+
+    const flags = await va.call('GET', '/api/admin/risk?status=OPEN');
+    const flag = (flags.data?.items || [])[0];
+    const resolved = await va.call('POST', '/api/admin/risk/resolve',
+      { flag_id: flag?.id, decision: 'dismiss', reason: '人工复核后无需升级', event_id: eid('risk-resolve') });
+    const twice = await va.call('POST', '/api/admin/risk/resolve',
+      { flag_id: flag?.id, decision: 'dismiss', reason: '重复处置', event_id: eid('risk-resolve2') });
+    check('P-111 风控标记必须人工处置且不可重复处置',
+      resolved.status === 200 && twice.status === 404);
+
+    const redLines = ['/api/sbc/transfer', '/api/sbc/trade', '/api/sbc/redeem', '/api/sbc/withdraw',
+      '/api/sbc/exchange', '/api/sbc/yield', '/api/sbc/market', '/api/wallet/cashout'];
+    const codes = [];
+    for (const pth of redLines) codes.push((await va.call('POST', pth, {})).status);
+    check('P-112 V3 后 8 条 SBC 资产化红线仍全部 404', codes.every((s) => s === 404), codes.join(','));
+
+    const app = read('prod/site/app.js');
+    const newPaths = ['/api/auth/verify-email', '/api/auth/resend-verification', '/api/me/notifications',
+      '/api/me/notifications/read', '/api/me/locale', '/api/admin/ops',
+      '/api/admin/metrics', '/api/admin/audit', '/api/admin/risk', '/api/admin/risk/resolve',
+      '/api/admin/backup', '/api/admin/anchor', '/api/admin/cron'];
+    // 任务子路径由 taskPath(suffix) 统一拼接，不是完整字面量
+    check('P-113 生产前端已接入全部 V3 端点',
+      newPaths.every((p) => app.includes(p))
+      && app.includes("taskPath('feedback')") && app.includes("taskPath('cancel')"));
+    check('P-114 前端中英双语且海外默认英文',
+      app.includes("'zh-CN'") && app.includes('en:') && app.includes("LOCALE_KEY = 'sambon.locale'")
+      && /navigator\.language/.test(app) && /startsWith\('zh'\)/.test(app));
+
+    let v3Syntax = true;
+    for (const f of ['prod/lib/notify.js', 'prod/lib/llm.js', 'prod/lib/jobs.js',
+      'prod/lib/observability.js', 'prod/lib/risk.js', 'prod/lib/security.js', 'prod/lib/api.js']) {
+      try { execFileSync(process.execPath, ['--check', resolve(ROOT, f)], { stdio: 'pipe' }); }
+      catch { v3Syntax = false; }
+    }
+    check('P-115 全部 V3 后端模块通过语法检查', v3Syntax);
+    check('P-116 schema.sql 同步含新表与幂等补列语句',
+      read('schema.sql') === SCHEMA_SQL && read('schema.sql').includes('notifications')
+      && read('schema.sql').includes('ALTER TABLE users ADD COLUMN email_verified'));
   }
 
   console.log(`\n=== 结果：PASS ${pass} / FAIL ${failCount} ===`);

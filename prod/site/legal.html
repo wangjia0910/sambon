@@ -4,11 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>法律与合规声明 · 三宝殿 sambon.net</title>
+  <title>法律与合规声明 / Legal &amp; Compliance · 三宝殿 sambon.net</title>
   <!-- 绝对路径：静态文件位于 Cloudflare Pages 输出目录根 -->
+  <!-- 无内联 <script>：语言切换由 radio + :has() 纯 CSS 实现 -->
   <link rel="stylesheet" href="/styles.css">
   <style>
-    /* legal.html 专用排版：窄栏长文，不影响操作台样式 */
+    /* legal.html 专用排版：窄栏长文 + 双语纯 CSS 切换，不影响操作台样式 */
     .legal-wrap { max-width: 980px; margin: 24px auto 64px; padding: 0 16px; }
     .legal-head { padding: 20px 24px; }
     .legal-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 24px; }
@@ -19,242 +20,421 @@
     .legal-section p, .legal-section li { font-size: 13.5px; line-height: 1.85; }
     .note-box { border-left: 3px solid var(--primary); background: var(--surface-2); padding: 10px 14px; border-radius: 0 var(--radius) var(--radius) 0; }
     .legal-section .table th:first-child { width: 26%; }
-    @media (max-width: 900px) { .legal-wrap { margin: 12px auto 40px; } }
+
+    /* 语言切换条 */
+    .lang-picker { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 14px; }
+    .lang-picker input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+    .lang-tabs { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .lang-tabs label { padding: 6px 16px; font-size: 13px; cursor: pointer; background: var(--surface); color: var(--muted); }
+    .lang-tabs label + label { border-left: 1px solid var(--border); }
+    .lang-picker .hint { font-size: 12px; color: var(--muted); }
+    /* 高亮当前语言按钮 */
+    .legal-shell:has(#doc-lang-zh:checked) label[for="doc-lang-zh"],
+    .legal-shell:has(#doc-lang-en:checked) label[for="doc-lang-en"] { background: var(--primary); color: #fff; font-weight: 600; }
+    /* 核心：按所选语言成对显示 section[lang]；:has() 不支持时两种语言并列显示（优雅降级，内容不丢失） */
+    .legal-shell:has(#doc-lang-zh:checked) [lang="en"],
+    .legal-shell:has(#doc-lang-en:checked) [lang="zh-CN"] { display: none; }
+    .topic [lang="zh-CN"], .topic [lang="en"] { margin-bottom: 16px; }
+    .topic { scroll-margin-top: 16px; }
+
+    @media (max-width: 900px) {
+      .legal-wrap { margin: 12px auto 40px; }
+      .lang-picker .hint { display: block; width: 100%; }
+    }
   </style>
 </head>
 <body>
 
 <header class="topbar">
-  <div class="brand">三宝殿 · sambon.net <span class="brand-sub">法律与合规声明</span></div>
-  <div class="topbar-right"><a class="btn btn-ghost btn-sm" href="/">返回操作台</a></div>
+  <div class="brand">三宝殿 · sambon.net <span class="brand-sub">法律与合规声明 · Legal &amp; Compliance Disclosures</span></div>
+  <div class="topbar-right"><a class="btn btn-ghost btn-sm" href="/">返回操作台 / Back to console</a></div>
 </header>
 
 <div class="banner-l1">
   <strong>L1 状态声明</strong>
   <span>本站为生产系统演示环境，未完成 docs/07 的 G1–G7 与 V1–V8 全部核销，不构成正式运营许可；下列政策为演示文本，不承诺任何服务等级（SLA）或可用性指标。</span>
-  <span class="en">Demonstration environment only — G1–G7 and V1–V8 (docs/07) are not fully discharged and no operating licence is granted.</span>
+  <span class="en">Demonstration environment only — G1–G7 and V1–V8 (docs/07) are not fully discharged and no operating licence is granted. No SLA or availability commitment is made.</span>
 </div>
 
 <div class="legal-wrap">
+  <div class="legal-shell">
 
-  <div class="card legal-head">
-    <h2>法律与合规声明</h2>
-    <p class="muted">本页汇总《三宝殿 · sambon.net》（面向海外用户的中文界面悬赏互助平台，Cloudflare Pages 部署）在生产系统演示环境下的政策文本。所有前端请求为同源 <code>/api/</code> 调用；会话 Cookie 为 httpOnly，写操作须携带 <code>X-CSRF-Token</code>。</p>
-    <p class="note-box"><strong>适用范围提示：</strong>本服务不提供任何形式的资产发行、支付结算、金融或投资服务；SBC 仅为平台内贡献积分。政策文本中提及的「结算」「退回」「判给」均指平台内贡献积分记账科目的人工调整，不涉及任何外部资金。</p>
-    <p class="en">This page consolidates privacy, terms, acceptable use, AI transparency, minor restrictions and reporting disclosures for a demonstration deployment. All API calls are same-origin; session cookies are httpOnly; write requests require an X-CSRF-Token header.</p>
+    <div class="card legal-head">
+      <h2>法律与合规声明 / Legal &amp; Compliance Disclosures</h2>
+      <p class="muted">本页以中英双语呈现《三宝殿 · sambon.net》（面向海外用户的悬赏互助平台，Cloudflare Pages + D1 部署）的政策文本。所有前端请求均为同源 <code>/api/</code> 调用；会话 Cookie 为 httpOnly；写操作须携带 <code>X-CSRF-Token</code>。</p>
+      <p class="muted">This page presents, in Chinese and English, the policy texts for sambon.net, a bounty and mutual-aid platform deployed on Cloudflare Pages with D1. All front-end calls are same-origin <code>/api/</code> requests; session cookies are httpOnly; write requests carry an <code>X-CSRF-Token</code> header.</p>
+      <p class="note-box"><strong>适用范围 / Scope：</strong>本服务不提供任何资产发行、支付结算、金融或投资服务；SBC 仅为平台内贡献积分，不可兑付、不可转让。文本中的「结算」「退回」「判给」均指平台内贡献积分记账科目的人工调整，不涉及任何外部资金。 / The service provides no asset issuance, payment settlement, financial or investment service. SBC is an in-platform contribution point, non-redeemable and non-transferable; terms such as "settlement", "refund" or "award" refer only to manual bookkeeping adjustments of in-platform points and never to external funds.</p>
+    </div>
+
+    <div class="lang-picker">
+      <div class="lang-tabs" role="group" aria-label="Document language">
+        <input type="radio" name="doc-lang" id="doc-lang-zh" checked>
+        <input type="radio" name="doc-lang" id="doc-lang-en">
+        <label for="doc-lang-zh">中文</label>
+        <label for="doc-lang-en">English</label>
+      </div>
+      <span class="hint">选择语言 / Select language — 纯 CSS 切换，无脚本 / CSS-only, no script</span>
+    </div>
+
+    <nav class="legal-nav" aria-label="章节导航 / Sections">
+      <a href="#status">状态 / Status</a>
+      <a href="#privacy">数据与留存 / Data &amp; Retention</a>
+      <a href="#gdpr">GDPR / UK GDPR</a>
+      <a href="#transfer">跨境传输 / Transfers</a>
+      <a href="#ai">AI 透明度 / AI Transparency</a>
+      <a href="#sbc">SBC 声明 / SBC</a>
+      <a href="#minors">未成年人 / Minors</a>
+      <a href="#report">举报 / Reporting</a>
+      <a href="#terms">服务条款 / Terms</a>
+      <a href="#aup">可接受使用 / AUP</a>
+      <a href="#cookies">Cookie / Cookies</a>
+      <a href="#contact">联系方式 / Contact</a>
+    </nav>
+
+    <!-- ============ 1. 状态与适用范围 ============ -->
+    <div class="topic" id="status">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>一、状态与适用范围</h2>
+        <p>本站为生产系统演示环境，未完成 <code>docs/07</code> 的 G1–G7 与 V1–V8 全部核销，<strong>不构成正式运营许可</strong>；账号接入仅用于内部核验，未开放注册，不构成服务对外开放。我们不承诺任何具体的可用性、响应时间、处理时限或服务等级（SLA）数字。</p>
+        <p>本页政策为演示文本，可能随合规核销进度更新，更新后在本页呈现。若中英文本存在理解差异，以中文文本为解释基准；英文版本为面向海外用户的完整译文，不采用逐字机翻。</p>
+        <p class="note-box">本服务仅面向年满 18 周岁的用户，不面向儿童；面向海外用户时默认以英文界面呈现（可在页面右上角切换语言）。</p>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>1. Status and Scope</h2>
+        <p>This site is a production-system demonstration environment. The G1–G7 and V1–V8 gates in <code>docs/07</code> have not all been discharged, and <strong>no operating licence is granted</strong>. Account access exists solely for internal verification; registration is not open to the public and the service is not offered as a live commercial product. We make no numerical commitment regarding availability, response time, handling time or service level (SLA).</p>
+        <p>These policies are demonstration texts and may be updated as compliance gates are discharged, with changes published here. Where the Chinese and English texts admit different readings, the Chinese text governs interpretation; the English version is a complete, professionally written translation for international users, not a literal machine rendering.</p>
+        <p class="note-box">The service is for adults aged 18 or over and is not directed at children. For international users the interface defaults to English; the language can be switched at the top right of the console.</p>
+      </section>
+    </div>
+
+    <!-- ============ 2. 数据收集范围与留存 ============ -->
+    <div class="topic" id="privacy">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>二、数据收集范围与留存</h2>
+        <h3>2.1 我们收集哪些数据</h3>
+        <div class="table-wrap"><table class="table">
+          <thead><tr><th>类别</th><th>字段 / 内容</th><th>处理目的</th></tr></thead>
+          <tbody>
+            <tr><td>账号数据</td><td>邮箱、密码散列（服务端保存）、显示名、角色（publisher / solver / admin）、user_id、邮箱验证状态</td><td>身份识别、会话维持、邮箱验证、按角色强制鉴权</td></tr>
+            <tr><td>任务数据</td><td>标题、描述、分类、悬赏、服务费、冻结合计、验收标准、线上/线下、半径、所需技能、截止时间、虚拟联系方式</td><td>任务发布、审核、分派与验收</td></tr>
+            <tr><td>成果数据</td><td>提交内容、评分、理由、成果预览</td><td>验收与争议复核；成果预览对外展示前做 PII 脱敏</td></tr>
+            <tr><td>通知与事件</td><td>通知类别、标题、正文、状态、时间戳；event_id、事件类型、状态流转、任务关联 ID</td><td>站内通知、审计、事件回放、安全与防滥用</td></tr>
+            <tr><td>偏好与同意</td><td>语言偏好、personalized_enabled、consents（kind / version / granted）</td><td>双语呈现、个性化开关、Cookie 同意记录与撤回</td></tr>
+            <tr><td>账本与回执</td><td>平台内贡献积分冻结与记账流水、balance_check、anchor、本地哈希摘要；客户端曝光/忽略回执</td><td>账目平衡核对与算法透明度；纯记账记录，不具货币价值</td></tr>
+            <tr><td>边缘日志</td><td>Cloudflare 边缘访问日志中的 IP、User-Agent、请求时间与状态码</td><td>安全、防滥用与运行诊断</td></tr>
+          </tbody>
+        </table></div>
+        <h3>2.2 处理目的与法律依据</h3>
+        <p>上述数据仅用于：（a）履行账号与任务服务所必需；（b）遵守法定义务与保存审计记录；（c）在取得同意的前提下进行匿名统计；（d）为安全与防滥用所必需的合法利益。我们不出售个人数据，不将个人数据用于第三方广告投放，不进行与任务撮合无关的用户画像。</p>
+        <h3>2.3 留存</h3>
+        <p>留存以完成处理目的所需的最短期限为原则，并遵守适用法律：账号数据于账号存续期间保留；任务与事件审计记录在任务生命周期及法定争议期间内保留；访问日志按安全审计必要期限保留；同意记录保留至撤回后一段合理期间以证明合规；通知在用户已读或账号注销后按最短必要期限清理。账号注销后，除法律要求必须保留的记录外，个人数据予以删除或不可逆转地匿名化；匿名化后的汇总数据不再属于个人数据。本演示环境不对具体留存天数、响应时间或处理时限作出数字承诺。</p>
+        <h3>2.4 安全</h3>
+        <p>会话 Cookie 为 httpOnly，前端脚本不读取 Cookie 内容；所有写操作携带 <code>X-CSRF-Token</code> 请求头以缓解跨站请求伪造；成果正文展示前经过 PII 脱敏；角色与状态校验在服务端强制生效（<code>enforcement: server_side</code>），客户端展示不构成授权。</p>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>2. Data Collected and Retention</h2>
+        <h3>2.1 What we collect</h3>
+        <div class="table-wrap"><table class="table">
+          <thead><tr><th>Category</th><th>Fields / content</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td>Account</td><td>Email, password hash (server-side), display name, role (publisher / solver / admin), user_id, email verification status</td><td>Identity, session continuity, email verification, role-based authorisation</td></tr>
+            <tr><td>Task</td><td>Title, description, category, bounty, service fee, frozen total, acceptance criteria, online/offline, radius, required skills, deadline, virtual contact</td><td>Publishing, review, dispatch and acceptance</td></tr>
+            <tr><td>Result</td><td>Submitted content, rating, reason, result preview</td><td>Acceptance and dispute review; previews are PII-redacted before display</td></tr>
+            <tr><td>Notifications &amp; events</td><td>Notification kind, title, body, status, timestamp; event_id, event type, state transitions, related task ID</td><td>In-app notices, audit, event replay, security and anti-abuse</td></tr>
+            <tr><td>Preferences &amp; consent</td><td>Locale, personalized_enabled, consents (kind / version / granted)</td><td>Bilingual presentation, personalisation switch, consent records and withdrawal</td></tr>
+            <tr><td>Ledger &amp; receipts</td><td>In-platform point freezes and bookkeeping entries, balance_check, anchor, local hash digests; client exposure/ignore receipts</td><td>Balance reconciliation and algorithmic transparency; never a withdrawable balance</td></tr>
+            <tr><td>Edge logs</td><td>IP, User-Agent, request time and status code in Cloudflare edge access logs</td><td>Security, anti-abuse and operational diagnostics</td></tr>
+          </tbody>
+        </table></div>
+        <h3>2.2 Purposes and legal basis</h3>
+        <p>Data is used only to: (a) perform the account and task service; (b) meet legal obligations and retain audit records; (c) run anonymised analytics where consent has been given; and (d) pursue the legitimate interest of security and anti-abuse. We do not sell personal data, do not use it for third-party advertising, and do not build profiles unrelated to task matching.</p>
+        <h3>2.3 Retention</h3>
+        <p>Retention follows the shortest period necessary for the processing purpose and applicable law: account data is kept for the life of the account; task and audit records are kept for the task lifecycle and the statutory dispute window; access logs are kept for the period needed for security audit; consent records are kept for a reasonable period after withdrawal to evidence compliance; notifications are cleared once read or when the account is deleted. After account deletion, personal data is erased or irreversibly anonymised except where law requires retention; anonymised aggregates are no longer personal data. This demonstration environment makes no numerical promise about retention days, response times or handling deadlines.</p>
+        <h3>2.4 Security</h3>
+        <p>Session cookies are httpOnly and are never read by front-end scripts; every write request carries an <code>X-CSRF-Token</code> header to mitigate cross-site request forgery; result content is PII-redacted before display; role and state checks are enforced server-side (<code>enforcement: server_side</code>), and a front-end control never constitutes authorisation.</p>
+      </section>
+    </div>
+
+    <!-- ============ 3. GDPR / UK GDPR ============ -->
+    <div class="topic" id="gdpr">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>三、GDPR / UK GDPR 数据主体权利</h2>
+        <p>若你位于欧洲经济区（EEA）、英国或适用类似法规（含 <strong>UK GDPR</strong> 与 <em>Data Protection Act 2018</em>）的司法辖区，你就个人数据享有以下权利：</p>
+        <ul>
+          <li><strong>访问权</strong>：确认我们是否处理你的个人数据并取得副本；</li>
+          <li><strong>更正权</strong>：要求更正不准确或不完整的个人数据；</li>
+          <li><strong>删除权（被遗忘权）</strong>：在法定条件下要求删除个人数据；</li>
+          <li><strong>限制处理权</strong>：在争议期间要求限制处理范围；</li>
+          <li><strong>数据可携带权</strong>：以结构化、通用、机器可读格式接收你的数据；</li>
+          <li><strong>反对权</strong>：反对基于合法利益的处理，以及随时反对直接营销（本服务不进行直接营销）；</li>
+          <li><strong>撤回同意权</strong>：随时撤回 Cookie / 分析或个性化相关同意，撤回不影响撤回前处理的合法性；</li>
+          <li><strong>不受纯自动化决定约束的权利</strong>：见下文 AI 透明度，本站所有具法律效果的决定均由人工确认；</li>
+          <li><strong>投诉权</strong>：向所在辖区监管机构（EEA 为数据保护监管机构，英国为 ICO）投诉。</li>
+        </ul>
+        <h3>如何行使</h3>
+        <p>登录操作台后使用「导出我的数据」（<code>GET /api/me/export</code>，返回 JSON 文件）行使访问与可携带权；使用「删除我的账号」（<code>DELETE /api/me</code>）发起删除，须输入 <code>DELETE</code> 二次确认，处理后自动退出登录。Cookie 同意可通过「Cookie 偏好」随时重新选择（<code>POST /api/consents</code>）；个性化推荐可通过「关闭个性化推荐」开关关闭（<code>POST /api/preferences/personalized</code>），且由服务端强制生效。亦可联系 <code>privacy@sambon.net</code>（占位地址）。我们可能需要在处理前核验请求人身份，且不对处理时限作出数字承诺。</p>
+        <p>就英国用户而言，我们依 UK GDPR 遵循同等原则，跨境传输依 UK Addendum / IDTA 机制处理（见下节）。</p>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>3. GDPR / UK GDPR Data Subject Rights</h2>
+        <p>If you are in the European Economic Area, the United Kingdom, or a jurisdiction with comparable law (including the <strong>UK GDPR</strong> and the <em>Data Protection Act 2018</em>), you have the following rights over your personal data:</p>
+        <ul>
+          <li><strong>Access</strong> — confirmation of processing and a copy of your data;</li>
+          <li><strong>Rectification</strong> — correction of inaccurate or incomplete data;</li>
+          <li><strong>Erasure ("right to be forgotten")</strong> — deletion where the statutory conditions apply;</li>
+          <li><strong>Restriction</strong> — limitation of processing while a dispute is resolved;</li>
+          <li><strong>Portability</strong> — receipt of your data in a structured, commonly used, machine-readable format;</li>
+          <li><strong>Objection</strong> — to processing based on legitimate interests, and at any time to direct marketing (we do not carry out direct marketing);</li>
+          <li><strong>Withdrawal of consent</strong> — at any time for cookie/analytics or personalisation consent, without affecting the lawfulness of prior processing;</li>
+          <li><strong>Not to be subject to solely automated decisions</strong> — see AI Transparency below; every decision with legal effect is human-confirmed;</li>
+          <li><strong>Complaint</strong> — to your supervisory authority (an EEA data protection authority, or the ICO in the UK).</li>
+        </ul>
+        <h3>How to exercise them</h3>
+        <p>After signing in, use "Export my data" (<code>GET /api/me/export</code>, a JSON download) for access and portability, and "Delete my account" (<code>DELETE /api/me</code>) for erasure — the latter requires typing <code>DELETE</code> to confirm and signs you out afterwards. Cookie consent can be re-chosen at any time under "Cookie preferences" (<code>POST /api/consents</code>); personalised ranking can be disabled with the "Disable personalisation" switch (<code>POST /api/preferences/personalized</code>), enforced server-side. You may also write to <code>privacy@sambon.net</code> (placeholder). We may need to verify identity before acting and make no numerical promise about handling deadlines.</p>
+        <p>For UK users we apply the equivalent principles under the UK GDPR and handle cross-border transfers under the UK Addendum / IDTA mechanism described below.</p>
+      </section>
+    </div>
+
+    <!-- ============ 4. 跨境传输 ============ -->
+    <div class="topic" id="transfer">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>四、跨境传输与 Cloudflare DPA / SCC</h2>
+        <p>本服务部署于 Cloudflare Pages，边缘网络与 D1 数据库可能位于你所在国家/地区之外（包括美国及 Cloudflare 全球数据中心）。因此，你的个人数据可能发生跨境传输。</p>
+        <ul>
+          <li>Cloudflare 作为数据处理者，其义务由 <strong>Cloudflare Data Processing Addendum（DPA）</strong> 约定，包含保密、技术与组织安全措施、协助数据主体请求、以及删除或返还数据等条款；</li>
+          <li>对于从 EEA / 瑞士向未获充分性认定地区的传输，依 <strong>欧盟标准合同条款（EU Standard Contractual Clauses, SCC, 2021/914）</strong> 作为传输机制；对英国传输适用 <strong>UK Addendum / IDTA</strong>；</li>
+          <li>补充措施包括传输加密（TLS）、最小必要数据收集、httpOnly 会话 Cookie、CSRF 令牌、PII 脱敏展示、按角色的服务端强制鉴权与审计事件留痕；</li>
+          <li>你可向 <code>privacy@sambon.net</code> 索取上述保障措施的副本或说明（占位地址，正式运营前将替换为有效联系方式）。</li>
+        </ul>
+        <p class="note-box">本演示环境尚未完成 docs/07 的 G1–G7 与 V1–V8 全部核销，上述传输机制为合规设计说明，不构成已完成审计或取得正式运营许可的声明。</p>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>4. Cross-Border Transfers and the Cloudflare DPA / SCC</h2>
+        <p>The service runs on Cloudflare Pages; its edge network and D1 database may sit outside your country, including the United States and Cloudflare's global data centres. Your personal data may therefore be transferred across borders.</p>
+        <ul>
+          <li>Cloudflare acts as a processor under the <strong>Cloudflare Data Processing Addendum (DPA)</strong>, which covers confidentiality, technical and organisational measures, assistance with data-subject requests, and deletion or return of data;</li>
+          <li>For transfers from the EEA or Switzerland to countries without an adequacy decision, we rely on the <strong>EU Standard Contractual Clauses (SCC, Decision 2021/914)</strong>; UK transfers rely on the <strong>UK Addendum / IDTA</strong>;</li>
+          <li>Supplementary measures include TLS in transit, data minimisation, httpOnly session cookies, CSRF tokens, PII-redacted display, role-based server-side authorisation and audit trails;</li>
+          <li>You may request a copy or a description of these safeguards at <code>privacy@sambon.net</code> (a placeholder to be replaced with a live contact before any licensed operation).</li>
+        </ul>
+        <p class="note-box">Because the G1–G7 and V1–V8 gates in docs/07 are not yet discharged, these mechanisms are a description of the compliance design, not a claim that an audit has been completed or that an operating licence has been granted.</p>
+      </section>
+    </div>
+
+    <!-- ============ 5. AI 透明度与算法推荐 ============ -->
+    <div class="topic" id="ai">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>五、算法推荐说明、关闭方式与 AI 透明度</h2>
+        <h3>5.1 算法用途</h3>
+        <p>操作台在候选分派环节使用算法辅助排序（<code>POST /api/tasks/:id/dispatch</code>），依据任务属性、技能标签、半径与截止时间等特征生成候选与批次。排序结果仅为候选建议，不产生自动指派或自动裁决的法律效果。当前配置版本见操作台展示的 <code>weight_version</code>、<code>rule_version</code> 与 <code>llm_adapter_version</code>。</p>
+        <h3>5.2 输入特征、六项权重与输出</h3>
+        <p>输入：任务分类、所需技能、线上/线下与半径、截止时间、悬赏参数、账号级个性化开关状态。排序由六项权重共同决定，其取值与版本在「AI 透明度」卡片中逐项展示，并随 <code>GET /api/config</code> 返回。输出：候选列表 <code>candidates</code> 与批次 <code>batches</code>，以及本次模式 <code>mode</code> 与是否启用个性化 <code>personalized</code>。我们不把种族、宗教、健康、性取向等特殊类别数据用于排序；不使用大语言模型对任务审核、验收、争议裁定或账号处罚作出自动决定。</p>
+        <h3>5.3 降级模式</h3>
+        <p>当 <code>algorithm_degraded</code> 为真时，系统使用保守排序并降低个性化权重，以避免在特征不足时产生偏斜推荐；该状态会在「AI 透明度」卡片中明示。</p>
+        <h3>5.4 个性化推荐的关闭方式</h3>
+        <p>在「AI 透明度与配置」卡片中勾选「关闭个性化推荐」开关即可关闭账号级个性化（对应 <code>POST /api/preferences/personalized</code>，<code>enabled: false</code>）；取消勾选可重新开启。该开关<strong>服务端强制生效</strong>（<code>enforcement: server_side</code>），客户端无法绕过，关闭后排序仅使用与任务直接相关的非个性化特征。关闭个性化不影响任务完整性、审核与验收流程。客户端曝光/忽略回执（<code>POST /api/tasks/:id/feedback</code>）仅用于算法透明度说明，不改变人工闸门的结果。</p>
+        <h3>5.5 AI 透明度与人工闸门</h3>
+        <p><code>GET /api/config</code> 返回的 <code>ai_disclosure</code> 以中英双语在操作台原样展示，前端不改写、不隐藏。任务审核、候选推送、结算、成果验收、自动验收、争议裁定、风控处置与账号处罚均为<strong>人工闸门</strong>：前端对管理员操作弹出二次确认并标注「人工确认」，服务端在人工确认后执行。我们不作仅依赖自动化处理、且对你产生法律效果或类似重大影响的决定；你可对人工决定通过举报通道或 <code>privacy@sambon.net</code> 申请人工复核。</p>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>5. Algorithmic Recommendation, Opt-Out and AI Transparency</h2>
+        <h3>5.1 Purpose</h3>
+        <p>The console applies algorithm-assisted ranking when dispatching candidates (<code>POST /api/tasks/:id/dispatch</code>). It generates candidates and batches from task attributes, skill tags, radius and deadline. Ranking is advisory only: it neither auto-assigns work nor produces an adjudicated outcome. The active configuration is shown in the console as <code>weight_version</code>, <code>rule_version</code> and <code>llm_adapter_version</code>.</p>
+        <h3>5.2 Inputs, six weights and outputs</h3>
+        <p>Inputs: task category, required skills, online/offline and radius, deadline, bounty parameters and the account-level personalisation switch. Ranking is governed by six weights whose values and version are displayed item by item in the AI Transparency card and returned by <code>GET /api/config</code>. Outputs: the <code>candidates</code> list, <code>batches</code>, the run <code>mode</code> and whether personalisation was applied (<code>personalized</code>). Special-category data such as race, religion, health or sexual orientation is never used for ranking, and no large language model makes autonomous decisions on review, acceptance, dispute resolution or sanctions.</p>
+        <h3>5.3 Degraded mode</h3>
+        <p>When <code>algorithm_degraded</code> is true, the system falls back to conservative ranking and reduces personalisation weighting to avoid skewed recommendations under sparse features; this state is shown in the AI Transparency card.</p>
+        <h3>5.4 How to disable personalisation</h3>
+        <p>Tick "Disable personalised recommendations" in the AI Transparency card to turn off account-level personalisation (<code>POST /api/preferences/personalized</code> with <code>enabled: false</code>); untick to re-enable. The switch is <strong>enforced server-side</strong> (<code>enforcement: server_side</code>) and cannot be bypassed by the client; once disabled, ranking uses only non-personalised, task-relevant features. Disabling personalisation does not affect task integrity, review or acceptance. Client exposure/ignore receipts (<code>POST /api/tasks/:id/feedback</code>) serve algorithmic transparency only and never alter a human-gated outcome.</p>
+        <h3>5.5 AI transparency and human gates</h3>
+        <p>The <code>ai_disclosure</code> returned by <code>GET /api/config</code> is shown verbatim in Chinese and English; the front end neither rewrites nor hides it. Task review, candidate dispatch, settlement, result verification, auto-acceptance, dispute resolution, risk disposition and account sanctions are all <strong>human gates</strong>: administrator actions open a confirmation dialog labelled for explicit human confirmation, and the server acts only after that confirmation. We make no decision based solely on automated processing that produces legal or similarly significant effects; you may request human review of any decision through the reporting channel or at <code>privacy@sambon.net</code>.</p>
+      </section>
+    </div>
+
+    <!-- ============ 6. SBC 非资产声明 ============ -->
+    <div class="topic" id="sbc">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>六、SBC 非资产声明</h2>
+        <p class="note-box"><strong>SBC 为平台内贡献积分，不可兑付、不可转让。</strong>它仅用于在本演示环境内度量任务悬赏、服务费、冻结与记账流水，不构成资产、证券、电子货币、支付工具、投资标的或任何形式的财产权益。</p>
+        <ul>
+            <li>SBC 不与任何货币计价挂钩，不具有货币价值；</li>
+            <li>SBC 不可转让，无任何流转机制；</li>
+            <li>平台不就 SBC 作出任何价值保证或增值承诺；</li>
+          <li>账本（<code>GET /api/ledger/:userId</code>）仅记录平台内记账科目的冻结与调整，用于 <code>balance_check</code> 平衡核对，不代表可支取余额。</li>
+        </ul>
+        <p>任务参数中的「服务费」「冻结合计」以及争议裁定中的「退回发布方 / 判给解决方」均为平台内积分科目的账面调整，由人工闸门确认后执行，不涉及任何外部资金收付。</p>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>6. SBC Is Not an Asset</h2>
+        <p class="note-box"><strong>SBC is an in-platform contribution point: non-redeemable and non-transferable.</strong> It exists only to denominate bounties, service fees, freezes and bookkeeping entries within this demonstration environment. It is not an asset, security, e-money, payment instrument, investment product or any form of property right.</p>
+        <ul>
+            <li>SBC is not pegged to any currency and carries no monetary value;</li>
+            <li>SBC is non-transferable and has no circulation mechanism;</li>
+            <li>The platform gives no value guarantee and no appreciation promise;</li>
+          <li>The ledger (<code>GET /api/ledger/:userId</code>) records only freezes and adjustments of in-platform bookkeeping accounts for <code>balance_check</code> reconciliation; it is not a withdrawable balance.</li>
+        </ul>
+        <p>Terms such as "service fee", "frozen total" and, in dispute resolution, "refund to publisher / award to solver" are bookkeeping adjustments of in-platform points, executed after human confirmation and never involving external funds.</p>
+      </section>
+    </div>
+
+    <!-- ============ 7. 未成年人 / COPPA ============ -->
+    <div class="topic" id="minors">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>七、COPPA 与未成年人限制</h2>
+        <p>本服务仅面向年满 18 周岁（或所在司法辖区法定成年年龄，以较高者为准）的用户，不面向儿童，亦不故意收集未成年人数据。注册与登录环节不以年龄为营销目标，界面不采用诱导未成年人的设计。</p>
+        <ul>
+          <li>我们遵循美国《儿童在线隐私保护法》（<strong>COPPA</strong>）所体现的儿童保护原则，以及 GDPR 关于儿童同意年龄（GDPR-K）的相关规定；</li>
+          <li>若我们发现账号持有人为未成年人，将在人工复核后限制或注销该账号，并删除或匿名化相关数据；</li>
+          <li>家长或监护人如认为儿童提供了个人数据，可通过 <code>privacy@sambon.net</code>（占位地址）联系，我们将在人工确认后处理；</li>
+          <li>任务内容不得要求或诱导未成年人参与，举报通道可受理相关线索。</li>
+        </ul>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>7. COPPA and Minor Restrictions</h2>
+        <p>The service is for adults aged 18 or over (or the age of majority in the applicable jurisdiction, whichever is higher), is not directed at children, and does not knowingly collect children's data. Registration and sign-in are not age-targeted marketing, and the interface uses no design intended to induce minors.</p>
+        <ul>
+          <li>We observe the child-protection principles reflected in the US <strong>Children's Online Privacy Protection Act (COPPA)</strong> and the GDPR provisions on the age of digital consent (GDPR-K);</li>
+          <li>If we discover an account holder is a minor, we will restrict or delete the account after human review and erase or anonymise the related data;</li>
+          <li>A parent or guardian who believes a child has provided personal data may contact <code>privacy@sambon.net</code> (placeholder); we act after human confirmation;</li>
+          <li>Tasks must not require or induce minor participation; the reporting channel accepts related tips.</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- ============ 8. 举报 / DSA ============ -->
+    <div class="topic" id="report">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>八、举报通道与 DSA</h2>
+        <p>如发现违法内容、欺诈、PII 泄露、滥用、绕过审核或未成年人相关线索，可通过以下渠道提交：</p>
+        <ul>
+          <li><strong>站内举报</strong>：在操作台「详情 / 操作面板」的「举报通道」填写理由并提交（<code>POST /api/reports</code>，携带 task_id 与 reason）；</li>
+          <li><strong>邮件</strong>：<code>privacy@sambon.net</code>（占位地址，正式运营前替换为有效联系方式）。</li>
+        </ul>
+        <p>依欧盟《数字服务法》（<strong>DSA</strong>）的精神，我们提供便捷的非法内容通知与受理机制：举报进入人工复核队列，由管理员人工确认后决定是否驳回任务、限制功能或记录处罚；对处置结果保留事件审计记录，并向举报人反馈处理结论。我们不对受理、复核或反馈的具体时限作出数字承诺，但不会静默忽略举报：前端对每次提交均显示服务端返回的结果或错误码。风控队列中的标记亦须经人工处置（dismiss / escalate）后方可生效。</p>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>8. Reporting Channel and the DSA</h2>
+        <p>To report unlawful content, fraud, PII leakage, abuse, review bypass or minor-related concerns, use:</p>
+        <ul>
+          <li><strong>In-app reporting</strong> — the "Report channel" in the task detail panel (<code>POST /api/reports</code> with task_id and reason);</li>
+          <li><strong>Email</strong> — <code>privacy@sambon.net</code> (placeholder, to be replaced before any licensed operation).</li>
+        </ul>
+        <p>In the spirit of the EU <strong>Digital Services Act (DSA)</strong>, we provide an accessible notice-and-action mechanism: reports enter a human review queue, an administrator decides after explicit human confirmation whether to reject a task, restrict features or record a sanction, and the outcome is retained in the audit trail and communicated to the reporter. We make no numerical promise about acknowledgement, review or response deadlines, yet no report is silently dropped — the front end always surfaces the server result or error code. Flags in the risk queue likewise require a human disposition (dismiss / escalate) before taking effect.</p>
+      </section>
+    </div>
+
+    <!-- ============ 9. 服务条款 ============ -->
+    <div class="topic" id="terms">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>九、服务条款</h2>
+        <h3>9.1 服务性质</h3>
+        <p>本站为任务信息撮合与协作管理操作台的演示环境，提供任务发布、审核、分派、接单、成果提交、验收、争议处理、通知与审计回放等功能。账号接入仅用于内部核验，不构成服务对外开放或运营许可；SBC 仅为平台内贡献积分，不可兑付、不可转让。我们不承诺任何具体可用性、响应时间或服务等级（SLA）数字。</p>
+        <h3>9.2 账号与邮箱验证</h3>
+        <p>注册时须提供真实邮箱、密码与显示名，并选择角色（发布方 publisher 或 解决方 solver）；管理员账号由服务端另行配置。注册后可能要求邮箱验证（<code>POST /api/auth/verify-email</code>），未验证账号不得发布任务或接单。你须妥善保管凭据，对账号下的操作负责。会话失效（HTTP 401）时前端会统一清理登录态并回到认证视图。</p>
+        <h3>9.3 任务与人工闸门</h3>
+        <p>任务提交后进入待审核状态，由管理员人工审核；候选推送为算法辅助且默认 dry_run 预演；成果验收、争议裁定、自动验收、风控处置与处罚均为<strong>人工闸门</strong>，须经人工二次确认后由服务端执行。发布方或管理员可在任务进入终态前撤回任务（<code>POST /api/tasks/:id/cancel</code>）。服务端按角色与任务状态强制校验，前端展示不代表授权。任何结算类动作仅调整平台内贡献积分的记账科目，不涉及外部资金。</p>
+        <h3>9.4 责任限制与终止</h3>
+        <p>在法律允许的最大范围内，本演示环境按「现状」提供，不承担间接或后果性损失。你可随时通过「删除我的账号」终止账号。我们可在合规或安全必要时暂停功能，并对重大变更在本页更新文本。适用法律与争议解决地将在正式运营前补充（占位）；当前演示环境不构成对任何司法辖区的商业承诺。</p>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>9. Terms of Service</h2>
+        <h3>9.1 Nature of the service</h3>
+        <p>This is a demonstration console for task matching and collaboration management, offering publishing, review, dispatch, acceptance, result submission, verification, dispute handling, notifications and audit replay. Account access is for internal verification only and is neither a public launch nor an operating licence; SBC is an in-platform contribution point, non-redeemable and non-transferable. We make no numerical commitment on availability, response time or SLA.</p>
+        <h3>9.2 Accounts and email verification</h3>
+        <p>Registration requires a valid email, password, display name and a role (publisher or solver); administrator accounts are provisioned server-side. Email verification may be required after registration (<code>POST /api/auth/verify-email</code>); unverified accounts may not publish or accept tasks. You are responsible for safeguarding credentials and for activity under your account. On session expiry (HTTP 401) the front end clears the session and returns to the sign-in view.</p>
+        <h3>9.3 Tasks and human gates</h3>
+        <p>Submitted tasks enter a pending-review state for manual administrator review; candidate dispatch is algorithm-assisted and dry-run by default; result verification, dispute resolution, auto-acceptance, risk disposition and sanctions are <strong>human gates</strong> executed only after a second, explicit human confirmation. A publisher or administrator may withdraw a task before it reaches a terminal state (<code>POST /api/tasks/:id/cancel</code>). The server enforces role and state checks; a visible control is not an authorisation. Any settlement-like action adjusts only in-platform point bookkeeping accounts and never external funds.</p>
+        <h3>9.4 Liability and termination</h3>
+        <p>To the maximum extent permitted by law, this demonstration environment is provided "as is" without liability for indirect or consequential loss. You may terminate your account at any time via "Delete my account". We may suspend features where compliance or security requires it and will post material changes here. Governing law and venue will be added before any licensed operation (placeholder); this demonstration makes no commercial commitment to any jurisdiction.</p>
+      </section>
+    </div>
+
+    <!-- ============ 10. AUP ============ -->
+    <div class="topic" id="aup">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>十、可接受使用政策（AUP）</h2>
+        <p>你不得利用本服务从事下列行为：</p>
+        <ul>
+          <li>发布或提交违法内容、仇恨言论、骚扰、欺诈、虚假信息或侵犯第三方知识产权的材料；</li>
+          <li>在任务正文、成果或虚拟联系方式中夹带他人个人身份信息（PII）、凭据或敏感数据；成果预览会做 PII 脱敏，但提交方仍负首要责任；</li>
+          <li>绕过或试图绕过任务审核、邮箱验证、角色校验、CSRF 校验、服务端强制鉴权或人工闸门；</li>
+          <li>自动化爬取、批量注册、刷榜、干扰榜单或事件审计、对接口施加异常负载；</li>
+          <li>滥用举报通道，提交虚假或重复举报；</li>
+          <li>试图改变 SBC「平台内贡献积分，不可兑付、不可转让」的性质，或将其用于记账之外的用途；</li>
+          <li>以未成年人身份使用，或代未成年人提交数据。</li>
+        </ul>
+        <p>违规处理（驳回、限制、注销、记录处罚）均由管理员人工确认后执行，并保留事件审计记录以便复核。我们不对处理时限作出数字承诺。</p>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>10. Acceptable Use Policy (AUP)</h2>
+        <p>You must not use the service to:</p>
+        <ul>
+          <li>publish or submit unlawful content, hate speech, harassment, fraud, disinformation or material infringing third-party intellectual property;</li>
+          <li>embed another person's PII, credentials or sensitive data in task text, results or virtual contact details; previews are PII-redacted, but the submitter remains primarily responsible;</li>
+          <li>bypass or attempt to bypass task review, email verification, role checks, CSRF validation, server-side authorisation or human gates;</li>
+          <li>scrape automatically, register in bulk, manipulate leaderboards, tamper with event audits, or place abnormal load on the APIs;</li>
+          <li>abuse the reporting channel with false or duplicate reports;</li>
+          <li>attempt to change the nature of SBC as "an in-platform contribution point, non-redeemable and non-transferable", or use it for anything other than bookkeeping;</li>
+          <li>use the service as a minor, or submit data on behalf of a minor.</li>
+        </ul>
+        <p>Enforcement (rejection, restriction, deletion, recorded sanctions) is performed only after explicit human confirmation by an administrator and is retained in the audit trail for review. We make no numerical promise about handling deadlines.</p>
+      </section>
+    </div>
+
+    <!-- ============ 11. Cookie ============ -->
+    <div class="topic" id="cookies">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>十一、Cookie 与同意管理</h2>
+        <div class="table-wrap"><table class="table">
+          <thead><tr><th>类别</th><th>用途</th><th>是否必需</th></tr></thead>
+          <tbody>
+            <tr><td>会话 Cookie（httpOnly）</td><td>维持登录会话、配合服务端 CSRF 校验</td><td>必需，由浏览器自动携带，前端脚本不读取</td></tr>
+            <tr><td>CSRF 令牌</td><td>写操作请求头 X-CSRF-Token，来源于登录/注册响应或 /api/auth/me</td><td>必需（非 Cookie，存于前端内存）</td></tr>
+            <tr><td>分析 Cookie</td><td>匿名统计与错误诊断</td><td>可选，需你明确同意</td></tr>
+            <tr><td>本地存储 localStorage</td><td>记录 Cookie 选择、语言偏好，避免重复弹出同意条</td><td>功能必需，不用于跨站追踪</td></tr>
+          </tbody>
+        </table></div>
+        <p>首次访问时底部显示同意条：「接受必要+分析」或「仅必要」。选择后前端调用 <code>POST /api/consents</code>，请求体为 <code>{kind:'cookie', version:'v1', granted:true|false}</code>，并将选择写入 localStorage。你可随时通过操作台「数据与账号」中的「Cookie 偏好」重新打开同意条并更改选择；撤回同意不影响撤回前处理的合法性。语言偏好存于 <code>localStorage['sambon.locale']</code>，并尽力通过 <code>POST /api/me/locale</code> 同步至服务端，失败不阻塞界面。</p>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>11. Cookies and Consent Management</h2>
+        <div class="table-wrap"><table class="table">
+          <thead><tr><th>Category</th><th>Purpose</th><th>Required</th></tr></thead>
+          <tbody>
+            <tr><td>Session cookie (httpOnly)</td><td>Maintains the signed-in session and supports server-side CSRF checks</td><td>Required; sent automatically by the browser and never read by scripts</td></tr>
+            <tr><td>CSRF token</td><td>X-CSRF-Token header on writes, from the sign-in/registration response or /api/auth/me</td><td>Required (not a cookie; held in front-end memory)</td></tr>
+            <tr><td>Analytics cookies</td><td>Anonymised statistics and error diagnostics</td><td>Optional; requires your explicit consent</td></tr>
+            <tr><td>localStorage</td><td>Remembers cookie choice and locale to avoid repeated prompts</td><td>Functionally required; not used for cross-site tracking</td></tr>
+          </tbody>
+        </table></div>
+        <p>On first visit a consent bar offers "Accept necessary + analytics" or "Necessary only". The choice is sent via <code>POST /api/consents</code> with <code>{kind:'cookie', version:'v1', granted:true|false}</code> and stored in localStorage. You can reopen the bar at any time from "Cookie preferences" under Data &amp; Account and change your choice; withdrawal does not affect the lawfulness of prior processing. The locale is stored at <code>localStorage['sambon.locale']</code> and best-effort synchronised to the server via <code>POST /api/me/locale</code>; a failure never blocks the interface.</p>
+      </section>
+    </div>
+
+    <!-- ============ 12. 联系方式 ============ -->
+    <div class="topic" id="contact">
+      <section class="card legal-section" lang="zh-CN">
+        <h2>十二、联系方式与文本状态</h2>
+        <p>数据保护、权利行使、举报与合规问询：<code>privacy@sambon.net</code>。</p>
+        <p class="note-box">该地址为<strong>占位地址</strong>，用于演示环境文本占位；在取得正式运营许可前将替换为有效联系方式。本站不对任何具体响应时限、处理时限、可用性或服务等级（SLA）数字作出承诺。</p>
+        <p>本页文本与操作台中的 L1 状态声明一致：本站为生产系统演示环境，未完成 docs/07 的 G1–G7 与 V1–V8 全部核销，不构成正式运营许可。政策文本可能随合规核销进度更新，更新后以中英双语同步呈现。</p>
+        <p style="margin-top:14px"><a class="btn btn-ghost" href="/">返回操作台</a></p>
+      </section>
+      <section class="card legal-section" lang="en">
+        <h2>12. Contact and Text Status</h2>
+        <p>Data protection, rights requests, reports and compliance enquiries: <code>privacy@sambon.net</code>.</p>
+        <p class="note-box">This is a <strong>placeholder address</strong> used for demonstration text and will be replaced with a live contact before any licensed operation. No specific SLA, uptime, response-time or handling-time figure is promised.</p>
+        <p>This text matches the L1 status declaration in the console: this is a production-system demonstration environment; the G1–G7 and V1–V8 gates in docs/07 are not fully discharged and no operating licence is granted. Policies may be updated as compliance gates are discharged and are published here in both Chinese and English.</p>
+        <p style="margin-top:14px"><a class="btn btn-ghost" href="/">Back to console</a></p>
+      </section>
+    </div>
+
   </div>
-
-  <nav class="legal-nav" aria-label="章节导航">
-    <a href="#en">English Compliance Summary</a>
-    <a href="#privacy">隐私政策与数据收集</a>
-    <a href="#gdpr">GDPR 权利</a>
-    <a href="#transfer">跨境传输</a>
-    <a href="#terms">服务条款</a>
-    <a href="#aup">可接受使用政策</a>
-    <a href="#ai">AI 透明度</a>
-    <a href="#sbc">SBC 非资产声明</a>
-    <a href="#minors">未成年人限制</a>
-    <a href="#report">举报通道</a>
-    <a href="#cookies">Cookie 与同意</a>
-    <a href="#contact">联系方式</a>
-  </nav>
-
-  <!-- ============ 英文合规要点 ============ -->
-  <section class="card legal-section" id="en" style="margin-bottom:16px">
-    <h2>English Compliance Summary（合规要点 · 英文）</h2>
-    <ul>
-      <li><strong>Status：</strong>This site is a production-system demonstration environment. G1–G7 and V1–V8 (docs/07) are not fully discharged; no operating licence is granted. No specific SLA, uptime, response-time or availability figure is promised.</li>
-      <li><strong>Controller &amp; data：</strong>Account identifiers (email, display name, role), task content, virtual contact, event logs, preferences and consent records are processed for the purpose of running the task-matching console. Retention follows the shortest period necessary for the processing purpose and applicable law.</li>
-      <li><strong>GDPR：</strong>Data subjects may exercise access, rectification, erasure, restriction, portability, objection and consent withdrawal. In-app controls: "Export my data" (GET /api/me/export) and "Delete my account" (DELETE /api/me, confirmed by typing DELETE).</li>
-      <li><strong>Transfers：</strong>The service is hosted on Cloudflare's global edge network. Cross-border transfers rely on the Cloudflare Data Processing Addendum (DPA) and EU Standard Contractual Clauses (SCC), supplemented by technical and organisational measures.</li>
-      <li><strong>AI transparency：</strong>Algorithm-assisted candidate ranking is disclosed via weight_version and algorithm_degraded. Ranking is advisory only; review, dispatch, verification, dispute resolution and sanctions are manual gates with explicit human confirmation. Personalisation can be disabled in the console and is enforced server-side (enforcement: server_side). No solely automated decision produces legal or similarly significant effects.</li>
-      <li><strong>SBC：</strong>SBC is an in-platform contribution point, non-redeemable and non-transferable. It is not an asset, security, e-money, payment instrument or investment product; no redeemable value or value guarantee is offered or promised.</li>
-      <li><strong>Minors：</strong>Adults only (18+ or the age of majority in the applicable jurisdiction). No knowing collection of children's data; COPPA / GDPR-K principles are observed.</li>
-      <li><strong>Reporting &amp; contact：</strong>In-app report channel (POST /api/reports) or privacy@sambon.net (placeholder address). All enforcement actions are human-confirmed. No specific handling deadline is promised.</li>
-    </ul>
-  </section>
-
-  <!-- ============ 隐私政策 ============ -->
-  <section class="card legal-section" id="privacy" style="margin-bottom:16px">
-    <h2>一、隐私政策与数据收集范围</h2>
-    <h3>1. 我们收集哪些数据</h3>
-    <div class="table-wrap">
-      <table class="table">
-        <thead><tr><th>类别</th><th>字段 / 内容</th><th>处理目的</th></tr></thead>
-        <tbody>
-          <tr><td>账号数据</td><td>邮箱、密码散列（服务端保存）、显示名、角色（publisher / solver / admin）、user_id</td><td>身份识别、会话维持、按角色强制鉴权</td></tr>
-          <tr><td>任务数据</td><td>标题、描述、分类、悬赏、服务费、冻结合计、验收标准、线上/线下、半径、所需技能、截止时间、虚拟联系方式</td><td>任务发布、审核、分派与验收</td></tr>
-          <tr><td>成果数据</td><td>提交内容、评分、理由、成果预览</td><td>验收与争议复核；成果预览对外展示前做 PII 脱敏</td></tr>
-          <tr><td>事件与日志</td><td>event_id、事件类型、状态流转、时间戳、任务关联 ID；Cloudflare 边缘访问日志中的 IP、User-Agent、请求时间与状态码</td><td>审计、事件回放、安全与防滥用</td></tr>
-          <tr><td>偏好与同意</td><td>personalized_enabled、consents（kind / version / granted）</td><td>个性化开关、Cookie 同意记录与撤回</td></tr>
-          <tr><td>账本数据</td><td>平台内贡献积分冻结与记账流水、balance_check、anchor</td><td>账目平衡核对；不构成任何可兑付余额</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <h3>2. 处理目的与法律依据</h3>
-    <p>上述数据仅用于（a）履行账号与任务服务所必需；（b）遵守法定义务与保存审计记录；（c）在取得同意的前提下进行匿名统计；（d）为安全与防滥用所必需的合法利益。我们不出售个人数据，不将个人数据用于第三方广告投放，不进行与任务撮合无关的用户画像。</p>
-    <h3>3. 留存</h3>
-    <p>留存以完成处理目的所需的最短期限为原则，并遵守适用法律要求：账号数据于账号存续期间保留；任务与事件审计记录在任务生命周期及法定争议期间内保留；访问日志按安全审计必要期限保留；同意记录保留至同意被撤回后一段合理期间，用于证明合规。账号注销后，除法律要求必须保留的记录外，个人数据予以删除或不可逆转地匿名化；匿名化后的汇总数据不再属于个人数据。本演示环境不对具体留存天数、响应时间或处理时限作出数字承诺。</p>
-    <h3>4. 安全</h3>
-    <p>会话 Cookie 为 httpOnly，前端脚本不读取 Cookie 内容；所有写操作携带 <code>X-CSRF-Token</code> 请求头以缓解跨站请求伪造；成果正文展示前经过 PII 脱敏；角色与状态校验在服务端强制生效（<code>enforcement: server_side</code>），客户端展示不构成授权。</p>
-    <p class="en">We do not sell personal data, do not use it for third-party advertising, and do not build profiles unrelated to task matching. No specific retention period, response time or SLA figure is promised in this demonstration environment.</p>
-  </section>
-
-  <!-- ============ GDPR ============ -->
-  <section class="card legal-section" id="gdpr" style="margin-bottom:16px">
-    <h2>二、GDPR 数据主体权利</h2>
-    <p>若你位于欧洲经济区（EEA）、英国或适用类似法规的司法辖区，你就个人数据享有以下权利：</p>
-    <ul>
-      <li><strong>访问权</strong>：确认我们是否处理你的个人数据并取得副本。</li>
-      <li><strong>更正权</strong>：要求更正不准确或不完整的个人数据。</li>
-      <li><strong>删除权（被遗忘权）</strong>：在法定条件下要求删除个人数据。</li>
-      <li><strong>限制处理权</strong>：在争议期间要求限制处理范围。</li>
-      <li><strong>数据可携带权</strong>：以结构化、通用、机器可读格式接收你的数据。</li>
-      <li><strong>反对权</strong>：反对基于合法利益的处理，以及随时反对直接营销（本服务不进行直接营销）。</li>
-      <li><strong>撤回同意权</strong>：随时撤回 Cookie / 分析或个性化相关同意，撤回不影响撤回前处理的合法性。</li>
-      <li><strong>投诉权</strong>：向所在辖区的数据保护监管机构投诉。</li>
-    </ul>
-    <h3>如何行使</h3>
-    <p>登录操作台后使用「导出我的数据」按钮（<code>GET /api/me/export</code>，返回 JSON 文件）行使访问与可携带权；使用「删除我的账号」按钮（<code>DELETE /api/me</code>）发起删除，该操作须输入 <code>DELETE</code> 二次确认，处理后自动退出登录。Cookie 同意可通过「Cookie 偏好」随时重新选择（<code>POST /api/consents</code>）。个性化推荐可通过操作台内的「关闭个性化推荐」开关关闭（<code>POST /api/preferences/personalized</code>），且由服务端强制生效。亦可联系 <code>privacy@sambon.net</code>（占位地址）。我们可能需要在处理前核验请求人身份，且不对处理时限作出数字承诺。</p>
-    <p class="en">Rights: access, rectification, erasure, restriction, portability, objection, consent withdrawal and the right to lodge a complaint with a supervisory authority. No specific response deadline is promised.</p>
-  </section>
-
-  <!-- ============ 跨境传输 ============ -->
-  <section class="card legal-section" id="transfer" style="margin-bottom:16px">
-    <h2>三、跨境传输与 Cloudflare DPA / SCC</h2>
-    <p>本服务部署于 Cloudflare Pages，边缘网络与 D1 数据库可能位于你所在国家/地区之外（包括美国及 Cloudflare 全球数据中心）。因此，你的个人数据可能发生跨境传输。</p>
-    <ul>
-      <li>Cloudflare 作为数据处理者，其义务由 <strong>Cloudflare Data Processing Addendum（DPA）</strong> 约定，包含保密、安全措施、协助数据主体请求与删除/返还数据等条款。</li>
-      <li>对于从 EEA / 英国 / 瑞士向未获充分性认定地区的传输，依 <strong>欧盟标准合同条款（EU Standard Contractual Clauses, SCC）</strong> 及适用的英国附录（UK Addendum）作为传输机制。</li>
-      <li>补充措施包括传输加密（TLS）、最小必要数据收集、httpOnly 会话 Cookie、CSRF 令牌、PII 脱敏展示、按角色的服务端强制鉴权与审计事件留痕。</li>
-      <li>你可向 <code>privacy@sambon.net</code> 索取上述保障措施的副本或说明（占位地址，正式运营前将替换为有效联系方式）。</li>
-    </ul>
-    <p class="note-box">本演示环境尚未完成 docs/07 的 G1–G7 与 V1–V8 全部核销，上述传输机制为合规设计说明，不构成已完成审计或取得正式运营许可的声明。</p>
-  </section>
-
-  <!-- ============ 服务条款 ============ -->
-  <section class="card legal-section" id="terms" style="margin-bottom:16px">
-    <h2>四、服务条款</h2>
-    <h3>1. 服务性质</h3>
-    <p>本站为任务信息撮合与协作管理操作台的演示环境，提供任务发布、审核、分派、接单、成果提交、验收、争议处理与审计回放等功能。账号接入仅用于内部核验，不构成服务对外开放或运营许可。我们不承诺任何具体可用性、响应时间或服务等级（SLA）数字。</p>
-    <h3>2. 账号</h3>
-    <p>注册时须提供真实邮箱、密码与显示名，并选择角色（发布方 publisher 或 解决方 solver）；管理员账号由服务端另行配置。你须妥善保管凭据，对账号下的操作负责。会话失效（HTTP 401）时前端会统一清理登录态并回到认证视图。</p>
-    <h3>3. 任务与人工闸门</h3>
-    <p>任务提交后进入待审核状态，由管理员人工审核；候选推送为算法辅助且默认 dry_run 预演；成果验收、争议裁定、自动验收与处罚均为<strong>人工闸门</strong>，须经人工二次确认后由服务端执行。服务端按角色与任务状态强制校验，前端展示不代表授权。任何结算类动作仅调整平台内贡献积分的记账科目，不涉及外部资金。</p>
-    <h3>4. 禁止事项</h3>
-    <p>详见下文《可接受使用政策》。违反者可能被限制功能、驳回任务或注销账号；相关处罚决定亦须人工确认。</p>
-    <h3>5. 责任限制与终止</h3>
-    <p>在法律允许的最大范围内，本演示环境按「现状」提供，不承担间接或后果性损失。你可随时通过「删除我的账号」终止账号。我们可在合规或安全必要时暂停功能，并对重大变更在本页更新文本。</p>
-    <h3>6. 适用法律</h3>
-    <p>适用法律与争议解决地将在正式运营前于本条补充（占位）；当前演示环境不构成对任何司法辖区的商业承诺。</p>
-  </section>
-
-  <!-- ============ AUP ============ -->
-  <section class="card legal-section" id="aup" style="margin-bottom:16px">
-    <h2>五、可接受使用政策（AUP）</h2>
-    <p>你不得利用本服务从事下列行为：</p>
-    <ul>
-      <li>发布或提交违法内容、仇恨言论、骚扰、欺诈、虚假信息或侵犯第三方知识产权的材料；</li>
-      <li>在任务正文、成果或虚拟联系方式中夹带他人个人身份信息（PII）、凭据或敏感数据；成果预览会做 PII 脱敏，但提交方仍负首要责任；</li>
-      <li>绕过或试图绕过任务审核、角色校验、CSRF 校验、服务端强制鉴权或人工闸门；</li>
-      <li>自动化爬取、批量注册、刷榜、干扰榜单或事件审计、对接口施加异常负载；</li>
-      <li>滥用举报通道，提交虚假或重复举报；</li>
-      <li>试图改变 SBC「平台内贡献积分，不可兑付、不可转让」的性质，或将其用于记账之外的用途；</li>
-      <li>以未成年人身份使用，或代未成年人提交数据。</li>
-    </ul>
-    <p>违规处理（驳回、限制、注销、记录处罚）均由管理员人工确认后执行，并保留事件审计记录以便复核。我们不对处理时限作出数字承诺。</p>
-  </section>
-
-  <!-- ============ AI 透明度 ============ -->
-  <section class="card legal-section" id="ai" style="margin-bottom:16px">
-    <h2>六、AI 透明度与算法推荐说明</h2>
-    <h3>1. 算法用途</h3>
-    <p>操作台在候选分派环节使用算法辅助排序（<code>POST /api/tasks/:id/dispatch</code>），依据任务属性、技能标签、半径与截止时间等特征生成候选与批次。排序结果仅为候选建议，不产生自动指派或自动裁决的法律效果。当前配置版本见操作台展示的 <code>weight_version</code> 与 <code>rule_version</code>。</p>
-    <h3>2. 输入特征与输出</h3>
-    <p>输入：任务分类、所需技能、线上/线下与半径、截止时间、悬赏参数、账号级个性化开关状态。输出：候选列表 <code>candidates</code> 与批次 <code>batches</code>，以及本次模式 <code>mode</code> 与是否启用个性化 <code>personalized</code>。我们不把种族、宗教、健康、性取向等特殊类别数据用于排序。</p>
-    <h3>3. 降级模式</h3>
-    <p>当 <code>algorithm_degraded</code> 为真时，系统使用保守排序并降低个性化权重，以避免在特征不足时产生偏斜推荐；该状态会在操作台「AI 透明度」卡片中明示。</p>
-    <h3>4. 个性化推荐的关闭方式</h3>
-    <p>在操作台「AI 透明度与配置」卡片中勾选「关闭个性化推荐」开关即可关闭账号级个性化（对应 <code>POST /api/preferences/personalized</code>，<code>enabled: false</code>）；取消勾选可重新开启。该开关<strong>服务端强制生效</strong>（<code>enforcement: server_side</code>），客户端无法绕过，关闭后排序仅使用与任务直接相关的非个性化特征。关闭个性化不影响任务完整性、审核与验收流程。</p>
-    <h3>5. 人工闸门与自动化决策</h3>
-    <p>任务审核、候选推送、成果验收、争议裁定与处罚均为人工闸门：前端对管理员操作弹出二次确认并标注「人工确认」，服务端在人工确认后执行。我们不作仅依赖自动化处理、且对你产生法律效果或类似重大影响的决定；你可对人工决定通过举报通道或 <code>privacy@sambon.net</code> 申请人工复核。</p>
-    <h3>6. 红线</h3>
-    <p>服务端 <code>GET /api/config</code> 返回的 <code>red_lines</code> 与 <code>ai_disclosure</code> 为算法边界说明，操作台原样展示，前端不改写、不隐藏。</p>
-    <p class="en">Algorithm-assisted ranking is advisory and disclosed; personalisation is opt-out and enforced server-side; no solely automated decision has legal or similarly significant effects.</p>
-  </section>
-
-  <!-- ============ SBC 非资产声明 ============ -->
-  <section class="card legal-section" id="sbc" style="margin-bottom:16px">
-    <h2>七、SBC 非资产声明</h2>
-    <p class="note-box"><strong>SBC 为平台内贡献积分，不可兑付、不可转让。</strong>它仅用于在本演示环境内度量任务悬赏、服务费、冻结与记账流水，不构成资产、证券、电子货币、支付工具、投资标的或任何形式的财产权益。</p>
-    <ul>
-      <li>SBC 不与任何货币计价挂钩，不构成任何可兑付的价值；</li>
-      <li>SBC 不可转让，不存在任何针对它的流转机制；</li>
-      <li>平台不就 SBC 作出任何价值保证或增值承诺；</li>
-      <li>账本（<code>GET /api/ledger/:userId</code>）仅记录平台内记账科目的冻结与调整，用于 <code>balance_check</code> 平衡核对，不代表可支取余额。</li>
-    </ul>
-    <p>任务参数中的「服务费」「冻结合计」以及争议裁定中的「退回发布方 / 判给解决方」均为平台内积分科目的账面调整，由人工闸门确认后执行，不涉及任何外部资金收付。</p>
-    <p class="en">SBC is a non-redeemable, non-transferable in-platform contribution point. It is not an asset, security, e-money, payment instrument or investment product; no redeemable value or value guarantee is offered or promised.</p>
-  </section>
-
-  <!-- ============ 未成年人 ============ -->
-  <section class="card legal-section" id="minors" style="margin-bottom:16px">
-    <h2>八、未成年人限制</h2>
-    <p>本服务仅面向年满 18 周岁（或所在司法辖区法定成年年龄，以较高者为准）的用户，不面向儿童，亦不故意收集未成年人数据。注册与登录环节不以年龄为营销目标，界面不采用诱导未成年人的设计。</p>
-    <ul>
-      <li>若我们发现账号持有人为未成年人，将在人工复核后限制或注销该账号，并删除或匿名化相关数据；</li>
-      <li>家长或监护人如认为儿童提供了个人数据，可通过 <code>privacy@sambon.net</code>（占位地址）联系，我们将在人工确认后处理；</li>
-      <li>我们遵循 GDPR 关于儿童同意年龄的相关规定（GDPR-K）及 COPPA 所体现的儿童保护原则；</li>
-      <li>任务内容不得要求或诱导未成年人参与，举报通道可受理相关线索。</li>
-    </ul>
-    <p class="en">Adults only (18+ or the applicable age of majority). We do not knowingly collect children's data; COPPA and GDPR-K principles are observed.</p>
-  </section>
-
-  <!-- ============ 举报通道 ============ -->
-  <section class="card legal-section" id="report" style="margin-bottom:16px">
-    <h2>九、举报通道</h2>
-    <p>如发现违法内容、欺诈、PII 泄露、滥用、绕过审核或未成年人相关线索，可通过以下渠道提交：</p>
-    <ul>
-      <li><strong>站内举报</strong>：在操作台「详情 / 操作面板」的「举报通道」填写理由并提交（<code>POST /api/reports</code>，携带 task_id 与 reason）；</li>
-      <li><strong>邮件</strong>：<code>privacy@sambon.net</code>（占位地址，正式运营前替换为有效联系方式）。</li>
-    </ul>
-    <p>举报进入人工复核队列，由管理员人工确认后决定是否驳回任务、限制功能或记录处罚；处理结果保留事件审计记录。我们不对受理、复核或反馈的具体时限作出数字承诺，但不会静默忽略举报：前端对每次提交均显示服务端返回的结果或错误码。</p>
-    <p class="en">Reports are reviewed by a human administrator; no specific handling deadline is promised. In-app: POST /api/reports. Email: privacy@sambon.net (placeholder).</p>
-  </section>
-
-  <!-- ============ Cookie ============ -->
-  <section class="card legal-section" id="cookies" style="margin-bottom:16px">
-    <h2>十、Cookie 与同意管理</h2>
-    <div class="table-wrap">
-      <table class="table">
-        <thead><tr><th>类别</th><th>用途</th><th>是否必需</th></tr></thead>
-        <tbody>
-          <tr><td>会话 Cookie（httpOnly）</td><td>维持登录会话、配合服务端 CSRF 校验</td><td>必需，由浏览器自动携带，前端脚本不读取</td></tr>
-          <tr><td>CSRF 令牌</td><td>写操作请求头 X-CSRF-Token，来源于登录/注册响应或 /api/auth/me</td><td>必需（非 Cookie，存于前端内存）</td></tr>
-          <tr><td>分析 Cookie</td><td>匿名统计与错误诊断</td><td>可选，需你明确同意</td></tr>
-          <tr><td>本地存储 localStorage</td><td>记录你的 Cookie 选择，避免重复弹出同意条</td><td>功能必需，不用于跨站追踪</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p>首次访问时底部显示同意条：「接受必要+分析」或「仅必要」。选择后前端调用 <code>POST /api/consents</code>，请求体为 <code>{kind:'cookie', version:'v1', granted:true|false}</code>，并将选择写入 localStorage。你可随时通过操作台「数据与账号」中的「Cookie 偏好」重新打开同意条并更改选择；撤回同意不影响撤回前处理的合法性。</p>
-    <p class="en">Necessary cookies maintain the session; analytics cookies are optional. Consent is recorded server-side (POST /api/consents) and locally to avoid repeated prompts; it may be withdrawn at any time.</p>
-  </section>
-
-  <!-- ============ 联系方式 ============ -->
-  <section class="card legal-section" id="contact">
-    <h2>十一、联系方式与文本状态</h2>
-    <p>数据保护、权利行使、举报与合规问询：<code>privacy@sambon.net</code>。</p>
-    <p class="note-box">该地址为<strong>占位地址</strong>，用于演示环境文本占位；在取得正式运营许可前将替换为有效联系方式。本站不对任何具体响应时限、处理时限、可用性或服务等级（SLA）数字作出承诺。</p>
-    <p>本页文本与操作台中的 L1 状态声明一致：本站为生产系统演示环境，未完成 docs/07 的 G1–G7 与 V1–V8 全部核销，不构成正式运营许可。政策文本可能随合规核销进度更新，更新后在本页呈现。</p>
-    <p class="en">privacy@sambon.net is a placeholder. No specific SLA, uptime, response-time or handling-time figure is promised. This is a demonstration environment; no operating licence is granted.</p>
-    <p style="margin-top:14px"><a class="btn btn-ghost" href="/">返回操作台</a></p>
-  </section>
-
 </div>
 
 <footer class="footer">
-  <div class="footer-links"><span>三宝殿 · sambon.net — 法律与合规声明（演示环境文本）</span></div>
-  <div class="muted">SBC 为平台内贡献积分，不可兑付、不可转让；不构成资产或投资标的。</div>
+  <div class="footer-links"><span>三宝殿 · sambon.net — 法律与合规声明（演示环境文本） / Legal &amp; Compliance (demonstration text)</span></div>
+  <div class="muted">SBC 为平台内贡献积分，不可兑付、不可转让；不构成资产或投资标的。 / SBC is a non-redeemable, non-transferable in-platform contribution point, not an asset or investment product.</div>
 </footer>
 
 </body>

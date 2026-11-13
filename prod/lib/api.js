@@ -33,9 +33,17 @@ import {
   rateLimit,
 } from './auth.js';
 import { ok, fail, errorResponse, ApiFailure } from './response.js';
+import { SCHEMA_VERSION } from './schema.js';
+// V3 完全体模块（D-14）：通知 / 大模型 / 定时任务 / 可观测 / 风控 / 账号安全
+import * as notify from './notify.js';
+import * as llm from './llm.js';
+import * as jobs from './jobs.js';
+import * as obs from './observability.js';
+import * as risk from './risk.js';
+import * as sec from './security.js';
 
 const SERVICE = 'sambon-production';
-const VERSION = 'v1.0.0';
+const VERSION = 'v3.0.0';   // D-14 完全体：通知 / LLM / cron / 运维 / 灾备 / i18n
 const INITIAL_SBC_DEFAULT = 1000;      // 平台内贡献积分初始额度，非资产、不可兑付
 const MAX_BODY_BYTES = 1024 * 1024;
 
@@ -46,7 +54,12 @@ export const CONTRACT_EVENTS = Object.freeze([
   'DispatchSent', 'TaskAccepted', 'TaskSubmitted', 'TaskVerified', 'TaskDelisted',
   'DisputeOpened', 'DisputeResolved', 'SettlementCompleted', 'PreferenceChanged',
 ]);
-export const PROD_EVENTS = Object.freeze([...CONTRACT_EVENTS, 'ReportFiled']);
+// D-13 扩展 + D-14 完全体扩展；契约 §4 原始 18 类一字未改
+export const PROD_EVENTS = Object.freeze([
+  ...CONTRACT_EVENTS, 'ReportFiled',
+  'TaskCancelled', 'DispatchExposed', 'DispatchIgnored', 'EmailVerified',
+  'NotificationQueued', 'RiskFlagged', 'BackupCreated', 'LedgerAnchored', 'CronCompleted',
+]);
 
 const EVENT_KEY_WHITELIST = new Set([
   'task_id', 'state', 'decision', 'amount', 'bounty', 'service_fee', 'rule_version',
@@ -59,6 +72,9 @@ const EVENT_KEY_WHITELIST = new Set([
   'model_decision', 'note', 'personalized_enabled', 'enforcement',
   'neutral_sort_rule', 'escrow_total', 'quality_bonus', 'auto_verified',
   'hits', 'category', 'channel',
+  // D-14 新增（只放枚举值 / 计数 / 布尔，绝不承载正文或 PII）
+  'cancel_reason', 'kind', 'flag', 'score', 'feature', 'locale', 'entry_count',
+  'pii_redacted', 'pii_on_chain', 'anchor', 'root', 'job', 'counts', 'feedback',
 ]);
 
 const iso = () => new Date().toISOString();
@@ -89,6 +105,9 @@ const userView = (u) => ({
   available_sbc: round2(Number(u.available_sbc ?? 0)),
   credit_score: round2(Number(u.credit_score ?? 100)),
   personalized_enabled: Number(u.personalized_enabled ?? 1) === 1,
+  email_verified: Number(u.email_verified ?? 0) === 1,
+  locale: u.locale || 'en',
+  gpc_enabled: Number(u.gpc_enabled ?? 0) === 1,
   created_at: u.created_at,
 });
 
@@ -417,9 +436,19 @@ function healthData(env, db) {
     status: db ? 'healthy' : 'degraded',
     service: SERVICE,
     version: VERSION,
-    schema_version: 'sambon-prod-schema-v1.0',
+    schema_version: SCHEMA_VERSION,
     time: iso(),
     admin_bootstrap_available: Boolean(env && env.ADMIN_BOOTSTRAP_TOKEN),
+    components: {
+      llm: llm.llmMeta(env || {}),
+      notify: notify.notifyMeta(env || {}),
+      cron: jobs.jobMeta(env || {}),
+      security: sec.securityMeta(env || {}),
+    },
+    features: {
+      email_verification: true, notifications: true, llm_adapter: true,
+      cron: true, risk: true, backup: true, anchor: true, i18n: true, concurrent_cas: true,
+    },
     note: db
       ? '持久化后端已就绪（D1）；会话、账本、事件均为服务端真实写入'
       : '未检测到 D1 绑定：只读演示模式，写操作不可用。绑定 DB 后自动切换，无需改代码',
@@ -435,7 +464,7 @@ function configData(env, db, session) {
     weight_version: WEIGHT_VERSION,
     rank_weight_version: 'v1.0',
     llm_adapter_version: LLM_ADAPTER_VERSION,
-    algorithm_degraded: true,
+    algorithm_degraded: llm.llmMeta(env || {}).degraded,
     dispatch_weights: DISPATCH_WEIGHTS,
     task_rank_weights: TASK_RANK_WEIGHTS,
     user_rank_weights: USER_RANK_WEIGHTS,
@@ -454,6 +483,17 @@ function configData(env, db, session) {
       '/api/sbc/exchange', '/api/sbc/yield', '/api/sbc/market', '/api/wallet/cashout',
     ],
     sbc_notice: 'SBC 为平台内贡献积分，不可兑付、不可转让、不可交易、无收益承诺。',
+    llm: { ...llm.llmMeta(env || {}), model_decision: null },
+    notify: notify.notifyMeta(env || {}),
+    locales: ['zh-CN', 'en'],
+    default_locale: 'en',
+    features: {
+      email_verification: (env || {}).EMAIL_VERIFICATION_REQUIRED === 'true',
+      notifications: true, llm_adapter: true, cron: Boolean((env || {}).CRON_SECRET),
+      risk: true, backup: true, anchor: true, i18n: true,
+      concurrent_cas: true, dispatch_feedback: true, task_cancel: true,
+    },
+    capabilities_note: 'V3 完全体：代码能力已完备；正式运营许可须外部动作核销（docs/13）。',
   };
 }
 
@@ -465,7 +505,12 @@ async function hRegister(c) {
   const displayName = String(b.display_name || '').trim();
   const role = String(b.role || '');
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || email.length > 254) fail('INVALID_EMAIL', '邮箱格式不合法');
+  if (sec.disposableEmail(email)) fail('DISPOSABLE_EMAIL', '不接受一次性邮箱域名注册');
   if (password.length < 10 || password.length > 128) fail('INVALID_PASSWORD', '密码长度须为 10–128 位');
+  if (c.env.ENFORCE_STRONG_PASSWORD === 'true') {
+    const pv = sec.validatePassword(password);
+    if (!pv.valid) fail('WEAK_PASSWORD', `口令强度不足：${pv.reasons.join('、')}`, 422);
+  }
   if (!displayName || displayName.length > 64) fail('INVALID_NAME', '显示名须为 1–64 字符');
   if (!['publisher', 'solver'].includes(role)) fail('INVALID_ROLE', '注册仅开放 publisher / solver；admin 须经引导端点创建');
   if (await c.db.first('SELECT user_id FROM users WHERE email = ?', [email])) {
@@ -476,12 +521,16 @@ async function hRegister(c) {
   const passwordHash = await hashPassword(password, salt, c.env);
   const grant = Math.max(0, Number(c.env?.INITIAL_SBC ?? INITIAL_SBC_DEFAULT));
   const evt = uuid('EVT');
+  const gpc = sec.gpcRequested(c.request);
+  const locale = ['zh-CN', 'en'].includes(String(b.locale || '')) ? String(b.locale) : 'en';
   const statements = [{
     sql: `INSERT INTO users (user_id, email, password_hash, salt, role, display_name,
-      available_sbc, credit_score, personalized_enabled, stats_json, banned, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, 0, 100, 1, '{}', 0, ?)`,
+      available_sbc, credit_score, personalized_enabled, stats_json, banned, created_at,
+      email_verified, locale, gpc_enabled)
+      VALUES (?, ?, ?, ?, ?, ?, 0, 100, ?, '{}', 0, ?, 0, ?, ?)`,
     // available_sbc 由下方 postLegs 的 user:* 腿统一记账写入，避免重复计入初始额度
-    params: [userId, email, passwordHash, salt, role, displayName, iso()],
+    // GPC / DNT 信号在注册时即生效：个性化默认关闭，服务端强制中性排序
+    params: [userId, email, passwordHash, salt, role, displayName, gpc ? 0 : 1, iso(), locale, gpc ? 1 : 0],
   }];
   // 初始额度由生态激励池支出，两腿守恒；不视为法币充值、不可兑付
   await postLegs(c.db, {
@@ -497,10 +546,24 @@ async function hRegister(c) {
   }));
   await c.db.batch(statements);
   const sess = await createSession(c.db, userId);
+  // 验证令牌只经通知队列送达，绝不通过 HTTP 响应下发（本地回归可显式开启 dev echo）
+  const ver = await sec.issueEmailVerification(c.db, userId);
+  await notify.enqueue(c.db, {
+    userId, kind: 'EMAIL_VERIFICATION', title: '验证邮箱 / Verify your email',
+    body: `Verification token: ${ver.token} (expires ${ver.expiresAt}). 请在操作台输入完成验证。`,
+  });
+  await c.db.batch([await appendEvent(c.db, {
+    type: 'NotificationQueued', actor: 'auth',
+    payload: { action: 'verification_issued', kind: 'EMAIL_VERIFICATION', channel: notify.notifyMeta(c.env).channel },
+  })]);
   return {
     status: 201,
     headers: { 'Set-Cookie': sessionCookie(sess.token, c.env) },
-    data: { user: userView(await loadUser(c.db, userId)), session: sess.session },
+    data: {
+      user: userView(await loadUser(c.db, userId)), session: sess.session,
+      verification_required: c.env.EMAIL_VERIFICATION_REQUIRED === 'true',
+      ...(c.env.EMAIL_VERIFICATION_DEV_ECHO === 'true' ? { dev_token: ver.token } : {}),
+    },
   };
 }
 
@@ -511,12 +574,20 @@ async function hLogin(c) {
   const row = await c.db.first('SELECT * FROM users WHERE email = ? AND deleted_at IS NULL AND banned = 0', [email]);
   // 统一错误码，避免账号枚举
   if (!row) fail('INVALID_CREDENTIALS', '邮箱或密码错误', 401);
+  if (await risk.isLocked(row)) fail('ACCOUNT_LOCKED', '连续登录失败，账号临时锁定 15 分钟', 423);
   const hash = await hashPassword(password, row.salt, c.env);
-  if (hash !== row.password_hash) fail('INVALID_CREDENTIALS', '邮箱或密码错误', 401);
+  if (hash !== row.password_hash) {
+    await risk.assessLogin(c.db, { userId: row.user_id, success: false });
+    fail('INVALID_CREDENTIALS', '邮箱或密码错误', 401);
+  }
+  await risk.assessLogin(c.db, { userId: row.user_id, success: true });
   const sess = await createSession(c.db, row.user_id);
   return {
     headers: { 'Set-Cookie': sessionCookie(sess.token, c.env) },
-    data: { user: userView(row), session: sess.session },
+    data: {
+      user: userView(row), session: sess.session,
+      verification_required: c.env.EMAIL_VERIFICATION_REQUIRED === 'true' && Number(row.email_verified) !== 1,
+    },
   };
 }
 
@@ -535,7 +606,8 @@ async function hMe(c) {
     data: {
       user: userView(u),
       csrf_token: c.session.csrf,
-      preferences: { personalized_enabled: Number(u.personalized_enabled) === 1 },
+      preferences: { personalized_enabled: Number(u.personalized_enabled) === 1, locale: u.locale || 'en' },
+      verification_required: c.env.EMAIL_VERIFICATION_REQUIRED === 'true' && Number(u.email_verified) !== 1,
       consents: consents.map((r) => ({ kind: r.kind, version: r.version, granted: Number(r.granted) === 1, created_at: r.created_at })),
     },
   };
@@ -619,6 +691,9 @@ async function hCreateTask(c) {
       deadline: new Date(now.getTime() + deadlineHours * 3600 * 1000).toISOString(),
       created_at: now.toISOString(),
     };
+    // V3：可配置真实模型抽取；未配置 / 超时 / 异常一律降级为 domain 规则结果，
+    // 且模型输出只作为附加提示写入 meta，绝不改变状态机、权重与冻结口径。
+    const llmRes = await llm.extractStructure(c.env, { title: row.title, description: row.description });
     const structure = extractTaskStructure({
       title: row.title, description: row.description, acceptance_criteria: row.acceptance_criteria,
       category: row.category, online: Number(row.online) === 1, deadline_hours: deadlineHours,
@@ -628,6 +703,7 @@ async function hCreateTask(c) {
       required_skills: Array.isArray(b.required_skills) ? b.required_skills.slice(0, 20).map(String) : [],
       difficulty: Number(b.difficulty ?? 0.3),
       structure, compliance: check,
+      llm: { degraded: llmRes.degraded, model_decision: null, hint: llmRes.degraded ? null : llmRes.structure },
     };
     const statements = [{
       sql: `INSERT INTO tasks (task_id, state, publisher_id, title, description, category,
@@ -643,7 +719,7 @@ async function hCreateTask(c) {
       payload: {
         task_id: taskId, state: 'PENDING_REVIEW', category: row.category, bounty,
         virtual_number_placeholder: true, compliance_pass: true,
-        llm_adapter_version: LLM_ADAPTER_VERSION, algorithm_degraded: true,
+        llm_adapter_version: LLM_ADAPTER_VERSION, algorithm_degraded: llmRes.degraded,
       },
     }));
     await c.db.batch(statements);
@@ -772,7 +848,7 @@ async function hDispatch(c) {
         payload: {
           task_id: row.task_id, dispatch_id: dispatchId, weight_version: WEIGHT_VERSION,
           mode: result.mode, candidate_count: result.candidates.length,
-          algorithm_degraded: true, llm_adapter_version: LLM_ADAPTER_VERSION,
+          algorithm_degraded: llm.llmMeta(c.env).degraded, llm_adapter_version: LLM_ADAPTER_VERSION,
         },
       }),
       await appendEvent(c.db, {
@@ -808,6 +884,13 @@ async function hAccept(c) {
     if (filtered) fail('SOLVER_FILTERED', `接单人被硬过滤拦截：${filtered}`, 422);
     const total = round2(Number(row.frozen_total));
     if (!total) fail('ILLEGAL_TRANSITION', '任务赏金尚未冻结，无法接单');
+    // 并发抢单保险：先用 version 做原子占位，挡住同一任务的第二个接单请求。
+    // 仅靠事后 state 检查会让败者的账本腿 / 事件仍被写入，留下孤立托管流水。
+    const claim = await c.db.run(
+      "UPDATE tasks SET version = version + 1 WHERE task_id = ? AND state = 'DISPATCHING' AND version = ?",
+      [row.task_id, Number(row.version)],
+    );
+    if (Number(claim.changes) !== 1) fail('CONCURRENT_CONFLICT', '并发抢单冲突，请刷新后重试', 409);
     const statements = [];
     await postLegs(c.db, {
       eventId: c.body.event_id || uuid('EVT'), taskId: row.task_id,
@@ -990,11 +1073,15 @@ async function hDispute(c) {
           JSON.stringify(safePayload({ resolution, decision: 'resolve' })), iso()],
       });
       await c.db.batch(statements);
+      const disputeLlm = await llm.disputeSummary(c.env, {
+        materials: [String(c.body.reason || ''), String(row.dispute_reason || '')].join(' ').slice(0, 800),
+      });
       return {
         data: {
           task: taskView(await loadTask(c.db, row.task_id)), resolution,
           arbitrator: '人工裁定', model_decision: null,
-          note: '裁定完成后才按结果分账；模型全程不直判',
+          llm_summary: disputeLlm.summary, llm_degraded: disputeLlm.degraded,
+          note: '裁定完成后才按结果分账；模型全程不直判，摘要仅供人工参考',
         },
       };
     }
@@ -1174,11 +1261,380 @@ async function hDeleteMe(c) {
 }
 
 // ---------------------------------------------------------------------------
+// V3 完全体端点（D-14）
+// 邮箱验证 / 通知中心 / 客户端埋点回执 / 任务撤回 / 管理员运维与灾备 / 定时任务
+//
+// 共同红线：
+//   1. 所有处置类动作（风控、锚定、备份、cron 触发）都有明确鉴权与人工确认留痕；
+//   2. 定时任务只生成「待人工确认」工单，绝不自动结算或自动裁定；
+//   3. 模型输出恒 model_decision:null，不进入推送名单 / 结算 / 裁定；
+//   4. 备份导出含个人数据，必须显式声明加密保存义务并写 audit_log。
+// ---------------------------------------------------------------------------
+
+/** 写操作成功后的统一副作用：通知入队 + 发布风控评估。放在编排层，避免逐个 handler 侵入。 */
+async function postWriteEffects(db, env, { pathname, method, data, actorId }) {
+  if (method === 'GET' || method === 'DELETE' || !data || typeof data !== 'object') return;
+  const task = data.task && typeof data.task === 'object' ? data.task : null;
+  const action = (pathname.match(/\/(review|dispatch|accept|submit|verify|dispute|cancel|feedback)$/) || [])[1];
+  if (task) {
+    if (/^\/api\/tasks$/.test(pathname) && method === 'POST') {
+      await risk.assessNewTask(db, {
+        userId: task.publisher_id, bounty: Number(task.bounty || 0),
+        category: task.category, title: task.title, description: task.description,
+      });
+    }
+    if (action === 'feedback') return; // 埋点回执不产生对方通知
+    const label = {
+      review: '任务审核结果 / Review result', dispatch: '任务已进入推送 / Task dispatched',
+      accept: '任务已被接单 / Task accepted', submit: '成果已提交 / Result submitted',
+      verify: '验收结果 / Verification result', dispute: '争议状态更新 / Dispute update',
+      cancel: '任务已撤回 / Task withdrawn',
+    }[action] || '任务状态更新 / Task update';
+    const recipients = new Set();
+    if (task.publisher_id && task.publisher_id !== actorId) recipients.add(task.publisher_id);
+    if (task.solver_id && task.solver_id !== actorId) recipients.add(task.solver_id);
+    for (const uid of recipients) {
+      await notify.enqueue(db, {
+        userId: uid, kind: 'TASK_UPDATE', title: label,
+        body: `Task ${task.task_id} is now ${task.state}. 请在操作台查看详情。`,
+        taskId: task.task_id,
+      });
+    }
+  }
+}
+
+async function hVerifyEmail(c) {
+  await rateLimit(c.db, c.request, 'verify_email', 20, c.env);
+  const token = String(c.body.token || '').trim();
+  if (!token) fail('MISSING_TOKEN', '缺少验证令牌');
+  const r = await sec.verifyEmailToken(c.db, token);
+  if (!r.ok) fail('VERIFICATION_FAILED', `验证失败：${r.reason}`, 400);
+  await notify.enqueue(c.db, {
+    userId: r.userId, kind: 'EMAIL_VERIFIED',
+    title: '邮箱已验证 / Email verified', body: 'Your email address has been verified.',
+  });
+  await c.db.batch([await appendEvent(c.db, {
+    type: 'EmailVerified', actor: 'auth', payload: { action: 'verified' },
+  })]);
+  return { data: { verified: true, user_id: r.userId } };
+}
+
+async function hResendVerification(c) {
+  const u = requireUser(c.session);
+  assertCsrf(c.request, c.session);
+  await rateLimit(c.db, c.request, 'resend_verification', 5, c.env);
+  if (Number(u.email_verified) === 1) return { data: { already_verified: true } };
+  const ver = await sec.issueEmailVerification(c.db, u.user_id);
+  await notify.enqueue(c.db, {
+    userId: u.user_id, kind: 'EMAIL_VERIFICATION', title: '验证邮箱 / Verify your email',
+    body: `Verification token: ${ver.token} (expires ${ver.expiresAt}). 请在操作台输入完成验证。`,
+  });
+  await c.db.batch([await appendEvent(c.db, {
+    type: 'NotificationQueued', actor: 'auth',
+    payload: { action: 'verification_resent', kind: 'EMAIL_VERIFICATION', channel: notify.notifyMeta(c.env).channel },
+  })]);
+  return {
+    data: {
+      queued: true, verification_required: true, channel: notify.notifyMeta(c.env).channel,
+      // 仅本地回归显式开启时回显令牌；生产绝不通过 HTTP 响应下发验证凭据
+      ...(c.env.EMAIL_VERIFICATION_DEV_ECHO === 'true' ? { dev_token: ver.token } : {}),
+    },
+  };
+}
+
+async function hNotifications(c) {
+  const u = requireUser(c.session);
+  const limit = Math.min(200, Math.max(1, Number(c.query.limit || 50)));
+  return { data: await notify.listForUser(c.db, u.user_id, { limit, unreadOnly: c.query.unread === 'true' }) };
+}
+
+async function hNotificationsRead(c) {
+  const u = requireUser(c.session);
+  assertCsrf(c.request, c.session);
+  const ids = Array.isArray(c.body.ids) ? c.body.ids.map(String).slice(0, 200) : [];
+  return { data: await notify.markRead(c.db, u.user_id, { ids, all: c.body.all === true }) };
+}
+
+async function hLocale(c) {
+  const u = requireUser(c.session);
+  assertCsrf(c.request, c.session);
+  const locale = ['zh-CN', 'en'].includes(String(c.body.locale)) ? String(c.body.locale) : null;
+  if (!locale) fail('INVALID_LOCALE', '仅支持 zh-CN / en');
+  await c.db.run('UPDATE users SET locale = ? WHERE user_id = ?', [locale, u.user_id]);
+  return { data: { locale, enforcement: 'server_side' } };
+}
+
+/** 任务撤回（D-09 P1）：PENDING_REVIEW→REJECTED，PUBLISHED/DISPATCHING→CANCELLED */
+async function hCancel(c) {
+  const u = requireUser(c.session);
+  assertCsrf(c.request, c.session);
+  return withIdempotency(c.db, c.body, async () => {
+    const row = await loadTask(c.db, c.params[0]);
+    if (row.publisher_id !== u.user_id && u.role !== 'admin') fail('FORBIDDEN', '仅发布方或管理员可撤回任务', 403);
+    const target = row.state === 'PENDING_REVIEW' ? 'REJECTED' : 'CANCELLED';
+    if (!['PENDING_REVIEW', 'PUBLISHED', 'DISPATCHING'].includes(row.state) || !canTransition(row.state, target)) {
+      fail('ILLEGAL_TRANSITION', `当前状态 ${row.state} 不允许撤回`);
+    }
+    const reason = String(c.body.reason || 'publisher_withdrawn').slice(0, 200);
+    const evt = c.body.event_id || uuid('EVT');
+    const statements = [];
+    const frozen = round2(Number(row.frozen_total || 0));
+    let settlement = null;
+    if (frozen > 0) {
+      if (Number(row.escrowed) === 1 && row.solver_id) {
+        // 已接单撤回：契约 computeCancelSettlement，90% 退发布方 + 10% 补偿接单人
+        settlement = computeCancelSettlement(frozen);
+        await postLegs(c.db, {
+          eventId: evt, taskId: row.task_id, memo: 'cancel:已托管撤回，按契约退款与补偿',
+          legs: [
+            { account: 'subject:escrow', delta: -frozen },
+            { account: `user:${row.publisher_id}`, delta: +settlement.refund },
+            { account: `user:${row.solver_id}`, delta: +settlement.compensation },
+          ], statements,
+        });
+      } else {
+        // 未托管撤回：冻结全额原路退回（含 5% 服务费，D-04）
+        await postLegs(c.db, {
+          eventId: evt, taskId: row.task_id, memo: 'cancel:未托管撤回，冻结全额退回（含服务费）',
+          legs: [
+            { account: 'subject:frozen', delta: -frozen },
+            { account: `user:${row.publisher_id}`, delta: +frozen },
+          ], statements,
+        });
+      }
+    }
+    statements.push({
+      sql: 'UPDATE tasks SET state = ?, version = version + 1 WHERE task_id = ? AND version = ?',
+      params: [target, row.task_id, Number(row.version)],
+    });
+    statements.push(await appendEvent(c.db, {
+      type: 'TaskCancelled', taskId: row.task_id, eventId: c.body.event_id || null, actor: u.user_id,
+      payload: { task_id: row.task_id, state: target, cancel_reason: reason, amount: frozen, rule_version: RULE_VERSION },
+    }));
+    statements.push({
+      sql: 'INSERT INTO audit_log (actor_id, action, target_id, detail_json, created_at) VALUES (?, ?, ?, ?, ?)',
+      params: [u.user_id, 'TASK_CANCEL_MANUAL', row.task_id,
+        JSON.stringify(safePayload({ decision: 'cancel', cancel_reason: reason, amount: frozen })), iso()],
+    });
+    await c.db.batch(statements);
+    return { data: { task: taskView(await loadTask(c.db, row.task_id)), settlement, rule_version: RULE_VERSION } };
+  });
+}
+
+/** 客户端曝光 / 忽略回执（D-07 P1）：只记录，不改变推送名单与排序 */
+async function hFeedback(c) {
+  const u = requireRole(c.session, ['solver']);
+  assertCsrf(c.request, c.session);
+  return withIdempotency(c.db, c.body, async () => {
+    const row = await loadTask(c.db, c.params[0]);
+    const kind = c.body.kind === 'IGNORED' ? 'IGNORED' : 'EXPOSED';
+    if (!['PUBLISHED', 'DISPATCHING'].includes(row.state)) {
+      fail('ILLEGAL_TRANSITION', `当前状态 ${row.state} 不接受曝光回执`);
+    }
+    const statements = [
+      {
+        sql: 'INSERT INTO dispatch_feedback (task_id, solver_id, kind, created_at) VALUES (?, ?, ?, ?)',
+        params: [row.task_id, u.user_id, kind, iso()],
+      },
+      await appendEvent(c.db, {
+        type: kind === 'IGNORED' ? 'DispatchIgnored' : 'DispatchExposed',
+        taskId: row.task_id, eventId: c.body.event_id || null, actor: u.user_id,
+        payload: { task_id: row.task_id, action: kind, note: 'client_feedback_only' },
+      }),
+    ];
+    await c.db.batch(statements);
+    return {
+      status: 201,
+      data: { task_id: row.task_id, kind, recorded: true, note: '埋点回执仅用于疲劳度统计，不改变推送名单' },
+    };
+  });
+}
+
+const adminOnly = (c) => requireRole(c.session, ['admin']);
+
+async function hAdminMetrics(c) {
+  adminOnly(c);
+  const windowMinutes = Math.min(1440, Math.max(1, Number(c.query.window_minutes || 60)));
+  return { data: await obs.metricsSummary(c.db, { windowMinutes }) };
+}
+
+async function hAdminAudit(c) {
+  adminOnly(c);
+  const limit = Math.min(500, Math.max(1, Number(c.query.limit || 50)));
+  const rows = await c.db.all(
+    'SELECT seq, actor_id, action, target_id, detail_json, created_at FROM audit_log ORDER BY seq DESC LIMIT ?', [limit],
+  );
+  return {
+    data: {
+      count: rows.length,
+      items: rows.map((r) => {
+        let detail = {};
+        try { detail = JSON.parse(r.detail_json || '{}'); } catch { detail = {}; }
+        const { detail_json: _raw, ...rest } = r;
+        return { ...rest, detail };
+      }),
+    },
+  };
+}
+
+async function hAdminRisk(c) {
+  adminOnly(c);
+  const status = String(c.query.status || 'OPEN').toUpperCase().slice(0, 24);
+  const limit = Math.min(500, Math.max(1, Number(c.query.limit || 100)));
+  return { data: { status, items: await risk.listFlags(c.db, { status, limit }) } };
+}
+
+async function hAdminRiskResolve(c) {
+  const u = adminOnly(c);
+  assertCsrf(c.request, c.session);
+  return withIdempotency(c.db, c.body, async () => {
+    const decision = String(c.body.decision || '');
+    if (!['dismiss', 'escalate'].includes(decision)) fail('INVALID_DECISION', '仅支持 dismiss / escalate');
+    const r = await risk.resolveFlag(c.db, {
+      flagId: String(c.body.flag_id || ''), actorId: u.user_id, decision,
+      reason: String(c.body.reason || '').slice(0, 200),
+    });
+    if (!r.updated) fail('FLAG_NOT_FOUND', '风控标记不存在或已处置', 404);
+    return { data: { flag_id: c.body.flag_id, decision, resolved_by: u.user_id, note: '人工确认处置，模型不参与' } };
+  });
+}
+
+/** 平台级审计导出（灾备）：含个人数据，须加密保存；不做在线 restore，避免破坏账本哈希链 */
+async function hAdminBackup(c) {
+  const u = adminOnly(c);
+  const tables = [
+    'users', 'sessions', 'tasks', 'ledger_entries', 'events', 'idempotency',
+    'dispatches', 'consents', 'reports', 'audit_log', 'rate_limits', 'meta',
+    'notifications', 'email_verifications', 'dispatch_feedback', 'metrics',
+    'risk_flags', 'backups',
+  ];
+  const payload = {
+    generated_at: iso(), scope: 'platform_export', schema_version: SCHEMA_VERSION,
+    notice: 'GDPR 运维导出：含账号邮箱、口令派生值、会话摘要与任务正文，须加密保存、限定留存、不得外传；账本哈希链为本地摘要，未接公链。',
+    tables: {},
+  };
+  let rowCount = 0;
+  for (const t of tables) {
+    const rows = await c.db.all(`SELECT * FROM ${t} ORDER BY rowid DESC LIMIT 5000`);
+    payload.tables[t] = rows;
+    rowCount += rows.length;
+  }
+  const digest = sha256Hex(JSON.stringify(payload));
+  const backupId = uuid('BK');
+  await c.db.run(
+    'INSERT INTO backups (backup_id, actor_id, scope, row_count, sha256, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+    [backupId, u.user_id, 'platform_export', rowCount, digest, iso()],
+  );
+  await c.db.batch([
+    await appendEvent(c.db, {
+      type: 'BackupCreated', actor: u.user_id,
+      payload: { action: 'platform_export', entry_count: rowCount, scope: 'platform_export' },
+    }),
+    {
+      sql: 'INSERT INTO audit_log (actor_id, action, target_id, detail_json, created_at) VALUES (?, ?, ?, ?, ?)',
+      params: [u.user_id, 'BACKUP_EXPORTED_MANUAL', backupId,
+        JSON.stringify(safePayload({ action: 'platform_export', entry_count: rowCount })), iso()],
+    },
+  ]);
+  return { data: { ...payload, backup_id: backupId, sha256: digest, row_count: rowCount } };
+}
+
+/** 人工触发账本 Merkle 锚定：本地哈希摘要，零 PII、零任务正文、未接公链 */
+async function hAdminAnchor(c) {
+  const u = adminOnly(c);
+  assertCsrf(c.request, c.session);
+  const integ = await obs.ledgerIntegrity(c.db);
+  const at = iso();
+  const anchor = {
+    root: integ.merkle_root, entry_count: integ.entry_count, at,
+    actor: u.user_id, pii_on_chain: false, note: 'local_hash_digest_only',
+  };
+  await c.db.run(
+    'INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
+    ['ledger_anchor', JSON.stringify(anchor)],
+  );
+  await c.db.batch([
+    await appendEvent(c.db, {
+      type: 'LedgerAnchored', actor: u.user_id,
+      payload: { action: 'manual_anchor', entry_count: integ.entry_count, pii_redacted: true },
+    }),
+    {
+      sql: 'INSERT INTO audit_log (actor_id, action, target_id, detail_json, created_at) VALUES (?, ?, ?, ?, ?)',
+      params: [u.user_id, 'LEDGER_ANCHOR_MANUAL', null,
+        JSON.stringify(safePayload({ entry_count: integ.entry_count, action: 'manual_anchor' })), at],
+    },
+  ]);
+  return {
+    data: {
+      merkle_root: integ.merkle_root, entry_count: integ.entry_count, anchored_at: at,
+      balanced: integ.balanced, hash_chain_valid: integ.hash_chain_valid,
+      pii_on_chain: false, note: '本地哈希摘要，未接任何公链',
+    },
+  };
+}
+
+/** 定时任务入口：外部调度器带 X-Cron-Secret 调用；超时项只生成人工确认工单 */
+async function hAdminCron(c) {
+  const expected = c.env && c.env.CRON_SECRET;
+  if (!expected) fail('CRON_DISABLED', '未配置 CRON_SECRET，定时任务端点不可用', 503);
+  const given = c.request.headers.get('x-cron-secret') || String(c.body.secret || '');
+  if (!given || sha256Hex(given) !== sha256Hex(String(expected))) {
+    fail('INVALID_CRON_SECRET', '定时任务密钥无效', 403);
+  }
+  const r = await jobs.runJobs(c.db, c.env, { dryRun: c.body.dry_run === true });
+  await c.db.batch([await appendEvent(c.db, {
+    type: 'CronCompleted', actor: 'system-cron',
+    payload: { action: 'cron_run', scope: 'scheduled_jobs' },
+  })]);
+  return {
+    data: {
+      ...r, mode: 'http_triggered',
+      note: '超时自动验收 / 争议结案只生成待人工确认工单与提醒，不自动结算或裁定',
+    },
+  };
+}
+
+async function hAdminOps(c) {
+  adminOnly(c);
+  const pending = await notify.pendingCount(c.db);
+  const integ = await obs.ledgerIntegrity(c.db);
+  const versionRow = await c.db.first('SELECT value FROM meta WHERE key = ?', ['schema_version']);
+  const anchorRow = await c.db.first('SELECT value FROM meta WHERE key = ?', ['ledger_anchor']);
+  let anchor = null;
+  if (anchorRow) { try { anchor = JSON.parse(anchorRow.value); } catch { anchor = null; } }
+  return {
+    data: {
+      service: SERVICE, version: VERSION, schema_version: versionRow?.value || SCHEMA_VERSION,
+      components: {
+        db: { status: 'configured', binding: 'DB', schema_version: versionRow?.value || SCHEMA_VERSION },
+        llm: llm.llmMeta(c.env),
+        notify: { ...notify.notifyMeta(c.env), pending },
+        cron: jobs.jobMeta(c.env),
+        security: sec.securityMeta(c.env),
+      },
+      jobs: {
+        auto_verify_hours: AUTO_VERIFY_HOURS, dispute_close_hours: DISPUTE_CLOSE_HOURS,
+        mode: 'http_triggered', note: '由外部调度器定时调用 /api/admin/cron',
+      },
+      notifications_pending: pending,
+      ledger_integrity: integ,
+      anchor,
+      readiness: {
+        code_capabilities_complete: true,
+        note: '代码能力已完备；正式运营许可仍须外部动作核销，见 docs/13 与 tests/readiness-check.mjs',
+      },
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
 // 路由表（未登记路径一律 404：SBC 转让 / 交易 / 兑付等红线接口从未实现）
 // ---------------------------------------------------------------------------
 
 const PUBLIC_ROUTES = new Set(['GET /api/health', 'GET /api/config', 'POST /api/auth/register',
-  'POST /api/auth/login', 'POST /api/admin/bootstrap', 'POST /api/consents']);
+  'POST /api/auth/login', 'POST /api/admin/bootstrap', 'POST /api/consents',
+  // 邮箱验证凭令牌；cron 凭 CRON_SECRET（两者在 handler 内独立鉴权）
+  'POST /api/auth/verify-email', 'POST /api/admin/cron']);
 
 const ROUTES = [
   ['GET', /^\/api\/health$/, (c) => ({ data: healthData(c.env, c.db) })],
@@ -1206,6 +1662,22 @@ const ROUTES = [
   ['POST', /^\/api\/reports$/, hReports],
   ['GET', /^\/api\/me\/export$/, hExport],
   ['DELETE', /^\/api\/me$/, hDeleteMe],
+  // ---- D-14 完全体新增端点 ----
+  ['POST', /^\/api\/auth\/verify-email$/, hVerifyEmail],
+  ['POST', /^\/api\/auth\/resend-verification$/, hResendVerification],
+  ['GET', /^\/api\/me\/notifications$/, hNotifications],
+  ['POST', /^\/api\/me\/notifications\/read$/, hNotificationsRead],
+  ['POST', /^\/api\/me\/locale$/, hLocale],
+  ['POST', /^\/api\/tasks\/([^/]+)\/cancel$/, hCancel],
+  ['POST', /^\/api\/tasks\/([^/]+)\/feedback$/, hFeedback],
+  ['GET', /^\/api\/admin\/metrics$/, hAdminMetrics],
+  ['GET', /^\/api\/admin\/audit$/, hAdminAudit],
+  ['GET', /^\/api\/admin\/risk$/, hAdminRisk],
+  ['POST', /^\/api\/admin\/risk\/resolve$/, hAdminRiskResolve],
+  ['GET', /^\/api\/admin\/backup$/, hAdminBackup],
+  ['POST', /^\/api\/admin\/anchor$/, hAdminAnchor],
+  ['POST', /^\/api\/admin\/cron$/, hAdminCron],
+  ['GET', /^\/api\/admin\/ops$/, hAdminOps],
 ];
 
 async function readBody(request) {
@@ -1218,11 +1690,14 @@ async function readBody(request) {
 
 /** Cloudflare Pages Functions 入口；本地回归直接传入 Request 对象调用 */
 export async function dispatch(request, env = {}) {
+  const ctx = obs.requestContext(request);
+  let db = null;
+  let response;
   try {
     const url = new URL(request.url);
     const pathname = url.pathname;
     const method = request.method.toUpperCase();
-    const db = createDb(env);
+    db = createDb(env);
 
     // 未绑定 D1：只读演示模式，站点不崩；写操作明确 503，不伪装成生产可用
     if (!db) {
@@ -1238,7 +1713,6 @@ export async function dispatch(request, env = {}) {
     await db.ensureSchema();
     await rateLimit(db, request, 'global', 180, env);
 
-    const key = `${method} ${pathname}`;
     let matched = null;
     for (const [m, re, handler] of ROUTES) {
       if (m !== method) continue;
@@ -1254,12 +1728,46 @@ export async function dispatch(request, env = {}) {
     const isPublic = PUBLIC_ROUTES.has(`${method} ${pathname}`);
     if (!isPublic && !session) return errorResponse(new ApiFailure('UNAUTHORIZED', '请先登录', 401));
 
+    // GPC / DNT：浏览器级退出信号账号级落库，服务端强制中性排序
+    if (session && sec.gpcRequested(request) && Number(session.user.personalized_enabled) === 1) {
+      await db.run(
+        'UPDATE users SET personalized_enabled = 0, gpc_enabled = 1 WHERE user_id = ?',
+        [session.user.user_id],
+      );
+      session.user.personalized_enabled = 0;
+    }
+
     const result = await matched.handler({
       db, env, request, url, body, session, params: matched.params,
       query: Object.fromEntries(url.searchParams.entries()),
     });
-    return ok(result.data ?? null, result.status || 200, result.headers || {});
+    response = ok(result.data ?? null, result.status || 200, result.headers || {});
+
+    // 写操作副作用（通知入队 / 发布风控评估）：失败不影响主响应
+    try {
+      await postWriteEffects(db, env, {
+        pathname, method, data: result.data,
+        actorId: session ? session.user.user_id : null,
+      });
+    } catch (e) {
+      obs.structuredLog(ctx, { level: 'warn', event: 'post_write_effect_failed', code: String(e && e.name) });
+    }
   } catch (e) {
-    return errorResponse(e);
+    response = errorResponse(e);
   }
+
+  const durationMs = Date.now() - ctx.startedAt;
+  if (db) {
+    try {
+      await obs.recordMetric(db, {
+        scope: 'request', key: response.status >= 400 ? 'error' : 'completed',
+        value: durationMs, meta: { event: ctx.path, status: response.status },
+      });
+    } catch { /* 指标写入失败不得影响业务响应 */ }
+  }
+  // 只对 5xx 输出结构化日志，避免回归 / 压测噪声；字段白名单，零 PII
+  if (response.status >= 500) {
+    obs.structuredLog(ctx, { level: 'error', event: 'request_failed', status: response.status, durationMs });
+  }
+  return response;
 }

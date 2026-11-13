@@ -7,7 +7,7 @@
  * Git 集成部署后无需手工跑迁移。
  */
 
-import { SCHEMA_STATEMENTS, SCHEMA_VERSION } from './schema.js';
+import { SCHEMA_STATEMENTS, SCHEMA_VERSION, COLUMN_MIGRATIONS } from './schema.js';
 
 const initialized = new WeakSet();
 
@@ -46,9 +46,21 @@ export function createDb(env) {
       return raw.batch(prepared);
     },
 
+    /**
+     * 幂等自举：建表 + 老库补列 + 版本号。
+     * COLUMN_MIGRATIONS 对 v1.0 已存在的库逐条 ALTER；新库列已存在会抛
+     * "duplicate column name"，按预期忽略，其余错误必须抛出（不静默吞掉真实故障）。
+     */
     async ensureSchema() {
       if (initialized.has(raw)) return;
       for (const sql of SCHEMA_STATEMENTS) await raw.prepare(sql).run();
+      for (const sql of COLUMN_MIGRATIONS) {
+        try {
+          await raw.prepare(sql).run();
+        } catch (e) {
+          if (!/duplicate column|already exists/i.test(String(e && e.message))) throw e;
+        }
+      }
       await raw.prepare(
         'INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
       ).bind('schema_version', SCHEMA_VERSION).run();

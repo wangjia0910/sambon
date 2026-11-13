@@ -18,4 +18,7 @@ Thumbs.db
 .env
 .env.*
 
+# 正式运营就绪证据（含人工签字与内部路径，不入库；模板 ops/readiness.template.json 入库）
+ops/readiness.json
+
 # 注：.workbuddy/ 为项目相关数据，不属于临时缓存，禁止删除或忽略

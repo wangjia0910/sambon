@@ -6,36 +6,48 @@
   <meta name="robots" content="noindex, nofollow">
   <title>三宝殿 · sambon.net — 生产系统操作台</title>
   <!-- 绝对路径：以下静态文件会被复制到 Cloudflare Pages 输出目录根 -->
+  <!-- 生产页 CSP 为 script-src 'self'：仅加载同源 app.js，无任何内联 <script> / 第三方 CDN -->
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 
-  <!-- ===== 顶部栏：品牌 / 当前用户与角色 / mode 徽章 ===== -->
+  <!-- ===== 顶部栏：品牌 / 当前用户与角色 / mode 徽章 / 通知 / 语言切换 ===== -->
   <header class="topbar">
     <div class="brand">
       三宝殿 · sambon.net
-      <span class="brand-sub">悬赏互助平台 · 生产系统操作台</span>
+      <span class="brand-sub" data-i18n="brand.sub">悬赏互助平台 · 生产系统操作台</span>
     </div>
     <div class="topbar-right">
       <span id="mode-badge" class="badge">mode: —</span>
-      <span id="user-chip" class="user-chip">未登录</span>
-      <button id="logout-btn" class="btn btn-ghost btn-sm" data-action="logout" hidden>退出登录</button>
+      <span id="user-chip" class="user-chip" data-i18n="topbar.notLoggedIn">未登录</span>
+      <button id="logout-btn" class="btn btn-ghost btn-sm" data-action="logout" data-i18n="topbar.logout" hidden>退出登录</button>
+      <!-- 通知中心：显示未读数，点击展开面板 -->
+      <button type="button" class="btn btn-ghost btn-sm notif-btn" id="notif-btn" data-action="notif-toggle" hidden>通知 (0)</button>
+      <!-- 语言切换：中文默认，海外默认英文；切换后立即重渲染当前视图 -->
+      <div class="lang-switch" role="group" aria-label="Language switch">
+        <button type="button" class="lang-btn" id="lang-btn-zh" data-action="set-locale" data-locale="zh-CN">中文</button>
+        <button type="button" class="lang-btn" id="lang-btn-en" data-action="set-locale" data-locale="en">EN</button>
+      </div>
     </div>
   </header>
 
-  <!-- ===== L1 状态声明（常驻，不可关闭） ===== -->
+  <!-- ===== L1 状态声明（常驻，不可关闭；文案由 app.js 的 t() 按语言填充） ===== -->
   <div class="banner-l1" id="l1-banner">
-    <strong>L1 状态声明</strong>
-    <span>本站为生产系统演示环境，未完成 docs/07 的 G1–G7 与 V1–V8 全部核销，不构成正式运营许可；不承诺任何服务等级（SLA）或可用性指标。</span>
-    <span class="en">Demonstration environment only — G1–G7 and V1–V8 (docs/07) are not fully discharged and no operating licence is granted. No SLA or availability commitment is made.</span>
+    <strong data-i18n="l1.title">L1 状态声明</strong>
+    <span data-i18n="l1.body">本站为生产系统演示环境，未完成 docs/07 的 G1–G7 与 V1–V8 全部核销，不构成正式运营许可；不承诺任何服务等级（SLA）或可用性指标。</span>
   </div>
 
   <!-- ===== 演示模式横幅：由 app.js 依据 /api/health 的 mode 控制显隐与写锁 ===== -->
   <div id="demo-banner" class="banner-demo" hidden>
-    <span>演示模式：后端未绑定 D1 持久化，写操作不可用。</span>
-    <a href="/index.html">L0 演示台</a>
-    <span class="en">Demo mode: D1 persistence is not bound; all write operations are disabled. No operating licence is granted.</span>
+    <span data-i18n="demo.body">演示模式：后端未绑定 D1 持久化，写操作不可用。</span>
+    <a href="/index.html" data-i18n="demo.link">L0 演示台</a>
   </div>
+
+  <!-- ===== 邮箱验证常驻提示条挂载点（由 app.js 渲染，登录后 email_verified=false 时显示） ===== -->
+  <div id="verify-bar" class="verify-bar"></div>
+
+  <!-- ===== 通知中心下拉面板挂载点（由 app.js 渲染） ===== -->
+  <div id="notif-panel" class="notif-panel" hidden></div>
 
   <!-- ===== 主区：由 app.js 依据登录态渲染（认证视图 / 操作台视图） ===== -->
   <main id="app" class="app"></main>
@@ -43,24 +55,23 @@
   <!-- ===== 页脚：合规入口与运行元信息 ===== -->
   <footer class="footer">
     <div class="footer-links">
-      <a href="/legal.html">隐私政策 / 服务条款 / 可接受使用政策 / AI 透明度 / 未成年人限制 / 举报通道</a>
+      <a href="/legal.html" data-i18n="footer.legal">隐私政策 / 服务条款 / 可接受使用政策 / AI 透明度 / 未成年人限制 / 举报通道</a>
       <span>·</span>
-      <span>SBC 为平台内贡献积分，不可兑付、不可转让。</span>
+      <span data-i18n="footer.sbc">SBC 为平台内贡献积分，不可兑付、不可转让。</span>
     </div>
-    <div id="meta-line" class="muted">健康检查未就绪</div>
+    <div id="meta-line" class="muted" data-i18n="meta.notReady">健康检查未就绪</div>
   </footer>
 
   <!-- ===== Cookie 同意条：首次访问显示，选择后调用 POST /api/consents ===== -->
   <div id="cookie-bar" class="cookie-bar" hidden>
     <div class="cookie-copy">
-      <strong>Cookie 与同意</strong>
-      <span>必要 Cookie 用于会话与 CSRF 安全（httpOnly 会话 Cookie 由浏览器自动携带）；分析 Cookie 仅用于匿名统计，可选。你可在「数据与账号」中随时调整。</span>
-      <a href="/legal.html#cookies">查看隐私政策</a>
-      <span class="en">Necessary cookies keep the session secure; analytics cookies are optional and may be withdrawn at any time.</span>
+      <strong data-i18n="cookie.title">Cookie 与同意</strong>
+      <span data-i18n="cookie.body">必要 Cookie 用于会话与 CSRF 安全（httpOnly 会话 Cookie 由浏览器自动携带）；分析 Cookie 仅用于匿名统计，可选。你可在「数据与账号」中随时调整。</span>
+      <a href="/legal.html#cookies" data-i18n="cookie.link">查看隐私政策</a>
     </div>
     <div class="cookie-actions">
-      <button type="button" class="btn btn-primary" data-action="cookie-accept-all">接受必要+分析</button>
-      <button type="button" class="btn btn-ghost" data-action="cookie-necessary">仅必要</button>
+      <button type="button" class="btn btn-primary" data-action="cookie-accept-all" data-i18n="cookie.accept">接受必要+分析</button>
+      <button type="button" class="btn btn-ghost" data-action="cookie-necessary" data-i18n="cookie.necessary">仅必要</button>
     </div>
   </div>
 

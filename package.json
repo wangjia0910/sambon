@@ -9,6 +9,8 @@
     "build": "node tools/build-cloudflare.mjs",
     "test": "node tests/smoke.mjs && node tests/verify-local.mjs && node tests/verify-cloudflare.mjs && node tests/verify-site-selfcheck.mjs && node --disable-warning=ExperimentalWarning tests/verify-production.mjs",
     "test:production": "node --disable-warning=ExperimentalWarning tests/verify-production.mjs",
-    "check": "node tests/predeploy-check.mjs"
+    "check": "node tests/predeploy-check.mjs",
+    "check:ready": "node tests/readiness-check.mjs",
+    "check:ready:strict": "node tests/readiness-check.mjs --strict"
   }
 }

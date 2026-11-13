@@ -3,7 +3,7 @@
    浅色 / 专业克制的后台管理台风格：白与浅灰底、深色文字、蓝灰主色、
    圆角卡片、清晰表格；不使用渐变，不使用图标字体。
    分区：变量 → 基础 → 布局 → 顶部与横幅 → 卡片 → 表单与按钮
-        → 表格与徽章 → 弹窗 / toast / Cookie 条 → 合规文档 → 响应式
+        → 表格与徽章 → 弹窗 / toast / Cookie 条 → 合规文档 → 新增组件 → 响应式
    ========================================================================== */
 
 :root {
@@ -171,6 +171,7 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity: .
 .modal { width: min(520px, 100%); box-shadow: 0 12px 40px rgba(15, 23, 42, .22); }
 .modal-title { font-size: 17px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
 .modal-body { margin: 12px 0; font-size: 13.5px; }
+.modal-extra { margin: 12px 0 0; display: flex; flex-direction: column; gap: 10px; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
 
 /* ---------- Toast ---------- */
@@ -202,6 +203,53 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity: .
 .legal-section p, .legal-section li { font-size: 13.5px; line-height: 1.85; }
 .note-box { border-left: 3px solid var(--primary); background: var(--surface-2); padding: 10px 14px; border-radius: 0 var(--radius) var(--radius) 0; }
 
+/* ---------- 新增组件：语言切换 / 通知 / 提示条 / 运维面板 ---------- */
+.lang-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.lang-btn { border: none; background: var(--surface); color: var(--muted); padding: 4px 11px; font: inherit; font-size: 12px; cursor: pointer; }
+.lang-btn + .lang-btn { border-left: 1px solid var(--border); }
+.lang-btn.active { background: var(--primary); color: #fff; font-weight: 600; }
+.notif-btn { position: relative; }
+.notif-count { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--danger); color: #fff; font-size: 11px; line-height: 18px; text-align: center; margin-left: 4px; }
+
+.verify-bar { max-width: 1600px; margin: 14px auto 0; padding: 0 18px; }
+.notif-panel { position: absolute; top: 56px; right: 18px; width: min(380px, calc(100vw - 24px)); max-height: 70vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 34px rgba(15, 23, 42, .18); z-index: 80; padding: 14px 16px; }
+.notif-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.notif-head h4 { margin: 0; }
+.notif-list { display: flex; flex-direction: column; gap: 8px; }
+.notif-item { border: 1px solid var(--border); border-radius: 6px; padding: 9px 11px; background: var(--surface-2); }
+.notif-item.unread { border-left: 3px solid var(--primary); background: var(--surface); }
+.notif-item-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.notif-kind { font-size: 11px; color: var(--primary-dark); background: var(--primary-soft); border-radius: 999px; padding: 1px 8px; }
+.notif-title { font-size: 13px; font-weight: 600; margin: 4px 0 2px; }
+.notif-body { font-size: 12.5px; color: var(--muted); white-space: pre-wrap; word-break: break-word; }
+.notif-meta { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.notif-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+.notif-empty { color: var(--muted); font-size: 13px; }
+
+.notice { border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 6px; padding: 11px 14px; margin: 0 0 14px; font-size: 13px; line-height: 1.6; }
+.notice strong { display: block; margin-bottom: 3px; }
+.notice-info { background: var(--primary-soft); border-left-color: var(--primary); }
+.notice-warn { background: var(--warn-soft); border-left-color: var(--warn); color: #7a3d06; }
+.notice-danger { background: var(--danger-soft); border-left-color: var(--danger); color: #7a2027; }
+.notice-ok { background: var(--ok-soft); border-left-color: var(--ok); color: #1f5138; }
+.notice-actions { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.notice-actions .form-row { flex: 1 1 220px; }
+
+.console-tabs { margin: 0 0 16px; }
+.ops-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.ops-grid .card { min-width: 0; }
+.ops-full { grid-column: 1 / -1; }
+.badge-configured { background: var(--ok-soft); color: var(--ok); border-color: #bcdcc7; }
+.badge-degraded { background: var(--warn-soft); color: var(--warn); border-color: #f0c088; }
+.metric-alert { background: var(--danger-soft); border: 1px solid #e6b9bd; color: #7a2027; border-radius: 6px; padding: 9px 12px; font-size: 13px; font-weight: 600; margin: 8px 0; }
+.matrix-table td:first-child { font-family: var(--mono); font-size: 12px; }
+.locale-list { display: flex; gap: 6px; flex-wrap: wrap; }
+.ops-inline { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.ops-inline .form-row { flex: 1 1 220px; }
+.ops-hint { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+.inline-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.comp-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+
 /* ---------- 响应式：窄屏堆叠 ---------- */
 @media (max-width: 900px) {
   .topbar { flex-direction: column; align-items: flex-start; padding: 12px 14px; }
@@ -219,4 +267,8 @@ input:disabled, select:disabled, textarea:disabled, button:disabled { opacity: .
   .footer { padding-left: 12px; padding-right: 12px; }
   .legal-wrap { margin: 12px auto 40px; }
   .modal-actions { flex-wrap: wrap; }
+  .ops-grid { grid-template-columns: minmax(0, 1fr); }
+  .verify-bar { padding: 0 12px; }
+  .notif-panel { position: fixed; top: auto; bottom: 12px; left: 10px; right: 10px; width: auto; max-height: 62vh; }
+  .lang-switch { align-self: flex-start; }
 }

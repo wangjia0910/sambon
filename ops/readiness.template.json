@@ -1,0 +1,166 @@
+{
+  "version": "v3.0",
+  "note": "逐项填写 verified/by/at/evidence 后生效；缺任一字段不计核销。填好后保存为 ops/readiness.json（不入库）。",
+  "items": {
+    "E-01": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "基础设施",
+      "_title": "D1 数据库已绑定并生效"
+    },
+    "E-02": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "基础设施",
+      "_title": "自定义域与 TLS 生效"
+    },
+    "E-03": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "基础设施",
+      "_title": "生产环境变量已配置且密钥已轮换"
+    },
+    "E-04": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "基础设施",
+      "_title": "外部定时任务调度器已上线"
+    },
+    "E-05": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "基础设施",
+      "_title": "备份、留存与 Time Travel 演练"
+    },
+    "E-06": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "合规",
+      "_title": "V2-O 六组全部核销"
+    },
+    "E-07": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "合规",
+      "_title": "目标市场执业律师书面复核意见"
+    },
+    "E-08": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "合规",
+      "_title": "Cloudflare DPA + SCC / TIA 已签署"
+    },
+    "E-09": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "合规",
+      "_title": "隐私政策 / ToS / AUP 法务定稿"
+    },
+    "E-10": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "合规",
+      "_title": "PIPL 第 3 条适用性评估"
+    },
+    "E-11": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "合规",
+      "_title": "未成年人年龄核验（V8）"
+    },
+    "E-12": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "合规",
+      "_title": "SBC 非资产与支付税务书面结论"
+    },
+    "E-13": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "运营",
+      "_title": "真实通知 / 邮件通道已接通"
+    },
+    "E-14": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "运营",
+      "_title": "WAF / 风控名单与滥用处置流程"
+    },
+    "E-15": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "运营",
+      "_title": "安全事件响应与 DPO / 代表指定"
+    },
+    "E-16": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "运营",
+      "_title": "渗透测试 / 压测 / 灾备演练"
+    },
+    "E-17": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "运营",
+      "_title": "人工闸门演练与值班安排"
+    },
+    "E-18": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "准入",
+      "_title": "docs/07 全部 29 项与 G1–G7 核销"
+    },
+    "E-19": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "准入",
+      "_title": "L1 灰度结果复核"
+    },
+    "E-20": {
+      "verified": false,
+      "by": "",
+      "at": "",
+      "evidence": "",
+      "_group": "准入",
+      "_title": "正式上线批准签发"
+    }
+  }
+}

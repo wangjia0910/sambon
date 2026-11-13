@@ -34,7 +34,7 @@
 - **独立本地验证**：`node tests/verify-local.mjs` —— 主代理另行编写的 **32 项断言**（A–H 八组，不复用自检实现、基准取自 `CONTRACT.md` v0.2），覆盖白盒规则单测、端到端积分数值勾稽、并发抢单、个性化开关、争议人工兜底、合规红线、静态页、性能与重启重置；期望 `PASS 32 / FAIL 0`、退出码 0。完整报告见 `docs/06-本地测试验证报告.md`。
 - **上线准入自检**：`node tests/predeploy-check.mjs` —— 聚合上述两套测试与静态红线扫描（**12 项门禁**，含 Cloudflare 静态版一致性复跑），输出 **L0 在线演示预览**准入门禁与 **L1/L2** 判定（当前恒为 No-Go，除非 `docs/07` 九组清单真实勾选并附证据）；分层定义、部署手册与改造清单见 `docs/08-上线部署指导.md`。
 - **Cloudflare 静态 Web 版**：`node tools/build-cloudflare.mjs` 生成 `cloudflare/` 产物（Pages 直接上传或 Git 集成，输出目录 `cloudflare`）；`node tests/verify-cloudflare.mjs` 验证浏览器运行时与 Node 服务同序列口径一致（**14 项断言**）。静态版 `/api/*` 由页面内运行时计算，**不能用 curl 测 API**；线上站点可在浏览器控制台执行 `await import('/site-selfcheck.mjs').then(m => m.run())` 一键跑 10 项验收（详见 `docs/09` §3.2 / §5）。
-- **生产系统（D-13，本轮新增）**：`functions/api/[[path]].js` + `prod/lib/*` 为真实后端（会话 / CSRF / RBAC / D1 事务 / 幂等 / 账本哈希链 / GDPR），`prod/site/*` 为生产前端；`npm run build` 生成 `cloudflare/` 产物与 Functions 依赖副本，`npm run test:production` 跑 **75 项**独立回归（真实 SQL，见 `tests/verify-production.mjs`）。**上线 = `git push origin main` → Cloudflare Git 集成自动部署**；唯一一次性动作是在控制台绑定名为 `DB` 的 D1 数据库，未绑定时站点明确降级为演示模式并禁用写操作。完整部署、验收与边界见 `docs/12`。
+- **生产系统（D-13，本轮新增）**：`functions/api/[[path]].js` + `prod/lib/*` 为真实后端（会话 / CSRF / RBAC / D1 事务 / 幂等 / 账本哈希链 / GDPR），`prod/site/*` 为生产前端；`npm run build` 生成 `cloudflare/` 产物与 Functions 依赖副本，`npm run test:production` 跑 **117 项**独立回归（真实 SQL，见 `tests/verify-production.mjs`）。**上线 = `git push origin main` → Cloudflare Git 集成自动部署**；唯一一次性动作是在控制台绑定名为 `DB` 的 D1 数据库，未绑定时站点明确降级为演示模式并禁用写操作。完整部署、验收与边界见 `docs/12`。
 - **L0 / 生产两条通道并存**：`/` 重写到生产台 `prod.html`；`/index.html`、`/demo.html` 仍是浏览器内 mock 的 L0 演示台。二者互不干扰，既有回归（20/20、32/32、14/14、7/7、12/12）未破坏。
 - 自检通过后，任一 `task_id` 均可通过 `GET /api/events`（支持 `?task_id=`）完整回放「发布 → 推送批次与分数 → 接单 → 验收 → 积分流水 → 榜单变更」。
 
@@ -57,7 +57,8 @@
   - `src/hash.mjs` — 零依赖 SHA-256（Node / 浏览器 / Workers 通用）
 - `functions/`（**生产后端，D-13**；Cloudflare Git 集成自动编译）
   - `functions/api/[[path]].js` — Pages Functions catch-all 入口
-  - `prod/lib/api.js` — 26 个端点的编排、账本、事件、人工闸门
+  - `prod/lib/api.js` — 41 个端点的编排、账本、事件、人工闸门
+  - `prod/lib/{notify,llm,jobs,observability,risk,security}.js` — V3 完全体模块（通知 / 可配置大模型 / 定时任务 / 指标 / 风控 / 账号安全）
   - `prod/lib/{auth,db,response,schema}.js` — 认证 / D1 适配 / 响应 / 表结构真源
   - `prod/lib/{domain,hash}.js` — 由根 `src/` 逐字节同步的**生成副本，勿手改**
 - `prod/site/`（**生产前端，D-13**）：`index.html` → `prod.html`、`app.js`、`styles.css`、`legal.html`；`prod/wrangler.toml` 为 Wrangler 模板
@@ -67,7 +68,8 @@
 - `tests/predeploy-check.mjs` — 主代理整合：L0 上线准入自检（12 项门禁）
 - `tests/verify-cloudflare.mjs` — 主代理整合：Cloudflare 静态版跨实现一致性验证（**14 项断言**）
 - `tests/verify-site-selfcheck.mjs` — 主代理整合：站点一键自检脚本的浏览器式运行时验证（**7 项断言**）
-- `tests/verify-production.mjs` — 主代理整合：**生产系统独立回归（75 项）**；`tests/d1-mock.js` 用 `node:sqlite` 模拟 D1、执行真实 SQL
+- `tests/verify-production.mjs` — 主代理整合：**生产系统独立回归（117 项）**；`tests/d1-mock.js` 用 `node:sqlite` 模拟 D1、执行真实 SQL
+- `tests/readiness-check.mjs` — 主代理整合：**正式运营就绪门禁**（代码侧 16 项自动核销、外部 20 项须逐项证据，当前 0/20 → NOT READY）
 - `tools/`（主代理整合）
   - `tools/build-cloudflare.mjs` — 生成 `cloudflare/` 产物（L0 八件套 + 生产前端 + `_redirects`）、同步 `prod/lib` 生成副本、导出 `schema.sql`
   - `tools/cf-runtime.mjs` — 浏览器运行时源文件（mock req/res，调用共用 `handle()`）
@@ -87,7 +89,8 @@
   - `docs/09-Cloudflare部署指导.md` — 主代理整合：Web 单端形态、静态产物、三条部署路径、**Git 集成部署状态核验（§3.1）**、验收与回滚
   - `docs/10-算法与区块链备案申报指导.md` — 主代理整合：**D-12 归档稿**（境内两项备案申报口径、D-11 时序裁决、材料清单与法定期限，仅在复评触发、决定进入境内市场时恢复适用）
   - `docs/11-境外发布合规基线.md` — 主代理整合：**境外版生效基线**：地域适用判定与复评闸门、V2-O 六组上线前置、GDPR/ePrivacy/DSA/AI Act/CCPA 等目标市场义务与量化验收
-  - `docs/12-生产系统架构与部署.md` — 主代理整合：**生产系统（D-13）**：Pages Functions + D1 架构、P0 改造对照、Git 自动部署与 D1 一次性绑定、接口与角色矩阵、安全合规设计、75 项回归与运维边界
+  - `docs/13-完全体能力与运营就绪.md` — 主代理整合：**V3 完全体（D-14）**：L2 待办逐项销账、20 项外部闸门、生产配置、定时任务接入、代码完全体 ≠ 运营许可
+  - `docs/12-生产系统架构与部署.md` — 主代理整合：**生产系统（D-13）**：Pages Functions + D1 架构、P0 改造对照、Git 自动部署与 D1 一次性绑定、接口与角色矩阵、安全合规设计、117 项回归与运维边界
 - `review/`（**阶段 B 过程快照，原始意见不改**）
   - `review/product-review.md` — 产品交叉评审
   - `review/engineering-review.md` — 研发交叉评审
@@ -113,14 +116,16 @@
 | 上线检查清单                   | `docs/07-上线检查清单.md`（九组可勾选项，当前 0/29，G6 不通过）                                       | 法务           |
 | Cloudflare Web 版部署指导       | `docs/09-Cloudflare部署指导.md`（静态产物、三条部署路径、B-1～B-8 验收、回滚）                          | 主代理整合      |
 | Cloudflare 静态版一致性验证      | `tests/verify-cloudflare.mjs`（14 项断言，浏览器运行时 vs Node 服务 15 组字段全一致）                  | 主代理整合      |
+| V3 完全体与运营就绪（D-14）      | `docs/13-完全体能力与运营就绪.md`（L2 待办销账、20 项外部闸门、配置与定时任务）                                 | 主代理整合      |
 | 生产系统架构与部署（D-13）        | `docs/12-生产系统架构与部署.md`（Functions + D1、自动部署、D1 绑定、验收与边界）                              | 主代理整合      |
-| 生产系统独立回归                  | `tests/verify-production.mjs`（75 项，真实 SQL / D1 mock）                                               | 主代理整合      |
+| 生产系统独立回归                  | `tests/verify-production.mjs`（117 项，真实 SQL / D1 mock）                                              | 主代理整合      |
+| 正式运营就绪门禁                | `tests/readiness-check.mjs`（16 项代码能力 + 20 项外部证据，当前 NOT READY）                            | 主代理整合      |
 | 境外发布合规基线（生效）           | `docs/11-境外发布合规基线.md`（D-12 地域判定、V2-O 六组、复评触发条件、目标市场义务与验收）                      | 主代理整合      |
 | 境内备案申报指导（归档）           | `docs/10-算法与区块链备案申报指导.md`（V2-a / V2-b、D-11、13 条整改勾稽、法定期限表；仅在复评触发时恢复）        | 主代理整合      |
 
 ## 状态与边界（项目初版 ≠ 生产系统）
 
-- **不接**真实支付、**不接**真实大模型、**不接**公链；**不采集**真实 PII；**已交付可部署的生产系统代码（D-13），但 G1–G7 / V1–V8 / V2-O 未核销，不构成正式运营许可**。代码托管于 GitHub 仓库，**仅作版本管理，不等于发布或上线**；本轮已发布 **L0 在线演示预览链接**（虚构数据、无真实用户与资金、可逆可下线，远端验收 6/6，见 `docs/08` §2.4）；**Cloudflare Pages 静态 Web 版**同属 L0，产物在 `cloudflare/`（见 `docs/09`）；`wangjia0910/sambon` 已在 Cloudflare 完成 **Connect to Git** 连接，`main` 分支每次 push 自动触发部署，产物目录须为 `cloudflare`、构建命令留空（根 `package.json` 提供兜底）。二者**均不构成正式运营许可，不得表述为平台已上线**；按 **D-13**，Cloudflare 站点主入口已改为 Pages Functions + D1 生产系统（代码已自动部署，D1 绑定为一次性控制台动作），但其状态仍为「生产系统演示环境」，`docs/07` 仍 0/29、L1/L2 仍 No-Go；按契约 §11 **D-12**（用户 2026-11-12 指令「部署在 Cloudflare 无需备案，面向海外」），服务地域定为**中国境外（海外）**：算法规定 §2 / 区块链规定 §2 的适用范围均为「在中华人民共和国境内」，故**算法推荐服务备案、区块链信息服务备案、ICP 备案与配套境内安全评估报告不作为境外版上线闸门**；`docs/10` 与 D-11 归档为**境内市场触发式预案**（复评条件见 `docs/11` §1.3）。境外版仍以 **V2-O 境外发布合规基线六组**为 G6 一票否决项，当前 `docs/07` 0/29 未完成；法务结论维持「有条件通过、未触发一票否决」。准入门禁与操作见 `docs/08-上线部署指导.md`、`tests/predeploy-check.mjs`。
+- **不接**真实支付、**不接**真实大模型、**不接**公链；**不采集**真实 PII；**已交付可部署的生产系统代码（D-13），但 G1–G7 / V1–V8 / V2-O 未核销，不构成正式运营许可**。代码托管于 GitHub 仓库，**仅作版本管理，不等于发布或上线**；本轮已发布 **L0 在线演示预览链接**（虚构数据、无真实用户与资金、可逆可下线，远端验收 6/6，见 `docs/08` §2.4）；**Cloudflare Pages 静态 Web 版**同属 L0，产物在 `cloudflare/`（见 `docs/09`）；`wangjia0910/sambon` 已在 Cloudflare 完成 **Connect to Git** 连接，`main` 分支每次 push 自动触发部署，产物目录须为 `cloudflare`、构建命令留空（根 `package.json` 提供兜底）。二者**均不构成正式运营许可，不得表述为平台已上线**；按 **D-13**，Cloudflare 站点主入口已改为 Pages Functions + D1 生产系统（代码已自动部署，D1 绑定为一次性控制台动作），但其状态仍为「生产系统演示环境」，`docs/07` 仍 0/29、L1/L2 仍 No-Go；按 **D-14**（2026-11-13「继续开发成完全体」），代码侧已升级为 V3 完全体（117/117 回归、41 端点、19 张表、中英双语，见 `docs/13`），但**正式运营许可仍须 20 项外部证据核销，当前 0/20 → NOT READY**，代码 READY 不得表述为已上线；按 **D-14**（2026-11-13「继续开发成完全体」），代码侧已升级为 V3 完全体（117/117 回归、41 端点、19 张表、中英双语，见 `docs/13`），但**正式运营许可仍须 20 项外部证据核销，当前 0/20 → NOT READY**，代码 READY 不得表述为已上线；按契约 §11 **D-12**（用户 2026-11-12 指令「部署在 Cloudflare 无需备案，面向海外」），服务地域定为**中国境外（海外）**：算法规定 §2 / 区块链规定 §2 的适用范围均为「在中华人民共和国境内」，故**算法推荐服务备案、区块链信息服务备案、ICP 备案与配套境内安全评估报告不作为境外版上线闸门**；`docs/10` 与 D-11 归档为**境内市场触发式预案**（复评条件见 `docs/11` §1.3）。境外版仍以 **V2-O 境外发布合规基线六组**为 G6 一票否决项，当前 `docs/07` 0/29 未完成；法务结论维持「有条件通过、未触发一票否决」。准入门禁与操作见 `docs/08-上线部署指导.md`、`tests/predeploy-check.mjs`。
 - 链相关能力仅做「本地 Merkle 摘要 + 可插拔锚定接口」演示，零 PII、零任务正文上链（CONTRACT §10）。
 - 结算、争议裁定、账号处罚保留**人工兜底**，模型不得直判；必须提供「关闭个性化推荐」开关，关闭后按时间 + 距离做中性排序；该开关初版为**进程级全局单例**（服务端强制），账号级按 `user_id` 隔离列 P1，初版不得宣称已实现账号级（CONTRACT v0.2 §11 D-06）。
 - **所有演示数据均为虚构样例**，不得出现真实个人信息；联系方式一律虚拟号占位，日志与事件脱敏。

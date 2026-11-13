@@ -31,3 +31,25 @@ database_name = "sambon-prod"
 # PBKDF2_ITERATIONS      = 口令派生轮数（默认 120000，不建议下调）
 # RATE_LIMIT_DISABLED    = 仅本地回归使用，生产必须留空
 # COOKIE_SECURE          = 仅本地 http 联调可设 false，生产必须留空（强制 Secure）
+#
+# ---- V3 完全体（D-14，详见 docs/13 §4）----
+# LLM_API_URL            = OpenAI-compatible chat/completions 端点；不配则规则降级
+# LLM_API_KEY            = 模型密钥（密文）；不配则 algorithm_degraded=true
+# LLM_MODEL              = 模型名，默认 gpt-4o-mini
+# NOTIFY_WEBHOOK_URL     = 真实邮件 / 推送服务 Webhook；不配则 queue_only（sent=0，不伪造已发送）
+# NOTIFY_WEBHOOK_SECRET  = HMAC-SHA256 签名密钥（密文）
+# CRON_SECRET            = /api/admin/cron 的 X-Cron-Secret，供外部调度器定时调用；不配则端点 503
+# EMAIL_VERIFICATION_REQUIRED = 'true' 时未验证账号限制发布 / 接单；默认不强制
+# ENFORCE_STRONG_PASSWORD     = 'true' 时启用 >=12 位 + 3 类字符校验
+# EMAIL_VERIFICATION_DEV_ECHO = 仅本地回归；生产严禁设置（会把验证令牌回显到响应）
+#
+# ---- V3 完全体（D-14，详见 docs/13 §4）----
+# LLM_API_URL            = OpenAI-compatible chat/completions 端点；不配则规则降级
+# LLM_API_KEY            = 模型密钥（密文）；不配则 algorithm_degraded=true
+# LLM_MODEL              = 模型名，默认 gpt-4o-mini
+# NOTIFY_WEBHOOK_URL     = 真实邮件 / 推送服务 Webhook；不配则 queue_only（sent=0，不伪造已发送）
+# NOTIFY_WEBHOOK_SECRET  = HMAC-SHA256 签名密钥（密文）
+# CRON_SECRET            = /api/admin/cron 的 X-Cron-Secret，供外部调度器定时调用；不配则端点 503
+# EMAIL_VERIFICATION_REQUIRED = 'true' 时未验证账号限制发布 / 接单；默认不强制
+# ENFORCE_STRONG_PASSWORD     = 'true' 时启用 >=12 位 + 3 类字符校验
+# EMAIL_VERIFICATION_DEV_ECHO = 仅本地回归；生产严禁设置（会把验证令牌回显到响应）
