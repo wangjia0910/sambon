@@ -20,5 +20,9 @@ Thumbs.db
 
 # 正式运营就绪证据（含人工签字与内部路径，不入库；模板 ops/readiness.template.json 入库）
 ops/readiness.json
+# 线上部署核验报告（含实时响应快照，本地留存不入库）
+ops/deployment-verification.json
+# 一次性生产密钥本地留存（绝不入库；用完建议轮换）
+ops/*.secret.txt
 
 # 注：.workbuddy/ 为项目相关数据，不属于临时缓存，禁止删除或忽略

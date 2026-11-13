@@ -11,6 +11,7 @@
     "test:production": "node --disable-warning=ExperimentalWarning tests/verify-production.mjs",
     "check": "node tests/predeploy-check.mjs",
     "check:ready": "node tests/readiness-check.mjs",
-    "check:ready:strict": "node tests/readiness-check.mjs --strict"
+    "check:ready:strict": "node tests/readiness-check.mjs --strict",
+    "verify:deploy": "node tests/verify-deployment.mjs"
   }
 }

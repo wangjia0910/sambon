@@ -16,12 +16,13 @@ name = "sambon-production"
 compatibility_date = "2026-11-12"
 pages_build_output_dir = "cloudflare"
 
-# 首次使用：npx wrangler d1 create sambon-prod
+# 用户已创建 D1 数据库 sanbaodian-db；本模板只用于本地联调 / 脚本化迁移。
+# 首次使用：npx wrangler d1 create sanbaodian-db（若数据库已存在则跳过）
 # 把返回的 database_id 填到下面，再执行：
-# npx wrangler d1 execute sambon-prod --file=schema.sql --remote
+# npx wrangler d1 execute sanbaodian-db --file=schema.sql --remote
 [[d1_databases]]
 binding = "DB"
-database_name = "sambon-prod"
+database_name = "sanbaodian-db"
 # database_id = "<填 wrangler d1 create 返回的 UUID>"
 
 [vars]
@@ -43,13 +44,3 @@ database_name = "sambon-prod"
 # ENFORCE_STRONG_PASSWORD     = 'true' 时启用 >=12 位 + 3 类字符校验
 # EMAIL_VERIFICATION_DEV_ECHO = 仅本地回归；生产严禁设置（会把验证令牌回显到响应）
 #
-# ---- V3 完全体（D-14，详见 docs/13 §4）----
-# LLM_API_URL            = OpenAI-compatible chat/completions 端点；不配则规则降级
-# LLM_API_KEY            = 模型密钥（密文）；不配则 algorithm_degraded=true
-# LLM_MODEL              = 模型名，默认 gpt-4o-mini
-# NOTIFY_WEBHOOK_URL     = 真实邮件 / 推送服务 Webhook；不配则 queue_only（sent=0，不伪造已发送）
-# NOTIFY_WEBHOOK_SECRET  = HMAC-SHA256 签名密钥（密文）
-# CRON_SECRET            = /api/admin/cron 的 X-Cron-Secret，供外部调度器定时调用；不配则端点 503
-# EMAIL_VERIFICATION_REQUIRED = 'true' 时未验证账号限制发布 / 接单；默认不强制
-# ENFORCE_STRONG_PASSWORD     = 'true' 时启用 >=12 位 + 3 类字符校验
-# EMAIL_VERIFICATION_DEV_ECHO = 仅本地回归；生产严禁设置（会把验证令牌回显到响应）
