@@ -1,0 +1,53 @@
+# 三宝殿 · sambon.net robots.txt
+# 核心口号：无事不登三宝殿
+# 合规：本站为演示/评审环境，结构化数据仅描述真实公开属性，不含 PII。
+
+User-agent: *
+Allow: /
+# API 端点与内部演示/操作台不供抓取索引
+Disallow: /api/
+Disallow: /prod.html
+Disallow: /production
+Disallow: /product
+Disallow: /index.html
+Disallow: /demo
+
+# 主流搜索引擎与 AI 爬虫允许抓取公开页面（AEO 友好）
+# 注意：具名 UA 段不会继承 * 段的规则，故须显式重复内部/演示页的禁抓声明。
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /prod.html
+Disallow: /production
+Disallow: /product
+Disallow: /index.html
+Disallow: /demo
+
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /prod.html
+Disallow: /production
+Disallow: /product
+Disallow: /index.html
+Disallow: /demo
+
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+Disallow: /prod.html
+Disallow: /production
+Disallow: /product
+Disallow: /index.html
+Disallow: /demo
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+Disallow: /prod.html
+Disallow: /production
+Disallow: /product
+Disallow: /index.html
+Disallow: /demo
+
+Sitemap: https://sambon.net/sitemap.xml

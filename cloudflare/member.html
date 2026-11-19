@@ -3,9 +3,34 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Sambon — a bounty hunters guild. Post bounties, hunt contracts, earn SBC contribution credits.">
-  <title>Sambon · Bounty Hunters Guild</title>
-  <!-- Production CSP is script-src 'self': only same-origin member.js, no inline scripts / CDN. -->
+
+  <!-- ===== 核心 SEO：无事不登三宝殿 ===== -->
+  <title>三宝殿 · 悬赏互助平台 — 无事不登三宝殿 | Sambon Bounty Hunters Guild</title>
+  <meta name="description" content="无事不登三宝殿。三宝殿（sambon.net）是面向全球的悬赏互助平台：发布悬赏、接单履约、以 SBC 平台内贡献积分记录声望。逛任务大厅、冲赏金猎人榜，让每一份委托都有猎人。">
+  <meta name="keywords" content="三宝殿,无事不登三宝殿,悬赏,悬赏互助,悬赏平台,悬赏任务,赏金猎人,任务大厅,猎人榜,接单平台,SBC,贡献积分,Sambon,bounty platform">
+  <meta name="author" content="Sambon">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#12100d">
+  <link rel="canonical" href="https://sambon.net/">
+  <link rel="alternate" hreflang="zh-CN" href="https://sambon.net/?lang=zh-CN">
+  <link rel="alternate" hreflang="en" href="https://sambon.net/?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://sambon.net/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="三宝殿 · Sambon">
+  <meta property="og:locale" content="en">
+  <meta property="og:locale:alternate" content="zh_CN">
+  <meta property="og:url" content="https://sambon.net/">
+  <meta property="og:title" content="三宝殿 · 悬赏互助平台 — 无事不登三宝殿">
+  <meta property="og:description" content="无事不登三宝殿。三宝殿悬赏互助平台：发布悬赏、接单履约、以 SBC 平台内贡献积分记录声望。逛任务大厅、冲赏金猎人榜，让每一份委托都有猎人。">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="三宝殿 · 悬赏互助平台 — 无事不登三宝殿">
+  <meta name="twitter:description" content="无事不登三宝殿。三宝殿悬赏互助平台：任务大厅与赏金猎人榜，发布悬赏、接单履约，以 SBC 贡献积分记录声望。">
+
+  <!-- CSP：script-src 'self' 仅加载同源 member.js / seo.js；JSON-LD 由 seo.js 注入，无内联脚本 -->
   <link rel="stylesheet" href="/member.css">
 </head>
 <body>
@@ -15,7 +40,7 @@
   <!-- ===== 公会顶栏：徽记 / 导航 / 角色状态（头像·等级·声望条）/ 语言 / 认证 ===== -->
   <header class="wow-topbar">
     <div class="wow-topbar-inner">
-      <a class="wow-brand" href="#/hall">
+      <a class="wow-brand" href="#/hall" aria-label="Sambon home — Bounty Board">
         <span class="wow-crest" aria-hidden="true"><span>⚔</span></span>
         <span class="wow-brand-text">
           <b>SAMBON</b>
@@ -54,10 +79,31 @@
     <a href="/index.html" data-i18n="banner.demoLink">Open L0 demo</a>
   </div>
 
+  <!-- ===== SEO 静态内容区块：对爬虫可见的核心语义（h1 + 口号 + 说明）；登录后由 JS 隐藏 ===== -->
+  <section class="wow-seo-intro" id="wow-seo-intro" aria-labelledby="seo-h1">
+    <h1 id="seo-h1">无事不登三宝殿</h1>
+    <p class="wow-seo-lead">有事，就来三宝殿。发布一份悬赏，匹配最可能按时完成的猎人；接下一份委托，用交付积累 SBC 平台内贡献积分与声望。</p>
+    <nav class="wow-seo-links" aria-label="Key sections">
+      <a href="#/hall">悬赏大厅 / Bounty Board</a>
+      <a href="#/rank">赏金猎人榜 / Hunter Ranks</a>
+      <a href="#/publish">发布悬赏 / Post a Bounty</a>
+      <a href="/legal.html">合规与隐私 / Legal</a>
+    </nav>
+  </section>
+
   <!-- ===== 主视图：由 member.js 按 hash 路由渲染 ===== -->
   <main id="m-app" class="wow-main">
     <div class="wow-loading" data-i18n="common.loading">Loading the guild hall…</div>
   </main>
+
+  <!-- ===== 无脚本兜底：保证禁用 JS 的爬虫/用户仍读到核心信息 ===== -->
+  <noscript>
+    <div class="wow-panel" style="max-width:1180px;margin:0 auto;padding:20px">
+      <h2>三宝殿 · 悬赏互助平台</h2>
+      <p>无事不登三宝殿。本站为悬赏互助平台的演示环境。启用 JavaScript 可使用任务大厅、赏金猎人榜、发布悬赏等交互功能。</p>
+      <p>SBC 为平台内贡献积分，不可兑付、不可转让、不构成资产或投资标的。</p>
+    </div>
+  </noscript>
 
   <!-- ===== 页脚：合规声明与入口 ===== -->
   <footer class="wow-footer">
@@ -78,6 +124,8 @@
   <div id="m-modal" class="wow-modal-root" hidden></div>
   <div id="m-toast" class="wow-toast-root" aria-live="polite"></div>
 
+  <!-- seo.js 注入结构化数据（同源，符合 script-src 'self'）；member.js 为应用入口 -->
+  <script src="/seo.js"></script>
   <script type="module" src="/member.js"></script>
 </body>
 </html>

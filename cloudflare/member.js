@@ -28,6 +28,7 @@ const I18N = {
     'footer.sbc': 'SBC is an in-platform contribution credit — not redeemable, not transferable.',
     'meta.idle': 'Scanning the realm…',
     'meta.ready': 'Realm {status} · vault {db} · v{version} · writes {lock}',
+    'meta.unlock': 'enabled/unlocked', 'meta.lock': 'locked',
     'common.loading': 'Opening the guild hall…', 'common.retry': 'Retry',
     'common.cancel': 'Cancel', 'common.confirm': 'Confirm', 'common.refresh': 'Refresh',
     'common.humanConfirm': 'Human confirmation', 'common.empty': 'No entries found',
@@ -99,6 +100,7 @@ const I18N = {
     'footer.sbc': 'SBC 为平台内贡献积分，不可兑付、不可转让、无收益承诺。',
     'meta.idle': '正在扫描服务器状态…',
     'meta.ready': '服务器 {status} · 金库 {db} · v{version} · 写操作{lock}',
+    'meta.unlock': '已开放', 'meta.lock': '已锁定',
     'common.loading': '正在开启公会大厅…', 'common.retry': '重试',
     'common.cancel': '取消', 'common.confirm': '确认', 'common.refresh': '刷新',
     'common.humanConfirm': '人工确认', 'common.empty': '暂无记录',
@@ -163,9 +165,20 @@ const I18N = {
 let LOCALE = 'en';
 
 function initLocale() {
+  // 优先级：URL ?lang=（hreflang 落地）> localStorage > 浏览器语言 > 海外默认英文
+  const fromUrl = (() => {
+    try { return new URLSearchParams(location.search).get('lang'); } catch { return null; }
+  })();
   const saved = (() => { try { return localStorage.getItem('sambon.locale'); } catch { return null; } })();
-  LOCALE = I18N[saved] ? saved : ((navigator.language || '').toLowerCase().startsWith('zh') ? 'zh-CN' : 'en');
+  const chosen = [fromUrl, saved].find((v) => I18N[v]) ||
+    ((navigator.language || '').toLowerCase().startsWith('zh') ? 'zh-CN' : 'en');
+  LOCALE = chosen;
   document.documentElement.lang = LOCALE === 'zh-CN' ? 'zh-CN' : 'en';
+  // 同步 og:locale 以匹配当前语言（SEO hreflang 一致性）
+  try {
+    const og = document.querySelector('meta[property="og:locale"]');
+    if (og) og.setAttribute('content', LOCALE === 'zh-CN' ? 'zh_CN' : 'en');
+  } catch {}
 }
 function t(key, vars) {
   let s = (I18N[LOCALE] && I18N[LOCALE][key]) || (I18N.en[key]) || key;
@@ -199,7 +212,7 @@ function eid(prefix) {
   return (prefix || 'EVT') + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
 }
 function toast(message, type) {
-  const root = document.getElementById('wow-toast');
+  const root = document.getElementById('m-toast');
   const el = document.createElement('div');
   el.className = 'wow-toast ' + (type || '');
   el.textContent = message;
@@ -209,7 +222,7 @@ function toast(message, type) {
 function fmtDate(v) {
   if (!v) return '—';
   const d = new Date(v);
-  if (isNaN(d.getTime())) return String(v);
+  if (isNaN(d.getTime())) return esc(v);
   return d.toLocaleString(LOCALE === 'zh-CN' ? 'zh-CN' : 'en-US', { hour12: false });
 }
 function stateBadge(s) {
@@ -308,7 +321,11 @@ async function api(path, opts = {}) {
   if (res.status === 401) {
     const err = (payload && payload.error) || { code: 'UNAUTHORIZED', message: 'Unauthorized' };
     if (opts.authAttempt) throw new ApiError(err.code, err.message, 401);
-    clearSession(); go('#/auth');
+    clearSession();
+    // 启动探测用的静默 401：清会话后返回 null，不跳转登录页、不弹错误。
+    // 保证匿名访客停留在任务大厅并能看到含核心口号的 SEO 引导区。
+    if (opts.silent401) return null;
+    go('#/auth');
     throw new ApiError(err.code, err.message, 401);
   }
   if (!res.ok || !payload || payload.ok !== true || payload.error) {
@@ -326,7 +343,11 @@ function clearSession() {
 function parseHash() {
   const raw = (location.hash || '#/hall').replace(/^#\/?/, '');
   const [name, id] = raw.split('/');
-  return { name: name || 'hall', id: id ? decodeURIComponent(id) : null };
+  let decoded = null;
+  if (id) {
+    try { decoded = decodeURIComponent(id); } catch { decoded = id; }
+  }
+  return { name: name || 'hall', id: decoded };
 }
 function go(hash) { if (location.hash === hash) render(); else location.hash = hash; }
 
@@ -338,6 +359,9 @@ async function render() {
   highlightNav(n);
   document.getElementById('m-signin').hidden = !!state.user;
   document.getElementById('m-logout').hidden = !state.user;
+  // SEO 静态引导区：未登录且在大厅/榜单时显示（供爬虫与访客读取核心语义），登录后隐藏
+  const seoIntro = document.getElementById('wow-seo-intro');
+  if (seoIntro) seoIntro.hidden = !!state.user || !['hall', 'rank'].includes(n);
   renderHeroCard();
   const app = document.getElementById('m-app');
 
@@ -498,7 +522,8 @@ async function renderRank(app) {
     </div>`;
 }
 function rankMedal(n) {
-  return `<span class="wow-rank-no${[1,2,3].includes(n) ? ' r' + n : ''}">${n}</span>`;
+  const v = Number(n) || 0;
+  return `<span class="wow-rank-no${[1,2,3].includes(v) ? ' r' + v : ''}">${esc(n)}</span>`;
 }
 
 
@@ -740,7 +765,7 @@ function renderAuth(app) {
 /* ------------------------------------------------ 5. 人工闸门弹窗 -------- */
 function humanConfirm({ title, message, word, onConfirm }) {
   state.modal = { onConfirm };
-  const root = document.getElementById('wow-modal');
+  const root = document.getElementById('m-modal');
   root.hidden = false;
   root.innerHTML = `<div class="wow-modal">
     <h3>${esc(title)}</h3>
@@ -756,7 +781,7 @@ function humanConfirm({ title, message, word, onConfirm }) {
   const input = document.getElementById('m-confirm-input');
   if (input) input.focus();
 }
-function closeModal() { state.modal = null; document.getElementById('wow-modal').hidden = true; document.getElementById('wow-modal').innerHTML = ''; }
+function closeModal() { state.modal = null; document.getElementById('m-modal').hidden = true; document.getElementById('m-modal').innerHTML = ''; }
 
 /* ------------------------------------------------ 6. 写操作 ------------- */
 async function doAction(action, el) {
@@ -836,8 +861,11 @@ document.addEventListener('click', (ev) => {
       document.documentElement.lang = LOCALE === 'zh-CN' ? 'zh-CN' : 'en';
       applyStaticI18n(); render(); break;
     case 'logout':
-      api('/api/auth/logout', { method: 'POST', body: {} }).catch(() => {});
-      clearSession(); go('#/hall'); render(); break;
+      // 等服务端会话失效后再清本地态，避免请求失败时本地已退出、服务端会话仍有效的竞态。
+      api('/api/auth/logout', { method: 'POST', body: {} })
+        .catch(() => {})
+        .finally(() => { clearSession(); go('#/hall'); render(); });
+      break;
     case 'open-task': go('#/task/' + el.getAttribute('data-id')); break;
     case 'refresh-tasks': render(); break;
     case 'rank-tab': state.rankTab = el.getAttribute('data-tab'); render(); break;
@@ -871,7 +899,7 @@ async function bootstrap() {
   try { cfg = await api('/api/config'); } catch (e) { showError(e); }
   state.config = cfg;
   state.mode = (health && health.mode) || (cfg && cfg.mode) || 'demo';
-  if (state.mode !== 'production') document.getElementById('wow-banner-demo').hidden = false;
+  if (state.mode !== 'production') document.getElementById('m-demo-banner').hidden = false;
 
   const meta = document.getElementById('m-meta');
   if (health) {

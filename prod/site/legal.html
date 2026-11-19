@@ -3,10 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex, nofollow">
+  <!-- 合规声明为公开内容，允许收录以便搜索引擎理解站点性质（SEO 一致性，见审计报告 M-04） -->
+  <meta name="robots" content="index, follow, max-snippet:-1">
+  <link rel="canonical" href="https://sambon.net/legal.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://sambon.net/legal.html?lang=zh-CN">
+  <link rel="alternate" hreflang="en" href="https://sambon.net/legal.html?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://sambon.net/legal.html">
+  <meta name="description" content="三宝殿（sambon.net）隐私政策、服务条款、可接受使用政策、AI 透明度、未成年人限制与举报通道。SBC 为平台内贡献积分，不可兑付、不可转让。">
   <title>法律与合规声明 / Legal &amp; Compliance · 三宝殿 sambon.net</title>
   <!-- 绝对路径：静态文件位于 Cloudflare Pages 输出目录根 -->
-  <!-- 无内联 <script>：语言切换由 radio + :has() 纯 CSS 实现 -->
+  <!-- 语言切换主体由 radio + :has() 纯 CSS 实现；legal-lang.js 仅按 ?lang= 落地 hreflang（同源外部脚本，兼容严格 CSP） -->
   <link rel="stylesheet" href="/styles.css">
   <style>
     /* legal.html 专用排版：窄栏长文 + 双语纯 CSS 切换，不影响操作台样式 */
@@ -437,5 +443,6 @@
   <div class="muted">SBC 为平台内贡献积分，不可兑付、不可转让；不构成资产或投资标的。 / SBC is a non-redeemable, non-transferable in-platform contribution point, not an asset or investment product.</div>
 </footer>
 
+<script src="/legal-lang.js"></script>
 </body>
 </html>

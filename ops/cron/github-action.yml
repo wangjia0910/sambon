@@ -1,0 +1,42 @@
+# E-04 外部定时任务调度器配置（GitHub Actions 方案）
+# 用途：每 15 分钟调用一次 /api/admin/cron，驱动 5 个作业（超时工单/争议结案/留存清理/账本锚定/通知投递）。
+# 系统只对「超时」生成人工确认工单，绝不自动结算/裁定/处罚（CONTRACT §11 D-14）。
+#
+# 部署步骤：
+#   1. 仓库 Settings → Secrets and variables → Actions → 新增两个仓库密钥：
+#        SAMBON_CRON_URL        = https://sambon.net/api/admin/cron
+#        SAMBON_CRON_SECRET     = 与 Cloudflare Pages 环境变量 CRON_SECRET 完全一致的值
+#   2. 把本文件放到仓库 .github/workflows/sambon-cron.yml
+#   3. 首次推送后到 Actions 页手动 Run workflow 验证一次；之后按 cron 自动跑
+#   4. 连续跑满 7 天、无报错后，把运行日志截图/导出作为 E-04 的 evidence
+#
+# 注意：CRON_SECRET 只存于 GitHub Secrets 与 Cloudflare 环境变量，不进代码、不进前端。
+
+name: sambon-cron
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # 每 15 分钟（UTC）
+  workflow_dispatch:         # 允许手动触发核对
+
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Invoke /api/admin/cron
+        env:
+          URL: ${{ secrets.SAMBON_CRON_URL }}
+          SECRET: ${{ secrets.SAMBON_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          resp=$(curl -sS -w '\nHTTP_STATUS:%{http_code}\n' -X POST "$URL" \
+            -H "Content-Type: application/json" \
+            -H "X-Cron-Secret: $SECRET" \
+            -d '{"dry_run":false}')
+          echo "$resp"
+          status=$(echo "$resp" | sed -n 's/.*HTTP_STATUS:\([0-9]*\).*/\1/p')
+          if [ "$status" != "200" ]; then
+            echo "cron endpoint returned $status" >&2
+            exit 1
+          fi

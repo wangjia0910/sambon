@@ -115,6 +115,34 @@ async function main() {
   check('VM-27 主题资源零外链（无图片/字体 CDN，全部 CSS 绘制）',
     !/https?:\/\//.test(css) && !/@import/.test(css) && !/url\(/.test(css));
 
+  // ---- 审计回归：DOM 挂载点契约（曾发生 wow-* / m-* ID 错配导致白屏 / 人工闸门失效）----
+  // 静态 getElementById 引用的 ID 必须在 HTML 中存在；动态注入的 ID 必须在 JS 模板中生成。
+  const htmlIds = new Set([...mHtml.matchAll(/id="([^"]+)"/g)].map((m) => m[1]));
+  const domRefs = [...new Set([...js.matchAll(/getElementById\('([^']+)'\)/g)].map((m) => m[1]))];
+  const dynamicIds = ['m-confirm-input', 'auth-form', 'publish-form', 'hall-q', 'hall-grid', 'hall-state'];
+  const orphanRefs = domRefs.filter((id) => !htmlIds.has(id) && !dynamicIds.includes(id) &&
+    !js.includes(`id="${id}"`) && !js.includes(`id=\\"${id}\\"`));
+  check('VM-28 静态 DOM 挂载点契约：getElementById 均有对应 HTML id 或 JS 动态生成',
+    orphanRefs.length === 0, orphanRefs.length ? `孤儿引用：${orphanRefs.join(', ')}` : `${domRefs.length} 项全部匹配`);
+  // 三个曾出错的关键挂载点逐一锁定，防止未来改回错误 ID
+  check('VM-29 关键挂载点正确（toast/modal/demo 横幅用 m-* 前缀）',
+    /getElementById\('m-toast'\)/.test(js) &&
+    /getElementById\('m-modal'\)/.test(js) &&
+    /getElementById\('m-demo-banner'\)/.test(js) &&
+    !/getElementById\('wow-toast'\)/.test(js) &&
+    !/getElementById\('wow-modal'\)/.test(js) &&
+    !/getElementById\('wow-banner-demo'\)/.test(js));
+
+  // ---- 审计回归：匿名访客静默 401（曾把未登录访客强制跳登录页，SEO h1 不可达）----
+  check('VM-30 匿名启动探测 silent401 静默降级（不跳登录页）',
+    /silent401:\s*true/.test(js) &&
+    /if \(opts\.silent401\) return null;/.test(js) &&
+    /api\('\/api\/auth\/me', \{ silent401: true \}\)/.test(js));
+  check('VM-31 I18N meta.unlock / meta.lock 已定义（状态栏不显示原始 key）',
+    /'meta\.unlock'/.test(js) && /'meta\.lock'/.test(js));
+  check('VM-32 parseHash 对畸形 hash 做 decodeURIComponent 保护',
+    /try \{ decoded = decodeURIComponent\(id\); \} catch/.test(js));
+
   const pass = results.filter((r) => r.ok).length;
   const fail = results.length - pass;
   console.log(`\n=== 结果：PASS ${pass} / FAIL ${fail} / 共 ${results.length} 项 ===`);

@@ -626,7 +626,11 @@ export function sanitizeSubmissionText(text) {
   // 均加数字边界，避免长数字串被部分匹配（本地验证 V-14 发现的边界缺陷）。
   const cleaned = raw
     .replace(/(?<!\d)\d{17}[\dXx](?!\d)/g, () => { redacted += 1; return '[已脱敏]'; })
-    .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g, () => { redacted += 1; return '[已脱敏]'; });
+    .replace(/(?<!\d)1[3-9]\d{9}(?!\d)/g, () => { redacted += 1; return '[已脱敏]'; })
+    // 兜底：任意 >=6 位连续数字（长串号码 / 拼接证件号 / 超长数字串）。
+    // 前两条精确规则已把证件号与手机号替换为非数字，故此条不会二次匹配它们；
+    // 数字边界确保只对完整数字串脱敏，与 redactDigits 的事件脱敏口径一致。
+    .replace(/(?<!\d)\d{6,}(?!\d)/g, () => { redacted += 1; return '[已脱敏]'; });
   return {
     text: cleaned,
     pii_redacted: redacted > 0,

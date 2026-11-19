@@ -386,3 +386,22 @@ code { font-family: var(--mono); font-size: .9em; background: rgba(0,0,0,.35); p
   .wow-hero-card { display: none; }
   .wow-hero-stats { gap: 16px; }
 }
+
+/* ---------------- SEO 静态引导区（爬虫可读；登录后由 JS 隐藏）---------------- */
+.wow-seo-intro {
+  max-width: 1180px; margin: 18px auto 0; padding: 0 20px;
+}
+.wow-seo-intro h1 {
+  font-family: var(--serif); font-size: 30px; letter-spacing: 3px;
+  color: var(--gold-bright); text-shadow: 0 2px 6px #000, 0 0 22px rgba(216,180,92,.25);
+  margin: 0 0 8px;
+}
+.wow-seo-lead { color: var(--parchment-2); font-size: 14px; max-width: 860px; margin: 0 0 12px; }
+.wow-seo-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.wow-seo-links a {
+  font-family: var(--serif); font-size: 12px; color: var(--gold);
+  border: 1px solid var(--gold-line); border-radius: 3px; padding: 3px 10px;
+  background: rgba(0,0,0,.25);
+}
+.wow-seo-links a:hover { color: var(--gold-bright); border-color: var(--gold); }
+@media (max-width: 560px) { .wow-seo-intro h1 { font-size: 24px; } }

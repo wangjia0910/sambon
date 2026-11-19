@@ -87,9 +87,23 @@ const HEADERS = `# Cloudflare Pages 响应头：确保 ESM 模块以正确 MIME 
   Content-Type: text/javascript; charset=utf-8
   X-Content-Type-Options: nosniff
 
+/seo.js
+  Content-Type: text/javascript; charset=utf-8
+  X-Content-Type-Options: nosniff
+
+/legal-lang.js
+  Content-Type: text/javascript; charset=utf-8
+  X-Content-Type-Options: nosniff
+
 /member.css
   Content-Type: text/css; charset=utf-8
   X-Content-Type-Options: nosniff
+
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
 
 /*.html
   Cache-Control: no-store
@@ -118,6 +132,8 @@ const HEADERS = `# Cloudflare Pages 响应头：确保 ESM 模块以正确 MIME 
   Content-Type: text/css; charset=utf-8
   X-Content-Type-Options: nosniff
 
+# 全局兜底安全头：/* 是 Cloudflare Pages 的 match-all 路径模式（合法语法，非注释）。
+# 各行内聚在此规则块下，命中更具体路径时会与本块合并，缺失项由此补齐。
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
@@ -171,7 +187,7 @@ for (const f of SRC_FILES) {
 writeFileSync(join(OUT, '_headers'), HEADERS, 'utf8');
 
 // ---- ② 生产系统前端 ----
-const SITE_FILES = ['index.html', 'app.js', 'styles.css', 'legal.html', 'member.html', 'member.js', 'member.css'];
+const SITE_FILES = ['index.html', 'app.js', 'styles.css', 'legal.html', 'legal-lang.js', 'member.html', 'member.js', 'member.css', 'seo.js', 'sitemap.xml', 'robots.txt'];
 for (const f of SITE_FILES) {
   const src = join(SITE, f);
   if (!existsSync(src)) throw new Error(`缺少生产前端文件：prod/site/${f}`);
@@ -195,7 +211,8 @@ writeFileSync(join(ROOT, 'schema.sql'), SCHEMA_SQL, 'utf8');
 const files = [
   'index.html', 'cf-runtime.mjs', 'site-selfcheck.mjs', '_headers',
   ...SRC_FILES.map((f) => `src/${f}`),
-  'prod.html', 'app.js', 'styles.css', 'legal.html', 'member.html', 'member.js', 'member.css',
+  'prod.html', 'app.js', 'styles.css', 'legal.html', 'legal-lang.js', 'member.html', 'member.js', 'member.css',
+  'seo.js', 'sitemap.xml', 'robots.txt',
   '_redirects', '_routes.json', 'demo.html',
 ];
 console.log('=== Cloudflare Pages 产物 ===');

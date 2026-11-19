@@ -19,9 +19,23 @@
   Content-Type: text/javascript; charset=utf-8
   X-Content-Type-Options: nosniff
 
+/seo.js
+  Content-Type: text/javascript; charset=utf-8
+  X-Content-Type-Options: nosniff
+
+/legal-lang.js
+  Content-Type: text/javascript; charset=utf-8
+  X-Content-Type-Options: nosniff
+
 /member.css
   Content-Type: text/css; charset=utf-8
   X-Content-Type-Options: nosniff
+
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
 
 /*.html
   Cache-Control: no-store
@@ -50,6 +64,8 @@
   Content-Type: text/css; charset=utf-8
   X-Content-Type-Options: nosniff
 
+# 全局兜底安全头：/* 是 Cloudflare Pages 的 match-all 路径模式（合法语法，非注释）。
+# 各行内聚在此规则块下，命中更具体路径时会与本块合并，缺失项由此补齐。
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
