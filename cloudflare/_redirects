@@ -1,7 +1,10 @@
 # 三宝殿 · Cloudflare Pages 路由（Git 集成部署自动生效）
-# 主入口：生产系统操作台（200 rewrite，不改地址栏）
+# 主入口：用户版悬赏互助平台产品站（面向发布方 / 接单人）
 # 目标用无扩展名路径，避免 Cloudflare Pages Pretty URLs 把 *.html 做 308 跳转
-/               /prod             200
+/               /member           200
+/app            /member           200
+# 生产系统操作台（内部评审 / 运营），保留独立入口
+/product        /prod             200
 /production     /prod             200
 # L0 静态演示台保留，供对照与降级验收
 /demo           /index            200

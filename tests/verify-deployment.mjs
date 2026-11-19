@@ -97,9 +97,17 @@ async function main() {
     /不可兑付/.test(cd.sbc_notice || '') && /不可转让/.test(cd.sbc_notice || '') ? 'PASS' : 'FAIL', 'sbc_notice');
 
   const root = await probe('/');
-  record('D-13', '根路径为生产操作台',
-    root.status === 200 && /app\.js/.test(root.text) && /styles\.css/.test(root.text) ? 'PASS' : 'FAIL',
+  record('D-13', '根路径为用户版悬赏平台产品站',
+    root.status === 200 && /member\.js/.test(root.text) && /member\.css/.test(root.text) ? 'PASS' : 'FAIL',
     `http=${root.status}, bytes=${root.text.length}`);
+  const consolePage = await probe('/prod.html');
+  record('D-13b', '生产操作台独立入口保留',
+    consolePage.status === 200 && /app\.js/.test(consolePage.text) && /styles\.css/.test(consolePage.text) ? 'PASS' : 'FAIL',
+    `http=${consolePage.status}, bytes=${consolePage.text.length}`);
+  const memberJs = await probe('/member.js');
+  record('D-13c', '用户版前端 ESM 资源 MIME 正确',
+    memberJs.status === 200 && /javascript/.test(memberJs.contentType) ? 'PASS' : 'FAIL',
+    `content-type=${memberJs.contentType}`);
   const legal = await probe('/legal.html');
   record('D-14', '双语法务页面',
     legal.status === 200 && /lang="en"/.test(legal.text) && /[\u4e00-\u9fa5]/.test(legal.text) ? 'PASS' : 'FAIL',

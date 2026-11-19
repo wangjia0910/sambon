@@ -83,6 +83,14 @@ const HEADERS = `# Cloudflare Pages 响应头：确保 ESM 模块以正确 MIME 
   Content-Type: text/javascript; charset=utf-8
   X-Content-Type-Options: nosniff
 
+/member.js
+  Content-Type: text/javascript; charset=utf-8
+  X-Content-Type-Options: nosniff
+
+/member.css
+  Content-Type: text/css; charset=utf-8
+  X-Content-Type-Options: nosniff
+
 /*.html
   Cache-Control: no-store
   X-Content-Type-Options: nosniff
@@ -101,6 +109,11 @@ const HEADERS = `# Cloudflare Pages 响应头：确保 ESM 模块以正确 MIME 
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
 
+# 用户版悬赏平台产品站（站点主入口）：脚本仅同源 member.js，无内联脚本
+/member.html
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+
 /styles.css
   Content-Type: text/css; charset=utf-8
   X-Content-Type-Options: nosniff
@@ -114,9 +127,12 @@ const HEADERS = `# Cloudflare Pages 响应头：确保 ESM 模块以正确 MIME 
 // 站点主入口重写为生产系统；L0 演示仍可通过 /index.html、/demo.html 访问。
 // /api/* 不在此规则内，由 Pages Functions 直接接管。
 const REDIRECTS = `# 三宝殿 · Cloudflare Pages 路由（Git 集成部署自动生效）
-# 主入口：生产系统操作台（200 rewrite，不改地址栏）
+# 主入口：用户版悬赏互助平台产品站（面向发布方 / 接单人）
 # 目标用无扩展名路径，避免 Cloudflare Pages Pretty URLs 把 *.html 做 308 跳转
-/               /prod             200
+/               /member           200
+/app            /member           200
+# 生产系统操作台（内部评审 / 运营），保留独立入口
+/product        /prod             200
 /production     /prod             200
 # L0 静态演示台保留，供对照与降级验收
 /demo           /index            200
@@ -155,7 +171,7 @@ for (const f of SRC_FILES) {
 writeFileSync(join(OUT, '_headers'), HEADERS, 'utf8');
 
 // ---- ② 生产系统前端 ----
-const SITE_FILES = ['index.html', 'app.js', 'styles.css', 'legal.html'];
+const SITE_FILES = ['index.html', 'app.js', 'styles.css', 'legal.html', 'member.html', 'member.js', 'member.css'];
 for (const f of SITE_FILES) {
   const src = join(SITE, f);
   if (!existsSync(src)) throw new Error(`缺少生产前端文件：prod/site/${f}`);
@@ -179,7 +195,8 @@ writeFileSync(join(ROOT, 'schema.sql'), SCHEMA_SQL, 'utf8');
 const files = [
   'index.html', 'cf-runtime.mjs', 'site-selfcheck.mjs', '_headers',
   ...SRC_FILES.map((f) => `src/${f}`),
-  'prod.html', 'app.js', 'styles.css', 'legal.html', '_redirects', '_routes.json', 'demo.html',
+  'prod.html', 'app.js', 'styles.css', 'legal.html', 'member.html', 'member.js', 'member.css',
+  '_redirects', '_routes.json', 'demo.html',
 ];
 console.log('=== Cloudflare Pages 产物 ===');
 for (const f of files) {
