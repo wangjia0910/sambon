@@ -3,65 +3,80 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Sambon — a bounty mutual-aid platform. Post a task, get matched, earn SBC contribution credits.">
-  <title>Sambon · Bounty Mutual-Aid Platform</title>
-  <!-- 生产页 CSP 为 script-src 'self'：仅加载同源 member.js，无内联脚本 / 第三方 CDN -->
+  <meta name="description" content="Sambon — a bounty hunters guild. Post bounties, hunt contracts, earn SBC contribution credits.">
+  <title>Sambon · Bounty Hunters Guild</title>
+  <!-- Production CSP is script-src 'self': only same-origin member.js, no inline scripts / CDN. -->
   <link rel="stylesheet" href="/member.css">
 </head>
 <body>
+  <!-- 装饰性纹理层：羊皮纸暗纹 + 顶部光晕，纯 CSS，不影响可访问性 -->
+  <div class="wow-vignette" aria-hidden="true"></div>
 
-  <!-- ===== 顶部导航：品牌 / 主导航 / 用户区 / 语言 ===== -->
-  <header class="m-topbar">
-    <div class="m-topbar-inner">
-      <a class="m-brand" href="#/hall">
-        <span class="m-brand-mark">三</span>
-        <span class="m-brand-text">Sambon<small data-i18n="brand.sub">Bounty Mutual-Aid Platform</small></span>
+  <!-- ===== 公会顶栏：徽记 / 导航 / 角色状态（头像·等级·声望条）/ 语言 / 认证 ===== -->
+  <header class="wow-topbar">
+    <div class="wow-topbar-inner">
+      <a class="wow-brand" href="#/hall">
+        <span class="wow-crest" aria-hidden="true"><span>⚔</span></span>
+        <span class="wow-brand-text">
+          <b>SAMBON</b>
+          <small data-i18n="brand.sub">Bounty Hunters Guild</small>
+        </span>
       </a>
-      <nav class="m-nav" id="m-nav" aria-label="Main navigation">
-        <a href="#/hall" data-nav="hall" data-i18n="nav.hall">Task Hall</a>
-        <a href="#/rank" data-nav="rank" data-i18n="nav.rank">Leaderboard</a>
-        <a href="#/publish" data-nav="publish" data-i18n="nav.publish">Post a Task</a>
-        <a href="#/mine" data-nav="mine" data-i18n="nav.mine">My Tasks</a>
-        <a href="#/wallet" data-nav="wallet" data-i18n="nav.wallet">SBC Wallet</a>
+      <nav class="wow-nav" id="m-nav" aria-label="Guild navigation">
+        <a href="#/hall" data-nav="hall" data-i18n="nav.hall">Bounty Board</a>
+        <a href="#/rank" data-nav="rank" data-i18n="nav.rank">Hunter Ranks</a>
+        <a href="#/publish" data-nav="publish" data-i18n="nav.publish">Post Bounty</a>
+        <a href="#/mine" data-nav="mine" data-i18n="nav.mine">My Contracts</a>
+        <a href="#/wallet" data-nav="wallet" data-i18n="nav.wallet">Vault</a>
       </nav>
-      <div class="m-topbar-right">
-        <button type="button" class="m-lang" id="m-lang" data-action="toggle-locale" title="Switch language">中 / EN</button>
-        <span class="m-user" id="m-user" data-i18n="nav.guest">Guest</span>
-        <button type="button" class="m-btn m-btn-ghost m-btn-sm" id="m-logout" data-action="logout" data-i18n="nav.logout" hidden>Sign out</button>
-        <button type="button" class="m-btn m-btn-primary m-btn-sm" id="m-signin" data-action="go-auth" data-i18n="nav.signin">Sign in</button>
+      <div class="wow-topbar-right">
+        <div class="wow-hero-card" id="wow-hero-card" hidden>
+          <div class="wow-portrait" id="wow-portrait" aria-hidden="true">?</div>
+          <div class="wow-hero-meta">
+            <div class="wow-hero-line">
+              <span class="wow-hero-name" id="m-user">—</span>
+              <span class="wow-hero-level" id="wow-level">Lv.1</span>
+            </div>
+            <div class="wow-xp" title="Guild standing"><i id="wow-xp-fill"></i></div>
+            <div class="wow-hero-title tiny" id="wow-title">—</div>
+          </div>
+        </div>
+        <button type="button" class="wow-lang" id="m-lang" data-action="toggle-locale" title="Switch language / 切换语言">中 / EN</button>
+        <button type="button" class="wow-btn wow-btn-sm wow-btn-ghost" id="m-logout" data-action="logout" data-i18n="nav.logout" hidden>Leave</button>
+        <button type="button" class="wow-btn wow-btn-sm wow-btn-gold" id="m-signin" data-action="go-auth" data-i18n="nav.signin">Enter the Guild</button>
       </div>
     </div>
   </header>
 
   <!-- ===== 演示 / 状态声明条：由 member.js 依据 /api/health 控制 ===== -->
-  <div class="m-banner m-banner-demo" id="m-demo-banner" hidden>
+  <div class="wow-banner wow-banner-demo" id="m-demo-banner" hidden>
     <span data-i18n="banner.demo">Demo mode: persistence is not bound; write operations are unavailable.</span>
     <a href="/index.html" data-i18n="banner.demoLink">Open L0 demo</a>
   </div>
 
   <!-- ===== 主视图：由 member.js 按 hash 路由渲染 ===== -->
-  <main id="m-app" class="m-app">
-    <div class="m-loading" data-i18n="common.loading">Loading…</div>
+  <main id="m-app" class="wow-main">
+    <div class="wow-loading" data-i18n="common.loading">Loading the guild hall…</div>
   </main>
 
   <!-- ===== 页脚：合规声明与入口 ===== -->
-  <footer class="m-footer">
-    <div class="m-footer-inner">
-      <div class="m-footer-links">
+  <footer class="wow-footer">
+    <div class="wow-footer-inner">
+      <div class="wow-footer-links">
         <a href="/legal.html" data-i18n="footer.legal">Privacy · Terms · AUP · AI Transparency · Minors · Report</a>
         <span>·</span>
         <a href="/prod.html" data-i18n="footer.console">Operations console</a>
         <span>·</span>
         <a href="/index.html" data-i18n="footer.demo">L0 demo</a>
       </div>
-      <div class="m-footer-sbc" data-i18n="footer.sbc">SBC is an in-platform contribution credit — not redeemable, not transferable.</div>
-      <div class="m-muted" id="m-meta" data-i18n="meta.idle">Checking backend status…</div>
+      <div class="wow-footer-sbc" data-i18n="footer.sbc">SBC is an in-platform contribution credit — not redeemable, not transferable.</div>
+      <div class="wow-muted" id="m-meta" data-i18n="meta.idle">Checking realm status…</div>
     </div>
   </footer>
 
-  <!-- ===== 二次确认弹窗（人工闸门）与 toast ===== -->
-  <div id="m-modal" class="m-modal-root" hidden></div>
-  <div id="m-toast" class="m-toast-root" aria-live="polite"></div>
+  <!-- ===== 人工闸门二次确认弹窗与 toast ===== -->
+  <div id="m-modal" class="wow-modal-root" hidden></div>
+  <div id="m-toast" class="wow-toast-root" aria-live="polite"></div>
 
   <script type="module" src="/member.js"></script>
 </body>

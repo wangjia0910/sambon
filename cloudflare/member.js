@@ -17,66 +17,69 @@
 /* ------------------------------------------------ 0. 国际化 I18N / t() ---- */
 const I18N = {
   'en': {
-    'brand.sub': 'Bounty Mutual-Aid Platform',
-    'nav.hall': 'Task Hall', 'nav.rank': 'Leaderboard', 'nav.publish': 'Post a Task',
-    'nav.mine': 'My Tasks', 'nav.wallet': 'SBC Wallet', 'nav.guest': 'Guest',
-    'nav.logout': 'Sign out', 'nav.signin': 'Sign in',
-    'banner.demo': 'Demo mode: persistence is not bound; write operations are unavailable.',
+    'brand.sub': 'Bounty Hunters Guild',
+    'nav.hall': 'Bounty Board', 'nav.rank': 'Hunter Ranks', 'nav.publish': 'Post Bounty',
+    'nav.mine': 'My Contracts', 'nav.wallet': 'Vault', 'nav.guest': 'Visitor',
+    'nav.logout': 'Leave', 'nav.signin': 'Enter the Guild',
+    'banner.demo': 'Demo realm: persistence is not bound; write operations are unavailable.',
     'banner.demoLink': 'Open L0 demo',
     'footer.legal': 'Privacy · Terms · AUP · AI Transparency · Minors · Report',
     'footer.console': 'Operations console', 'footer.demo': 'L0 demo',
     'footer.sbc': 'SBC is an in-platform contribution credit — not redeemable, not transferable.',
-    'meta.idle': 'Checking backend status…',
-    'meta.ready': 'Backend {status} · DB {db} · v{version} · writes {lock}',
-    'common.loading': 'Loading…', 'common.retry': 'Retry',
+    'meta.idle': 'Scanning the realm…',
+    'meta.ready': 'Realm {status} · vault {db} · v{version} · writes {lock}',
+    'common.loading': 'Opening the guild hall…', 'common.retry': 'Retry',
     'common.cancel': 'Cancel', 'common.confirm': 'Confirm', 'common.refresh': 'Refresh',
-    'common.humanConfirm': 'Human confirmation', 'common.empty': 'No data yet',
-    'common.humanGate': 'Human gate: verification, dispute resolution and cancellation are confirmed by you and enforced by the server (enforcement: server_side). The UI alone is not an authorization.',
-    'hero.title': 'Get things done, together.',
-    'hero.lead': 'Post a task, get matched to the people most likely to finish on time, and reward contribution with SBC — an in-platform credit. Rules-first ranking, human-reviewed outcomes.',
-    'hero.cta': 'Browse tasks', 'hero.cta2': 'Post a task',
-    'hero.s1': 'Curated candidates', 'hero.s1d': 'Rules-first matching with explainable reasons',
-    'hero.s2': 'SBC credits', 'hero.s2d': 'In-platform contribution credit, non-redeemable',
-    'hero.s3': 'Human reviewed', 'hero.s3d': 'Settlement & disputes confirmed by people',
-    'hall.title': 'Task hall', 'hall.sub': 'Browse open tasks and leaderboards.',
-    'hall.search': 'Search by title or category…', 'hall.all': 'All states',
-    'rank.title': 'Leaderboard', 'rank.task': 'Task leaderboard', 'rank.user': 'Solver leaderboard',
-    'rank.note': 'Ranked within category with versioned weights. Disputed tasks are discounted; neutral sort applies when personalization is off.',
-    'publish.title': 'Post a task', 'publish.sub': 'Describe the task and its acceptance criteria. It enters manual review after submission.',
+    'common.humanConfirm': 'Human confirmation', 'common.empty': 'No entries found',
+    'common.humanGate': 'Human gate: verification, dispute rulings and cancellations are confirmed by a person and enforced by the server (enforcement: server_side). The interface alone is not an authorization.',
+    'hero.title': 'Every bounty has a hunter.',
+    'hero.lead': 'Post a contract and it is matched to the hunters most likely to complete it on time. Earn SBC — an in-platform contribution credit for your standing in the guild. Rules-first matchmaking, human-reviewed outcomes.',
+    'hero.cta': 'Enter the Board', 'hero.cta2': 'Post a Bounty',
+    'hero.s1': 'Tracked Bounties', 'hero.s1d': 'Rules-first matching with clear reasons',
+    'hero.s2': 'SBC Standing', 'hero.s2d': 'Contribution credit, never redeemable',
+    'hero.s3': 'Human Judged', 'hero.s3d': 'Settlements & disputes confirmed by people',
+    'hall.title': 'Bounty Board', 'hall.sub': 'Browse open contracts and hunter standings.',
+    'hall.search': 'Search contracts by title or category…', 'hall.all': 'All states',
+    'rarity.common': 'Common', 'rarity.uncommon': 'Uncommon', 'rarity.rare': 'Rare',
+    'rarity.epic': 'Epic', 'rarity.legendary': 'Legendary',
+    'rank.title': 'Hunter Ranks', 'rank.task': 'Bounty Rankings', 'rank.user': 'Hunter Leaderboard',
+    'rank.note': 'Contracts are ranked within category by versioned weights. Disputed bounties are discounted; neutral order (time + distance) applies when personalization is off.',
+    'rank.hunter': 'Hunter', 'rank.netSbc': 'Net SBC', 'rank.completed': 'Completed', 'rank.rating': 'Rating', 'rank.onTime': 'On-time',
+    'publish.title': 'Post a Bounty', 'publish.sub': 'Describe the contract and its acceptance criteria. It enters human review after submission.',
     'publish.f.title': 'Title', 'publish.f.desc': 'Description', 'publish.f.category': 'Category',
     'publish.f.bounty': 'Bounty (SBC)', 'publish.f.criteria': 'Acceptance criteria',
-    'publish.f.deadline': 'Deadline (hours)', 'publish.f.online': 'Online task',
+    'publish.f.deadline': 'Deadline (hours)', 'publish.f.online': 'Online contract',
     'publish.f.radius': 'Radius (km)', 'publish.f.skills': 'Required skills (comma separated)',
-    'publish.f.difficulty': 'Difficulty (0–1)', 'publish.submit': 'Submit task',
-    'publish.ok': 'Task submitted. It is now pending manual review.',
-    'publish.hint': 'Bounty and a 5% service fee are frozen only after a human approves the task.',
-    'mine.title': 'My tasks', 'mine.posted': 'Posted by me', 'mine.accepted': 'Accepted by me',
-    'wallet.title': 'SBC wallet', 'wallet.sub': 'SBC is an in-platform contribution credit — not redeemable, not transferable, no yield.',
-    'wallet.balance': 'Available balance', 'wallet.ledger': 'Ledger entries',
-    'wallet.anchor': 'Ledger anchoring', 'wallet.balanced': 'Balanced', 'wallet.unbalanced': 'Check failed',
-    'prefs.title': 'Preferences', 'prefs.personalized': 'Personalized recommendations',
-    'prefs.personalizedHint': 'When off, the server enforces neutral sorting by time + distance. Enforced server-side.',
+    'publish.f.difficulty': 'Difficulty (0–1)', 'publish.submit': 'Post Bounty',
+    'publish.ok': 'Bounty posted. Awaiting human review.',
+    'publish.hint': 'The bounty and a 5% service fee are frozen only after a human approves the contract.',
+    'mine.title': 'My Contracts', 'mine.posted': 'Bounties I Posted', 'mine.accepted': 'Contracts I Accepted',
+    'wallet.title': 'Hunter Vault', 'wallet.sub': 'SBC is an in-platform contribution credit — not redeemable, not transferable, no yield.',
+    'wallet.balance': 'Available SBC', 'wallet.ledger': 'Ledger Entries',
+    'wallet.anchor': 'Vault Anchoring', 'wallet.balanced': 'Balanced', 'wallet.unbalanced': 'Check failed',
+    'prefs.title': 'Guild Preferences', 'prefs.personalized': 'Personalized recommendations',
+    'prefs.personalizedHint': 'When off, the server enforces neutral ordering by time + distance (enforcement: server_side).',
     'prefs.on': 'On', 'prefs.off': 'Off', 'prefs.saved': 'Preference saved.',
-    'auth.title': 'Sign in / Register', 'auth.sub': 'Choose a role. Registration opens publisher and solver accounts.',
+    'auth.title': 'Enter the Guild', 'auth.sub': 'Choose a role. Registration opens publisher and hunter accounts.',
     'auth.login': 'Sign in', 'auth.register': 'Register',
     'auth.email': 'Email', 'auth.password': 'Password', 'auth.name': 'Display name',
-    'auth.role': 'Role', 'auth.publisher': 'Publisher', 'auth.solver': 'Solver',
+    'auth.role': 'Role', 'auth.publisher': 'Patron (poster)', 'auth.solver': 'Hunter',
     'auth.hint': 'Password: 10–128 characters. Sessions use an httpOnly cookie; a CSRF token is issued on sign in.',
-    'auth.verify': 'Please verify your email before posting or accepting tasks.',
+    'auth.verify': 'Please verify your email before posting or accepting contracts.',
     'auth.resend': 'Resend verification',
-    'task.detail': 'Task detail', 'task.back': 'Back to hall',
-    'task.accept': 'Accept task', 'task.submit': 'Submit result', 'task.verify': 'Approve & settle',
-    'task.reject': 'Reject (return to work)', 'task.dispute': 'Open dispute',
-    'task.cancel': 'Cancel task', 'task.feedback': 'Log exposure',
-    'task.report': 'Report', 'task.events': 'Event trail',
-    'task.bounty': 'Bounty', 'task.fee': 'Service fee', 'task.state': 'State',
+    'task.detail': 'Contract Detail', 'task.back': 'Back to Board',
+    'task.accept': 'Accept Contract', 'task.submit': 'Submit Spoils', 'task.verify': 'Confirm & Settle',
+    'task.reject': 'Reject (back to work)', 'task.dispute': 'Open Dispute',
+    'task.cancel': 'Cancel Contract', 'task.feedback': 'Log Exposure',
+    'task.report': 'Report', 'task.events': 'Event Trail',
+    'task.bounty': 'Bounty', 'task.fee': 'Service Fee', 'task.state': 'State',
     'task.category': 'Category', 'task.deadline': 'Deadline', 'task.criteria': 'Acceptance criteria',
     'task.desc': 'Description', 'task.skills': 'Required skills',
     'task.result': 'Submitted result (redacted)', 'task.note': 'Note',
-    'task.ok.accepted': 'Task accepted. Bounty moved to escrow.',
-    'task.ok.submitted': 'Result submitted.',
-    'task.ok.verified': 'Verified and settled.',
-    'task.ok.cancelled': 'Task cancelled.',
+    'task.ok.accepted': 'Contract accepted. Bounty moved to escrow.',
+    'task.ok.submitted': 'Spoils submitted.',
+    'task.ok.verified': 'Confirmed and settled.',
+    'task.ok.cancelled': 'Contract cancelled.',
     'task.ok.disputed': 'Dispute opened. Full bounty held in escrow.',
     'modal.confirmAction': 'Confirm this action',
     'modal.typeWord': 'Type {word} to confirm',
@@ -85,66 +88,69 @@ const I18N = {
     'err.network': 'Network error: {msg}',
   },
   'zh-CN': {
-    'brand.sub': '悬赏互助平台',
-    'nav.hall': '任务大厅', 'nav.rank': '排行榜', 'nav.publish': '发布悬赏',
-    'nav.mine': '我的任务', 'nav.wallet': 'SBC 账户', 'nav.guest': '访客',
-    'nav.logout': '退出登录', 'nav.signin': '登录 / 注册',
-    'banner.demo': '演示模式：后端未绑定 D1 持久化，写操作不可用。',
+    'brand.sub': '赏金猎人公会',
+    'nav.hall': '悬赏大厅', 'nav.rank': '猎人榜', 'nav.publish': '发布悬赏',
+    'nav.mine': '我的委托', 'nav.wallet': '猎人金库', 'nav.guest': '访客',
+    'nav.logout': '离开公会', 'nav.signin': '进入公会',
+    'banner.demo': '演示服务器：持久化未绑定，写操作不可用。',
     'banner.demoLink': '打开 L0 演示台',
     'footer.legal': '隐私政策 · 服务条款 · 可接受使用政策 · AI 透明度 · 未成年人限制 · 举报',
     'footer.console': '运营操作台', 'footer.demo': 'L0 演示',
     'footer.sbc': 'SBC 为平台内贡献积分，不可兑付、不可转让、无收益承诺。',
-    'meta.idle': '正在检查后端状态…',
-    'meta.ready': '后端 {status} · 数据库 {db} · v{version} · 写操作{lock}',
-    'common.loading': '加载中…', 'common.retry': '重试',
+    'meta.idle': '正在扫描服务器状态…',
+    'meta.ready': '服务器 {status} · 金库 {db} · v{version} · 写操作{lock}',
+    'common.loading': '正在开启公会大厅…', 'common.retry': '重试',
     'common.cancel': '取消', 'common.confirm': '确认', 'common.refresh': '刷新',
-    'common.humanConfirm': '人工确认', 'common.empty': '暂无数据',
-    'common.humanGate': '人工闸门：验收、争议裁定与取消由本人确认、服务端强制校验（enforcement: server_side）；界面展示不构成授权。',
-    'hero.title': '把事办成，互助共赢。',
-    'hero.lead': '发布任务，由大模型辅助的规则匹配推送给最可能按时完成的人，用 SBC 度量贡献。规则优先排序，结果由人工确认。',
-    'hero.cta': '浏览任务', 'hero.cta2': '发布悬赏',
-    'hero.s1': '精准匹配', 'hero.s1d': '规则优先，附可解释理由',
-    'hero.s2': 'SBC 贡献积分', 'hero.s2d': '平台内积分，不可兑付',
-    'hero.s3': '人工把关', 'hero.s3d': '结算与争议由人工确认',
-    'hall.title': '任务大厅', 'hall.sub': '浏览开放任务与榜单。',
-    'hall.search': '按标题或分类搜索…', 'hall.all': '全部状态',
-    'rank.title': '排行榜', 'rank.task': '任务榜', 'rank.user': '接单人榜',
-    'rank.note': '同类目内按版本化权重排序；争议任务降权；关闭个性化后按时间 + 距离中性排序。',
-    'publish.title': '发布悬赏', 'publish.sub': '填写任务与验收标准，提交后进入人工审核。',
+    'common.humanConfirm': '人工确认', 'common.empty': '暂无记录',
+    'common.humanGate': '人工闸门：验收、争议裁定与取消由人工确认、服务端强制校验（enforcement: server_side）；界面展示不构成授权。',
+    'hero.title': '每一份悬赏，都有它的猎人。',
+    'hero.lead': '发布委托，由规则匹配推送给最可能按时完成的猎人，用 SBC 记录你在公会中的贡献声望。规则优先排序，结算由人工把关。',
+    'hero.cta': '进入悬赏大厅', 'hero.cta2': '发布悬赏令',
+    'hero.s1': '在册悬赏', 'hero.s1d': '规则优先匹配，附可解释理由',
+    'hero.s2': 'SBC 声望', 'hero.s2d': '贡献积分，永不可兑付',
+    'hero.s3': '人工裁决', 'hero.s3d': '结算与争议由人工确认',
+    'hall.title': '悬赏大厅', 'hall.sub': '浏览开放委托与猎人榜单。',
+    'hall.search': '按标题或分类搜索悬赏…', 'hall.all': '全部状态',
+    'rarity.common': '普通', 'rarity.uncommon': '精良', 'rarity.rare': '稀有',
+    'rarity.epic': '史诗', 'rarity.legendary': '传说',
+    'rank.title': '猎人榜', 'rank.task': '悬赏排行', 'rank.user': '赏金猎人榜',
+    'rank.note': '同类目内按版本化权重排序；争议悬赏降权；关闭个性化后按时间 + 距离中性排序。',
+    'rank.hunter': '猎人', 'rank.netSbc': '净 SBC', 'rank.completed': '完成数', 'rank.rating': '评分', 'rank.onTime': '准时率',
+    'publish.title': '发布悬赏令', 'publish.sub': '填写委托与验收标准，提交后进入人工审核。',
     'publish.f.title': '标题', 'publish.f.desc': '描述', 'publish.f.category': '分类',
-    'publish.f.bounty': '悬赏（SBC）', 'publish.f.criteria': '验收标准',
-    'publish.f.deadline': '截止时间（小时）', 'publish.f.online': '线上任务',
+    'publish.f.bounty': '赏金（SBC）', 'publish.f.criteria': '验收标准',
+    'publish.f.deadline': '截止时间（小时）', 'publish.f.online': '线上委托',
     'publish.f.radius': '半径（公里）', 'publish.f.skills': '所需技能（逗号分隔）',
-    'publish.f.difficulty': '难度（0–1）', 'publish.submit': '提交任务',
-    'publish.ok': '任务已提交，等待人工审核。',
+    'publish.f.difficulty': '难度（0–1）', 'publish.submit': '发布悬赏令',
+    'publish.ok': '悬赏已发布，等待人工审核。',
     'publish.hint': '赏金与 5% 服务费仅在人工审核通过后冻结。',
-    'mine.title': '我的任务', 'mine.posted': '我发布的', 'mine.accepted': '我接的',
-    'wallet.title': 'SBC 账户', 'wallet.sub': 'SBC 为平台内贡献积分，不可兑付、不可转让、无收益承诺。',
-    'wallet.balance': '可用余额', 'wallet.ledger': '流水明细',
-    'wallet.anchor': '账本锚定', 'wallet.balanced': '账本守恒', 'wallet.unbalanced': '校验异常',
-    'prefs.title': '偏好设置', 'prefs.personalized': '个性化推荐',
+    'mine.title': '我的委托', 'mine.posted': '我发布的悬赏', 'mine.accepted': '我接取的委托',
+    'wallet.title': '猎人金库', 'wallet.sub': 'SBC 为平台内贡献积分，不可兑付、不可转让、无收益承诺。',
+    'wallet.balance': '可用 SBC', 'wallet.ledger': '流水明细',
+    'wallet.anchor': '金库锚定', 'wallet.balanced': '账本守恒', 'wallet.unbalanced': '校验异常',
+    'prefs.title': '公会偏好', 'prefs.personalized': '个性化推荐',
     'prefs.personalizedHint': '关闭后服务端强制按时间 + 距离中性排序（enforcement: server_side）。',
     'prefs.on': '开启', 'prefs.off': '关闭', 'prefs.saved': '偏好已保存。',
-    'auth.title': '登录 / 注册', 'auth.sub': '选择角色。注册开放发布方与接单人。',
+    'auth.title': '进入公会', 'auth.sub': '选择身份。注册开放委托方与猎人。',
     'auth.login': '登录', 'auth.register': '注册',
     'auth.email': '邮箱', 'auth.password': '密码', 'auth.name': '显示名',
-    'auth.role': '角色', 'auth.publisher': '发布方', 'auth.solver': '接单人',
+    'auth.role': '身份', 'auth.publisher': '委托方', 'auth.solver': '赏金猎人',
     'auth.hint': '密码 10–128 位。会话使用 httpOnly Cookie，登录时下发 CSRF 令牌。',
     'auth.verify': '发布或接单前请先完成邮箱验证。',
     'auth.resend': '重发验证邮件',
-    'task.detail': '任务详情', 'task.back': '返回大厅',
-    'task.accept': '接单', 'task.submit': '提交成果', 'task.verify': '通过并结算',
+    'task.detail': '委托详情', 'task.back': '返回大厅',
+    'task.accept': '接取委托', 'task.submit': '交付战利品', 'task.verify': '确认并结算',
     'task.reject': '驳回（退回履约）', 'task.dispute': '发起争议',
-    'task.cancel': '取消任务', 'task.feedback': '记录曝光',
+    'task.cancel': '取消委托', 'task.feedback': '记录曝光',
     'task.report': '举报', 'task.events': '事件回放',
     'task.bounty': '赏金', 'task.fee': '服务费', 'task.state': '状态',
     'task.category': '分类', 'task.deadline': '截止时间', 'task.criteria': '验收标准',
     'task.desc': '描述', 'task.skills': '所需技能',
-    'task.result': '已提交成果（已脱敏）', 'task.note': '备注',
+    'task.result': '已交付战利品（已脱敏）', 'task.note': '备注',
     'task.ok.accepted': '接单成功，赏金已转入托管。',
-    'task.ok.submitted': '成果已提交。',
+    'task.ok.submitted': '战利品已交付。',
     'task.ok.verified': '已验收并结算。',
-    'task.ok.cancelled': '任务已取消。',
+    'task.ok.cancelled': '委托已取消。',
     'task.ok.disputed': '争议已发起，赏金全额托管。',
     'modal.confirmAction': '确认此操作',
     'modal.typeWord': '输入 {word} 以确认',
@@ -178,6 +184,7 @@ const state = {
   hallQuery: '', hallState: '',
   mineTab: 'posted',
   personalized: true,
+  hunterCredit: 0,
   ledger: null,
   route: { name: 'hall', id: null },
   authTab: 'login',
@@ -192,9 +199,9 @@ function eid(prefix) {
   return (prefix || 'EVT') + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
 }
 function toast(message, type) {
-  const root = document.getElementById('m-toast');
+  const root = document.getElementById('wow-toast');
   const el = document.createElement('div');
-  el.className = 'm-toast ' + (type || '');
+  el.className = 'wow-toast ' + (type || '');
   el.textContent = message;
   root.appendChild(el);
   window.setTimeout(() => el.remove(), 4200);
@@ -211,7 +218,52 @@ function stateBadge(s) {
     SUBMITTED: 'warn', DISPUTED: 'danger', SETTLED: 'ok',
     PENDING_REVIEW: 'warn', REJECTED: 'danger', CANCELLED: '', EXPIRED: '', CLOSED: '', DRAFT: '',
   };
-  return `<span class="m-badge ${map[s] || ''}">${esc(s)}</span>`;
+  return `<span class="wow-badge ${map[s] || ''}">${esc(s)}</span>`;
+}
+
+/* ---------- 游戏化：稀有度 / 猎人等级 / 声望条 / 金币 ---------- */
+function rarityOf(bounty) {
+  const b = Number(bounty) || 0;
+  if (b >= 1000) return { key: 'legendary', label: t('rarity.legendary') };
+  if (b >= 300) return { key: 'epic', label: t('rarity.epic') };
+  if (b >= 80) return { key: 'rare', label: t('rarity.rare') };
+  if (b >= 20) return { key: 'uncommon', label: t('rarity.uncommon') };
+  return { key: 'common', label: t('rarity.common') };
+}
+function coin(amount) {
+  return `<span class="wow-gold"><i class="wow-coin"></i>${esc(amount)}</span>`;
+}
+function hunterTitleOf(count) {
+  const c = Number(count) || 0;
+  const zh = ['见习猎人','青铜猎人','白银猎人','黄金猎人','铂金猎人','钻石猎人','大师猎人','传奇猎人'];
+  const en = ['Novice','Bronze Hunter','Silver Hunter','Gold Hunter','Platinum Hunter','Diamond Hunter','Master Hunter','Legendary Hunter'];
+  const arr = LOCALE === 'zh-CN' ? zh : en;
+  const band = Math.min(arr.length - 1, Math.floor(c / 5));
+  return arr[band];
+}
+// 猎人等级由 credit_score + 已完成任务声望共同决定（声望取用户榜 net_sbc，登录时异步补充）
+function hunterLevel(user) {
+  const score = Number((user && user.credit_score) ?? 100);
+  const credit = Math.max(0, Number(state.hunterCredit || 0));
+  const xp = score + credit;
+  const level = Math.min(60, Math.max(1, Math.floor(xp / 500) + 1));
+  const into = xp % 500;
+  const titles = LOCALE === 'zh-CN'
+    ? ['见习猎人', '青铜猎人', '白银猎人', '黄金猎人', '铂金猎人', '钻石猎人', '大师猎人', '传奇猎人']
+    : ['Novice', 'Bronze Hunter', 'Silver Hunter', 'Gold Hunter', 'Platinum Hunter', 'Diamond Hunter', 'Master Hunter', 'Legendary Hunter'];
+  const band = Math.min(titles.length - 1, Math.floor((level - 1) / 8));
+  return { level, pct: Math.round((into / 500) * 100), title: titles[band], xp };
+}
+function renderHeroCard() {
+  const card = document.getElementById('wow-hero-card');
+  if (!card || !state.user) { if (card) card.hidden = true; return; }
+  const lv = hunterLevel(state.user);
+  card.hidden = false;
+  document.getElementById('wow-portrait').textContent = (state.user.display_name || '?').trim().charAt(0).toUpperCase();
+  document.getElementById('m-user').textContent = state.user.display_name || state.user.email || '—';
+  document.getElementById('wow-level').textContent = 'Lv.' + lv.level;
+  document.getElementById('wow-title').textContent = lv.title;
+  document.getElementById('wow-xp-fill').style.width = lv.pct + '%';
 }
 function canWrite() { return state.mode === 'production'; }
 function isRole(r) { return !!(state.user && state.user.role === r); }
@@ -286,9 +338,7 @@ async function render() {
   highlightNav(n);
   document.getElementById('m-signin').hidden = !!state.user;
   document.getElementById('m-logout').hidden = !state.user;
-  document.getElementById('m-user').textContent = state.user
-    ? (state.user.display_name || state.user.email) + (state.user.role ? ' · ' + state.user.role : '')
-    : t('nav.guest');
+  renderHeroCard();
   const app = document.getElementById('m-app');
 
   if (n === 'auth') return renderAuth(app);
@@ -296,7 +346,7 @@ async function render() {
     // 未登录：仅大厅 / 榜单可见（只读浏览提示），业务视图引导登录
     if (n === 'hall') return renderHall(app);
     if (n === 'rank') return renderRank(app);
-    app.innerHTML = `<div class="m-panel"><h2>${t('nav.signin')}</h2><p class="muted">${t('auth.sub')}</p><button class="m-btn m-btn-primary" data-action="go-auth">${t('nav.signin')}</button></div>`;
+    app.innerHTML = `<div class="wow-panel"><h2>${t('nav.signin')}</h2><p class="muted">${t('auth.sub')}</p><button class="wow-btn wow-btn-gold" data-action="go-auth">${t('nav.signin')}</button></div>`;
     return;
   }
   switch (n) {
@@ -316,17 +366,17 @@ function highlightNav(n) {
 /* ---------- 视图：任务大厅 ---------- */
 async function renderHall(app) {
   const hero = state.user ? '' : `
-    <section class="m-hero">
+    <section class="wow-hero">
       <h1>${t('hero.title')}</h1>
-      <p class="m-hero-lead">${t('hero.lead')}</p>
-      <div class="m-hero-actions">
-        <a href="#/hall" class="m-btn m-btn-primary">${t('hero.cta')}</a>
-        <a href="#/auth" class="m-btn m-btn-ghost">${t('hero.cta2')}</a>
+      <p class="wow-lead">${t('hero.lead')}</p>
+      <div class="wow-hero-actions">
+        <a href="#/hall" class="wow-btn wow-btn-gold">${t('hero.cta')}</a>
+        <a href="#/auth" class="wow-btn wow-btn-ghost">${t('hero.cta2')}</a>
       </div>
-      <div class="m-hero-stats">
-        <div class="m-stat"><b>6</b><span>${t('hero.s1')}</span></div>
-        <div class="m-stat"><b>SBC</b><span>${t('hero.s2')}</span></div>
-        <div class="m-stat"><b>100%</b><span>${t('hero.s3')}</span></div>
+      <div class="wow-hero-stats">
+        <div class="wow-stat"><b>⚔</b><span>${t('hero.s1')}</span></div>
+        <div class="wow-stat"><b>◆</b><span>${t('hero.s2')}</span></div>
+        <div class="wow-stat"><b>✓</b><span>${t('hero.s3')}</span></div>
       </div>
     </section>`;
 
@@ -338,19 +388,19 @@ async function renderHall(app) {
     } catch (e) { showError(e); }
     list = taskGrid(filteredTasks(), true);
   } else {
-    list = `<div class="m-notice info">${t('hall.sub')} <a href="#/auth">${t('nav.signin')}</a></div>`;
+    list = `<div class="wow-notice info">${t('hall.sub')} <a href="#/auth">${t('nav.signin')}</a></div>`;
   }
 
   app.innerHTML = `${hero}
-    <div class="m-section-head"><h2>${t('hall.title')}</h2><span class="muted">${t('hall.sub')}</span></div>
+    <div class="wow-section-head"><h2>${t('hall.title')}</h2><span class="muted">${t('hall.sub')}</span></div>
     ${state.user ? `
-    <div class="m-filters">
-      <input class="m-input" id="hall-q" placeholder="${t('hall.search')}" value="${esc(state.hallQuery)}">
-      <select class="m-select" id="hall-state" style="width:auto">
+    <div class="wow-filters">
+      <input class="wow-input" id="hall-q" placeholder="${t('hall.search')}" value="${esc(state.hallQuery)}">
+      <select class="wow-select" id="hall-state" style="width:auto">
         <option value="">${t('hall.all')}</option>
         ${['PENDING_REVIEW','PUBLISHED','DISPATCHING','ACCEPTED','IN_PROGRESS','SUBMITTED','DISPUTED'].map((s) => `<option value="${s}" ${state.hallState === s ? 'selected' : ''}>${s}</option>`).join('')}
       </select>
-      <button class="m-btn m-btn-ghost m-btn-sm" data-action="refresh-tasks">${t('common.refresh')}</button>
+      <button class="wow-btn wow-btn-ghost wow-btn-sm" data-action="refresh-tasks">${t('common.refresh')}</button>
     </div>` : ''}
     <div id="hall-grid">${list}</div>`;
 
@@ -368,23 +418,30 @@ function filteredTasks() {
   });
 }
 function taskGrid(tasks, clickable) {
-  if (!tasks.length) return `<div class="m-empty"><b>${t('common.empty')}</b></div>`;
-  return `<div class="m-grid">${tasks.map((x) => `
-    <article class="m-card ${clickable ? 'clickable' : ''}" ${clickable ? `data-action="open-task" data-id="${esc(x.task_id)}"` : ''}>
-      <div class="m-card-head">
-        <h3 class="m-card-title">${esc(x.title)}</h3>
+  if (!tasks.length) return `<div class="wow-empty"><b>${t('common.empty')}</b></div>`;
+  return `<div class="wow-grid">${tasks.map((x) => {
+    const r = rarityOf(x.bounty);
+    const tstate = x.state === 'DISPUTED' ? 'danger' : '';
+    return `
+    <article class="wow-contract r-${r.key} ${clickable ? 'clickable' : ''}" ${clickable ? `data-action="open-task" data-id="${esc(x.task_id)}"` : ''}>
+      <div class="wow-contract-head">
+        <div>
+          <div class="wow-rarity">${esc(r.label)}</div>
+          <h3 class="wow-contract-title">${esc(x.title)}</h3>
+        </div>
         ${stateBadge(x.state)}
       </div>
-      <p class="small muted" style="margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(x.description || '')}</p>
-      <div class="m-card-meta">
-        <span class="m-tag">${esc(x.category || '—')}</span>
-        ${(x.required_skills || []).slice(0, 3).map((s) => `<span class="m-tag">${esc(s)}</span>`).join('')}
+      <p class="small muted" style="margin:8px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(x.description || '')}</p>
+      <div class="wow-contract-meta">
+        <span class="wow-tag">${esc(x.category || '—')}</span>
+        ${(x.required_skills || []).slice(0, 3).map((sk) => `<span class="wow-tag">${esc(sk)}</span>`).join('')}
       </div>
-      <div class="m-card-foot">
-        <span class="m-bounty">${esc(x.bounty)} <small>SBC</small></span>
-        <span class="tiny muted">${esc(x.task_id)}</span>
+      <div class="wow-contract-foot">
+        ${coin(x.bounty)}
+        <span class="tiny muted mono">${esc(x.task_id)}</span>
       </div>
-    </article>`).join('')}</div>`;
+    </article>`;
+  }).join('')}</div>`;
 }
 
 /* ---------- 视图：排行榜 ---------- */
@@ -401,55 +458,75 @@ async function renderRank(app) {
 
   let body = '';
   if (state.rankTab === 'task') {
-    body = `<div class="m-table-wrap"><table class="m-table"><thead><tr>
+    body = `<div class="wow-table-wrap"><table class="wow-table"><thead><tr>
       <th>#</th><th>${t('publish.f.title')}</th><th>${t('task.state')}</th><th>${t('task.bounty')}</th><th>Rank score</th></tr></thead><tbody>
-      ${state.boardTasks.map((x) => `<tr><td>${esc(x.rank)}</td><td>${esc(x.title)}</td><td>${stateBadge(x.state)}</td><td class="num">${esc(x.bounty)}</td><td class="num">${x.rank_score === null ? '—' : esc(x.rank_score)}</td></tr>`).join('') || `<tr><td colspan="5">${t('common.empty')}</td></tr>`}
+      ${state.boardTasks.map((x) => {
+        const r = rarityOf(x.bounty);
+        return `<tr>
+          <td>${rankMedal(x.rank)}</td>
+          <td><span class="wow-rarity" style="color:var(--${r.key === 'common' ? 'common' : r.key})">◆ ${esc(r.label)}</span><br>${esc(x.title)}</td>
+          <td>${stateBadge(x.state)}</td>
+          <td class="num">${coin(x.bounty)}</td>
+          <td class="num">${x.rank_score === null ? '—' : esc(x.rank_score)}</td>
+        </tr>`;
+      }).join('') || `<tr><td colspan="5">${t('common.empty')}</td></tr>`}
       </tbody></table></div>
       <p class="tiny muted" style="margin-top:10px">${tk ? esc(tk.rank_weight_version) + ' · ' + esc(tk.mode) : ''}</p>`;
   } else {
-    body = `<div class="m-table-wrap"><table class="m-table"><thead><tr>
-      <th>#</th><th>${t('auth.name')}</th><th>Net SBC</th><th>Completed</th><th>Rating</th><th>On-time</th></tr></thead><tbody>
-      ${state.boardUsers.map((x) => `<tr><td>${esc(x.rank)}</td><td>${esc(x.name)}</td><td class="num pos">${esc(x.net_sbc)}</td><td class="num">${esc(x.completed_count)}</td><td class="num">${esc(x.weighted_rating)}</td><td class="num">${esc(x.on_time_rate)}</td></tr>`).join('') || `<tr><td colspan="6">${t('common.empty')}</td></tr>`}
+    body = `<div class="wow-table-wrap"><table class="wow-table"><thead><tr>
+      <th>#</th><th>${t('rank.hunter')}</th><th>${t('rank.netSbc')}</th><th>${t('rank.completed')}</th><th>${t('rank.rating')}</th><th>${t('rank.onTime')}</th></tr></thead><tbody>
+      ${state.boardUsers.map((x) => `<tr>
+        <td>${rankMedal(x.rank)}</td>
+        <td><b class="gold">${esc(x.name)}</b><br><span class="wow-rank-title">✦ ${esc(hunterTitleOf(x.completed_count))}</span></td>
+        <td class="num pos">${coin(x.net_sbc)}</td>
+        <td class="num">${esc(x.completed_count)}</td>
+        <td class="num">${esc(x.weighted_rating)}</td>
+        <td class="num">${esc(x.on_time_rate)}</td>
+      </tr>`).join('') || `<tr><td colspan="6">${t('common.empty')}</td></tr>`}
       </tbody></table></div>
       <p class="tiny muted" style="margin-top:10px">${us ? esc(us.rank_weight_version || '') : ''} ${us && us.note ? '· ' + esc(us.note) : ''}</p>`;
   }
   app.innerHTML = `
-    <div class="m-section-head"><h2>${t('rank.title')}</h2></div>
-    <div class="m-notice info">${t('rank.note')}</div>
-    <div class="m-panel">
-      <div class="m-tabs">
+    <div class="wow-section-head"><h2>⚔ ${t('rank.title')}</h2><span class="wow-muted">${t('rank.sub') || ''}</span></div>
+    <div class="wow-notice info">${t('rank.note')}</div>
+    <div class="wow-panel">
+      <div class="wow-tabs">
         <button class="${state.rankTab === 'task' ? 'active' : ''}" data-action="rank-tab" data-tab="task">${t('rank.task')}</button>
         <button class="${state.rankTab === 'user' ? 'active' : ''}" data-action="rank-tab" data-tab="user">${t('rank.user')}</button>
       </div>
       ${body}
     </div>`;
 }
+function rankMedal(n) {
+  return `<span class="wow-rank-no${[1,2,3].includes(n) ? ' r' + n : ''}">${n}</span>`;
+}
+
 
 /* ---------- 视图：发布悬赏 ---------- */
 function renderPublish(app) {
   app.innerHTML = `
-    <div class="m-section-head"><h2>${t('publish.title')}</h2><span class="muted">${t('publish.sub')}</span></div>
-    <div class="m-panel" style="max-width:720px">
-      <div class="m-notice warn">${t('publish.hint')} ${t('common.humanGate')}</div>
-      <form class="m-form" id="publish-form">
-        <div class="m-field"><label>${t('publish.f.title')} *</label><input class="m-input" name="title" required maxlength="200"></div>
-        <div class="m-field"><label>${t('publish.f.desc')} *</label><textarea class="m-textarea" name="description" required></textarea></div>
-        <div class="m-form-row">
-          <div class="m-field"><label>${t('publish.f.category')} *</label><input class="m-input" name="category" required placeholder="e.g. delivery / design / translation"></div>
-          <div class="m-field"><label>${t('publish.f.bounty')} *</label><input class="m-input" name="bounty" type="number" min="1" max="1000000" step="1" required></div>
+    <div class="wow-section-head"><h2>${t('publish.title')}</h2><span class="muted">${t('publish.sub')}</span></div>
+    <div class="wow-panel" style="max-width:720px">
+      <div class="wow-notice warn">${t('publish.hint')} ${t('common.humanGate')}</div>
+      <form class="wow-form" id="publish-form">
+        <div class="wow-field"><label>${t('publish.f.title')} *</label><input class="wow-input" name="title" required maxlength="200"></div>
+        <div class="wow-field"><label>${t('publish.f.desc')} *</label><textarea class="wow-textarea" name="description" required></textarea></div>
+        <div class="wow-form-row">
+          <div class="wow-field"><label>${t('publish.f.category')} *</label><input class="wow-input" name="category" required placeholder="e.g. delivery / design / translation"></div>
+          <div class="wow-field"><label>${t('publish.f.bounty')} *</label><input class="wow-input" name="bounty" type="number" min="1" max="1000000" step="1" required></div>
         </div>
-        <div class="m-field"><label>${t('publish.f.criteria')} *</label><textarea class="m-textarea" name="acceptance_criteria" required></textarea></div>
-        <div class="m-form-row">
-          <div class="m-field"><label>${t('publish.f.deadline')}</label><input class="m-input" name="deadline_hours" type="number" min="1" max="720" value="48"></div>
-          <div class="m-field"><label>${t('publish.f.radius')}</label><input class="m-input" name="radius_km" type="number" min="0" value="10"></div>
+        <div class="wow-field"><label>${t('publish.f.criteria')} *</label><textarea class="wow-textarea" name="acceptance_criteria" required></textarea></div>
+        <div class="wow-form-row">
+          <div class="wow-field"><label>${t('publish.f.deadline')}</label><input class="wow-input" name="deadline_hours" type="number" min="1" max="720" value="48"></div>
+          <div class="wow-field"><label>${t('publish.f.radius')}</label><input class="wow-input" name="radius_km" type="number" min="0" value="10"></div>
         </div>
-        <div class="m-field"><label>${t('publish.f.skills')}</label><input class="m-input" name="required_skills" placeholder="e.g. translation, proofreading"></div>
-        <div class="m-field">
+        <div class="wow-field"><label>${t('publish.f.skills')}</label><input class="wow-input" name="required_skills" placeholder="e.g. translation, proofreading"></div>
+        <div class="wow-field">
           <label>${t('publish.f.difficulty')}</label>
-          <input class="m-input" name="difficulty" type="number" min="0" max="1" step="0.1" value="0.3">
+          <input class="wow-input" name="difficulty" type="number" min="0" max="1" step="0.1" value="0.3">
         </div>
-        <div class="m-field"><label class="m-check"><input type="checkbox" name="online" checked> ${t('publish.f.online')}</label></div>
-        <div class="m-btn-row"><button class="m-btn m-btn-primary" type="submit">${t('publish.submit')}</button></div>
+        <div class="wow-field"><label class="wow-check"><input type="checkbox" name="online" checked> ${t('publish.f.online')}</label></div>
+        <div class="wow-btn-row"><button class="wow-btn wow-btn-gold" type="submit">${t('publish.submit')}</button></div>
       </form>
     </div>`;
   document.getElementById('publish-form').addEventListener('submit', async (e) => {
@@ -490,9 +567,9 @@ async function renderMine(app) {
   const accepted = state.tasks.filter((x) => x.solver_id === uid);
   const list = state.mineTab === 'posted' ? posted : accepted;
   app.innerHTML = `
-    <div class="m-section-head"><h2>${t('mine.title')}</h2><button class="m-btn m-btn-ghost m-btn-sm" data-action="refresh-tasks">${t('common.refresh')}</button></div>
-    <div class="m-panel">
-      <div class="m-tabs">
+    <div class="wow-section-head"><h2>${t('mine.title')}</h2><button class="wow-btn wow-btn-ghost wow-btn-sm" data-action="refresh-tasks">${t('common.refresh')}</button></div>
+    <div class="wow-panel">
+      <div class="wow-tabs">
         <button class="${state.mineTab === 'posted' ? 'active' : ''}" data-action="mine-tab" data-tab="posted">${t('mine.posted')} (${posted.length})</button>
         <button class="${state.mineTab === 'accepted' ? 'active' : ''}" data-action="mine-tab" data-tab="accepted">${t('mine.accepted')} (${accepted.length})</button>
       </div>
@@ -503,7 +580,7 @@ async function renderMine(app) {
 /* ---------- 视图：SBC 钱包 ---------- */
 async function renderWallet(app) {
   const uid = state.user && state.user.user_id;
-  let head = `<div class="m-panel"><p class="muted">${t('common.loading')}</p></div>`;
+  let head = `<div class="wow-panel"><p class="muted">${t('common.loading')}</p></div>`;
   if (uid) {
     try { state.ledger = await api('/api/ledger/' + encodeURIComponent(uid)); }
     catch (e) { showError(e); }
@@ -512,19 +589,19 @@ async function renderWallet(app) {
   if (l) {
     const bal = (l.balance_check && typeof l.balance_check.net === 'number') ? l.balance_check.net : null;
     head = `
-      <div class="m-panel">
+      <div class="wow-panel">
         <h2>${t('wallet.balance')}</h2>
-        <div class="m-bounty" style="font-size:34px">${bal === null ? '—' : esc(bal)} <small>SBC</small></div>
+        <div style="font-size:34px">${bal === null ? '—' : coin(bal)}</div>
         <p class="small muted">${t('wallet.sub')}</p>
-        <div class="m-notice ${l.balance_check && l.balance_check.balanced ? 'ok' : 'warn'}" style="margin-top:12px">
+        <div class="wow-notice ${l.balance_check && l.balance_check.balanced ? 'ok' : 'warn'}" style="margin-top:12px">
           ${t('wallet.anchor')}: ${l.balance_check && l.balance_check.balanced ? t('wallet.balanced') : t('wallet.unbalanced')}
           ${l.anchor && l.anchor.merkle_root ? ' · Merkle ' + esc(String(l.anchor.merkle_root).slice(0, 16)) + '…' : ''}
           · PII on chain: ${l.anchor ? (l.anchor.pii_on_chain ? 'YES' : 'NO') : '—'}
         </div>
       </div>
-      <div class="m-panel">
+      <div class="wow-panel">
         <h3>${t('wallet.ledger')}</h3>
-        <div class="m-table-wrap"><table class="m-table"><thead><tr>
+        <div class="wow-table-wrap"><table class="wow-table"><thead><tr>
           <th>#</th><th>${t('task.category')}</th><th>Delta</th><th>Balance</th><th>task_id</th><th>Rule</th><th>${fmtDate('') && ''}</th>
         </tr></thead><tbody>
         ${(l.entries || []).map((x) => `<tr>
@@ -537,15 +614,15 @@ async function renderWallet(app) {
         </tbody></table></div>
       </div>`;
   }
-  const prefs = `<div class="m-panel">
+  const prefs = `<div class="wow-panel">
     <h3>${t('prefs.title')}</h3>
     <p class="small muted">${t('prefs.personalizedHint')}</p>
-    <div class="m-btn-row">
-      <button class="m-btn ${state.personalized ? 'm-btn-primary' : 'm-btn-ghost'}" data-action="set-personalized" data-enabled="1">${t('prefs.on')}</button>
-      <button class="m-btn ${state.personalized ? 'm-btn-ghost' : 'm-btn-primary'}" data-action="set-personalized" data-enabled="0">${t('prefs.off')}</button>
+    <div class="wow-btn-row">
+      <button class="wow-btn ${state.personalized ? 'wow-btn-gold' : 'wow-btn-ghost'}" data-action="set-personalized" data-enabled="1">${t('prefs.on')}</button>
+      <button class="wow-btn ${state.personalized ? 'wow-btn-ghost' : 'wow-btn-gold'}" data-action="set-personalized" data-enabled="0">${t('prefs.off')}</button>
     </div>
   </div>`;
-  app.innerHTML = `<div class="m-section-head"><h2>${t('wallet.title')}</h2></div>${head}${prefs}`;
+  app.innerHTML = `<div class="wow-section-head"><h2>${t('wallet.title')}</h2></div>${head}${prefs}`;
 }
 
 /* ---------- 视图：任务详情 ---------- */
@@ -557,7 +634,7 @@ async function renderTask(app, id) {
     state.tasks = Array.isArray(d.tasks) ? d.tasks : [];
     task = state.tasks.find((x) => x.task_id === id) || task;
   } catch (e) { showError(e); }
-  if (!task) { app.innerHTML = `<div class="m-empty"><b>${t('common.empty')}</b><a href="#/hall">${t('task.back')}</a></div>`; return; }
+  if (!task) { app.innerHTML = `<div class="wow-empty"><b>${t('common.empty')}</b><a href="#/hall">${t('task.back')}</a></div>`; return; }
 
   try { const ev = await api('/api/events?task_id=' + encodeURIComponent(id)); state.events = ev.events || []; }
   catch { state.events = []; }
@@ -569,45 +646,45 @@ async function renderTask(app, id) {
 
   const actions = [];
   const w = requireWrite;
-  if (['DISPATCHING'].includes(task.state) && isSol) actions.push(`<button class="m-btn m-btn-accent" data-action="accept" data-id="${esc(id)}">${t('task.accept')}</button>`);
-  if (['ACCEPTED', 'IN_PROGRESS', 'SUBMITTED'].includes(task.state) && task.solver_id === uid) actions.push(`<button class="m-btn m-btn-primary" data-action="submit-form" data-id="${esc(id)}">${t('task.submit')}</button>`);
+  if (['DISPATCHING'].includes(task.state) && isSol) actions.push(`<button class="wow-btn wow-btn-accent" data-action="accept" data-id="${esc(id)}">${t('task.accept')}</button>`);
+  if (['ACCEPTED', 'IN_PROGRESS', 'SUBMITTED'].includes(task.state) && task.solver_id === uid) actions.push(`<button class="wow-btn wow-btn-gold" data-action="submit-form" data-id="${esc(id)}">${t('task.submit')}</button>`);
   if (task.state === 'SUBMITTED' && isPub) {
-    actions.push(`<button class="m-btn m-btn-accent" data-action="verify" data-id="${esc(id)}" data-decision="approve">${t('task.verify')}</button>`);
-    actions.push(`<button class="m-btn m-btn-ghost" data-action="verify" data-id="${esc(id)}" data-decision="reject">${t('task.reject')}</button>`);
+    actions.push(`<button class="wow-btn wow-btn-accent" data-action="verify" data-id="${esc(id)}" data-decision="approve">${t('task.verify')}</button>`);
+    actions.push(`<button class="wow-btn wow-btn-ghost" data-action="verify" data-id="${esc(id)}" data-decision="reject">${t('task.reject')}</button>`);
   }
-  if (['IN_PROGRESS', 'SUBMITTED'].includes(task.state) && (isPub || isSol)) actions.push(`<button class="m-btn m-btn-danger" data-action="dispute" data-id="${esc(id)}">${t('task.dispute')}</button>`);
-  if (['PENDING_REVIEW', 'PUBLISHED', 'DISPATCHING'].includes(task.state) && isPub) actions.push(`<button class="m-btn m-btn-danger" data-action="cancel" data-id="${esc(id)}">${t('task.cancel')}</button>`);
-  if (isSol && ['PUBLISHED', 'DISPATCHING'].includes(task.state)) actions.push(`<button class="m-btn m-btn-ghost" data-action="feedback" data-id="${esc(id)}">${t('task.feedback')}</button>`);
-  actions.push(`<button class="m-btn m-btn-ghost" data-action="report" data-id="${esc(id)}">${t('task.report')}</button>`);
+  if (['IN_PROGRESS', 'SUBMITTED'].includes(task.state) && (isPub || isSol)) actions.push(`<button class="wow-btn wow-btn-danger" data-action="dispute" data-id="${esc(id)}">${t('task.dispute')}</button>`);
+  if (['PENDING_REVIEW', 'PUBLISHED', 'DISPATCHING'].includes(task.state) && isPub) actions.push(`<button class="wow-btn wow-btn-danger" data-action="cancel" data-id="${esc(id)}">${t('task.cancel')}</button>`);
+  if (isSol && ['PUBLISHED', 'DISPATCHING'].includes(task.state)) actions.push(`<button class="wow-btn wow-btn-ghost" data-action="feedback" data-id="${esc(id)}">${t('task.feedback')}</button>`);
+  actions.push(`<button class="wow-btn wow-btn-ghost" data-action="report" data-id="${esc(id)}">${t('task.report')}</button>`);
 
   app.innerHTML = `
-    <div class="m-section-head"><h2>${t('task.detail')}</h2><a href="#/hall">← ${t('task.back')}</a></div>
-    ${unverified ? `<div class="m-notice warn">${t('auth.verify')} <button class="m-btn m-btn-ghost m-btn-sm" data-action="resend-verification">${t('auth.resend')}</button></div>` : ''}
-    <div class="m-split">
+    <div class="wow-section-head"><h2>${t('task.detail')}</h2><a href="#/hall">← ${t('task.back')}</a></div>
+    ${unverified ? `<div class="wow-notice warn">${t('auth.verify')} <button class="wow-btn wow-btn-ghost wow-btn-sm" data-action="resend-verification">${t('auth.resend')}</button></div>` : ''}
+    <div class="wow-split">
       <div>
-        <div class="m-panel">
-          <div class="m-card-head"><h2>${esc(task.title)}</h2>${stateBadge(task.state)}</div>
+        <div class="wow-panel">
+          <div class="wow-contract-head"><h2>${esc(task.title)}</h2>${stateBadge(task.state)}</div>
           <p>${esc(task.description || '')}</p>
           <h3>${t('task.criteria')}</h3><p>${esc(task.acceptance_criteria || '')}</p>
-          ${task.result_preview ? `<h3>${t('task.result')} ${task.result_pii_redacted ? '<span class="m-badge ok">redacted</span>' : ''}</h3><p class="m-notice info">${esc(task.result_preview)}</p>` : ''}
+          ${task.result_preview ? `<h3>${t('task.result')} ${task.result_pii_redacted ? '<span class="wow-badge ok">redacted</span>' : ''}</h3><p class="wow-notice info">${esc(task.result_preview)}</p>` : ''}
           <h3>${t('task.events')}</h3>
-          <div class="m-table-wrap"><table class="m-table"><thead><tr><th>#</th><th>Type</th><th>Time</th></tr></thead><tbody>
+          <div class="wow-table-wrap"><table class="wow-table"><thead><tr><th>#</th><th>Type</th><th>Time</th></tr></thead><tbody>
           ${(state.events || []).slice(-12).map((x) => `<tr><td>${esc(x.seq)}</td><td class="tiny">${esc(x.type)}</td><td class="tiny muted">${fmtDate(x.created_at)}</td></tr>`).join('') || `<tr><td colspan="3">${t('common.empty')}</td></tr>`}
           </tbody></table></div>
         </div>
       </div>
       <div>
-        <div class="m-panel">
-          <dl class="m-kv">
-            <dt>${t('task.bounty')}</dt><dd class="m-bounty">${esc(task.bounty)} <small>SBC</small></dd>
+        <div class="wow-panel">
+          <dl class="wow-kv">
+            <dt>${t('task.bounty')}</dt><dd>${coin(task.bounty)}</dd>
             <dt>${t('task.fee')}</dt><dd>${esc(task.service_fee)} SBC</dd>
             <dt>${t('task.state')}</dt><dd>${stateBadge(task.state)}</dd>
             <dt>${t('task.category')}</dt><dd>${esc(task.category || '—')}</dd>
             <dt>${t('task.deadline')}</dt><dd>${fmtDate(task.deadline)}</dd>
-            <dt>${t('task.skills')}</dt><dd>${(task.required_skills || []).map((s) => `<span class="m-tag">${esc(s)}</span>`).join(' ') || '—'}</dd>
+            <dt>${t('task.skills')}</dt><dd>${(task.required_skills || []).map((s) => `<span class="wow-tag">${esc(s)}</span>`).join(' ') || '—'}</dd>
             <dt>Task ID</dt><dd class="mono tiny">${esc(task.task_id)}</dd>
           </dl>
-          <div class="m-btn-row" style="margin-top:16px">${actions.join('')}</div>
+          <div class="wow-btn-row" style="margin-top:16px">${actions.join('')}</div>
         </div>
       </div>
     </div>`;
@@ -617,21 +694,21 @@ async function renderTask(app, id) {
 function renderAuth(app) {
   const login = state.authTab === 'login';
   app.innerHTML = `
-    <div class="m-panel" style="max-width:560px;margin:0 auto">
+    <div class="wow-panel" style="max-width:560px;margin:0 auto">
       <h2>${t('auth.title')}</h2><p class="muted">${t('auth.sub')}</p>
-      <div class="m-tabs">
+      <div class="wow-tabs">
         <button class="${login ? 'active' : ''}" data-action="auth-tab" data-tab="login">${t('auth.login')}</button>
         <button class="${!login ? 'active' : ''}" data-action="auth-tab" data-tab="register">${t('auth.register')}</button>
       </div>
-      <form class="m-form" id="auth-form">
-        <div class="m-field"><label>${t('auth.email')}</label><input class="m-input" name="email" type="email" required autocomplete="email"></div>
-        <div class="m-field"><label>${t('auth.password')}</label><input class="m-input" name="password" type="password" required minlength="10" autocomplete="${login ? 'current-password' : 'new-password'}"></div>
+      <form class="wow-form" id="auth-form">
+        <div class="wow-field"><label>${t('auth.email')}</label><input class="wow-input" name="email" type="email" required autocomplete="email"></div>
+        <div class="wow-field"><label>${t('auth.password')}</label><input class="wow-input" name="password" type="password" required minlength="10" autocomplete="${login ? 'current-password' : 'new-password'}"></div>
         ${login ? '' : `
-        <div class="m-field"><label>${t('auth.name')}</label><input class="m-input" name="display_name" required></div>
-        <div class="m-field"><label>${t('auth.role')}</label>
-          <select class="m-select" name="role"><option value="solver">${t('auth.solver')}</option><option value="publisher">${t('auth.publisher')}</option></select>
+        <div class="wow-field"><label>${t('auth.name')}</label><input class="wow-input" name="display_name" required></div>
+        <div class="wow-field"><label>${t('auth.role')}</label>
+          <select class="wow-select" name="role"><option value="solver">${t('auth.solver')}</option><option value="publisher">${t('auth.publisher')}</option></select>
         </div>`}
-        <button class="m-btn m-btn-primary" type="submit">${login ? t('auth.login') : t('auth.register')}</button>
+        <button class="wow-btn wow-btn-gold" type="submit">${login ? t('auth.login') : t('auth.register')}</button>
       </form>
       <p class="tiny muted" style="margin-top:14px">${t('auth.hint')}</p>
     </div>`;
@@ -663,23 +740,23 @@ function renderAuth(app) {
 /* ------------------------------------------------ 5. 人工闸门弹窗 -------- */
 function humanConfirm({ title, message, word, onConfirm }) {
   state.modal = { onConfirm };
-  const root = document.getElementById('m-modal');
+  const root = document.getElementById('wow-modal');
   root.hidden = false;
-  root.innerHTML = `<div class="m-modal">
+  root.innerHTML = `<div class="wow-modal">
     <h3>${esc(title)}</h3>
     <p>${esc(message)}</p>
     <p class="small muted">${t('common.humanGate')}</p>
-    <div class="m-field"><label>${t('modal.typeWord', { word: `<span class="m-confirm-word">${esc(word)}</span>` })}</label>
-      <input class="m-input" id="m-confirm-input" autocomplete="off"></div>
-    <div class="m-btn-row">
-      <button class="m-btn m-btn-primary" data-action="modal-confirm">${t('common.humanConfirm')}</button>
-      <button class="m-btn m-btn-ghost" data-action="modal-cancel">${t('common.cancel')}</button>
+    <div class="wow-field"><label>${t('modal.typeWord', { word: `<span class="wow-confirm-word">${esc(word)}</span>` })}</label>
+      <input class="wow-input" id="m-confirm-input" autocomplete="off"></div>
+    <div class="wow-btn-row">
+      <button class="wow-btn wow-btn-gold" data-action="modal-confirm">${t('common.humanConfirm')}</button>
+      <button class="wow-btn wow-btn-ghost" data-action="modal-cancel">${t('common.cancel')}</button>
     </div>
   </div>`;
   const input = document.getElementById('m-confirm-input');
   if (input) input.focus();
 }
-function closeModal() { state.modal = null; document.getElementById('m-modal').hidden = true; document.getElementById('m-modal').innerHTML = ''; }
+function closeModal() { state.modal = null; document.getElementById('wow-modal').hidden = true; document.getElementById('wow-modal').innerHTML = ''; }
 
 /* ------------------------------------------------ 6. 写操作 ------------- */
 async function doAction(action, el) {
@@ -794,7 +871,7 @@ async function bootstrap() {
   try { cfg = await api('/api/config'); } catch (e) { showError(e); }
   state.config = cfg;
   state.mode = (health && health.mode) || (cfg && cfg.mode) || 'demo';
-  if (state.mode !== 'production') document.getElementById('m-demo-banner').hidden = false;
+  if (state.mode !== 'production') document.getElementById('wow-banner-demo').hidden = false;
 
   const meta = document.getElementById('m-meta');
   if (health) {
@@ -814,6 +891,16 @@ async function bootstrap() {
       }
     }
   } catch {}
+
+  // 玩家声望：从用户榜取本人 net_sbc，补充猎人等级经验（失败静默，不影响主流程）
+  if (state.user) {
+    try {
+      const board = await api('/api/leaderboard/users');
+      const mine = Array.isArray(board.items)
+        ? board.items.find((i) => i.user_id === state.user.user_id) : null;
+      state.hunterCredit = mine ? Number(mine.net_sbc || 0) : 0;
+    } catch {}
+  }
 
   render();
 }

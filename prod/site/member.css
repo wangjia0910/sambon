@@ -1,209 +1,388 @@
 /* ==========================================================================
-   三宝殿 · sambon.net — 用户版悬赏互助平台（产品站样式）
-   浅色主题、克制专业、面向真实发布方 / 接单人。与操作台 styles.css 独立，
-   不复用其类名，避免互相影响。零依赖、无图标字体、无渐变。
-   分区：变量 → 基础 → 顶栏 / 导航 → 横幅 → 主区 / 卡片 → 表单 / 按钮
-        → 徽章 / 表格 → 弹窗 / toast → 响应式
+   Sambon · Bounty Hunters Guild — 用户版前端主题（魔兽世界风格）
+   深色石板 + 羊皮纸 + 鎏金符文；任务稀有度、猎人等级、声望条、金币。
+   零依赖、无图标字体、无外链资源；所有装饰用 CSS 绘制。
    ========================================================================== */
 
 :root {
-  --bg: #f6f8fb;
-  --surface: #ffffff;
-  --surface-2: #f1f5fa;
-  --text: #1b2430;
-  --muted: #647084;
-  --border: #e3e9f1;
-  --primary: #2f5fb0;
-  --primary-dark: #21468a;
-  --primary-soft: #e9f0fb;
-  --accent: #0f8a6a;
-  --accent-soft: #e7f5f0;
-  --danger: #b02e38;
-  --danger-soft: #fbeaec;
-  --warn: #a8620a;
-  --warn-soft: #fff3e2;
-  --radius: 12px;
-  --radius-sm: 7px;
-  --shadow: 0 1px 2px rgba(20, 35, 60, .05), 0 6px 20px rgba(20, 35, 60, .05);
-  --maxw: 1140px;
+  /* 场景底色：暗色石厅 */
+  --bg: #12100d;
+  --bg-2: #1b1712;
+  --stone: #221d16;
+  --stone-2: #2b2419;
+  --panel: linear-gradient(180deg, #2a2319 0%, #211b14 100%);
+  --panel-solid: #241e16;
+  /* 羊皮纸文字 */
+  --parchment: #e8dcc0;
+  --parchment-2: #c9b996;
+  --muted: #9c8b6f;
+  --muted-2: #6f6250;
+  /* 鎏金 */
+  --gold: #d8b45c;
+  --gold-bright: #f4d98a;
+  --gold-dark: #8a6a2f;
+  --gold-line: #6b5228;
+  --bronze: #a9793f;
+  /* 稀有度 */
+  --common: #b9b2a3;
+  --uncommon: #63d162;
+  --rare: #5b9bf0;
+  --epic: #b57ce8;
+  --legendary: #f59133;
+  /* 语义色 */
+  --ok: #6fbf73;
+  --danger: #cd4b47;
+  --warn: #e0a13c;
+  --faction: #d8b45c;
+  --radius: 4px;
   --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --serif: Georgia, "Times New Roman", "Noto Serif SC", "Songti SC", serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; min-height: 100%; }
 body {
-  background: var(--bg);
-  color: var(--text);
-  font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background:
+    radial-gradient(1200px 520px at 50% -80px, rgba(216, 180, 92, .10), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 4px),
+    var(--bg);
+  color: var(--parchment);
+  font: 14px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+  min-height: 100vh; display: flex; flex-direction: column;
+  position: relative;
 }
-h1, h2, h3, h4 { margin: 0 0 12px; font-weight: 650; line-height: 1.3; }
-h1 { font-size: 28px; }
-h2 { font-size: 22px; }
-h3 { font-size: 17px; }
-h4 { font-size: 15px; }
+.wow-vignette {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  box-shadow: inset 0 0 180px rgba(0,0,0,.75), inset 0 0 40px rgba(0,0,0,.5);
+}
+body > *:not(.wow-vignette) { position: relative; z-index: 1; }
+
+h1, h2, h3, h4 { font-family: var(--serif); margin: 0 0 10px; font-weight: 600; letter-spacing: .3px; }
+h1 { font-size: 30px; } h2 { font-size: 23px; } h3 { font-size: 17px; } h4 { font-size: 15px; }
 p { margin: 0 0 10px; }
-a { color: var(--primary); text-decoration: none; }
-a:hover { text-decoration: underline; }
-code { font-family: var(--mono); font-size: .9em; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
-.muted { color: var(--muted); }
-.small { font-size: 13px; }
-.tiny { font-size: 12px; }
-.mono { font-family: var(--mono); }
+a { color: var(--gold-bright); text-decoration: none; }
+a:hover { color: #fff2cf; text-decoration: none; }
+code { font-family: var(--mono); font-size: .9em; background: rgba(0,0,0,.35); padding: 1px 5px; border-radius: 3px; color: var(--parchment-2); }
+.muted, .wow-muted { color: var(--muted); }
+.small { font-size: 12.5px; } .tiny { font-size: 11.5px; } .mono { font-family: var(--mono); }
+.gold { color: var(--gold-bright); }
 
-/* ---------- 顶栏 ---------- */
-.m-topbar { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
-.m-topbar-inner { max-width: var(--maxw); margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 22px; }
-.m-brand { display: flex; align-items: center; gap: 10px; color: var(--text); flex-shrink: 0; }
-.m-brand:hover { text-decoration: none; }
-.m-brand-mark { width: 36px; height: 36px; border-radius: 9px; background: var(--primary); color: #fff; display: grid; place-items: center; font-size: 18px; font-weight: 700; }
-.m-brand-text { font-size: 18px; font-weight: 700; letter-spacing: .2px; line-height: 1.1; }
-.m-brand-text small { display: block; font-size: 10.5px; font-weight: 500; color: var(--muted); letter-spacing: .1px; margin-top: 2px; }
-.m-nav { display: flex; align-items: center; gap: 4px; flex: 1; flex-wrap: wrap; }
-.m-nav a { color: var(--muted); font-size: 14px; font-weight: 550; padding: 7px 12px; border-radius: 8px; }
-.m-nav a:hover { background: var(--surface-2); color: var(--text); text-decoration: none; }
-.m-nav a.active { background: var(--primary-soft); color: var(--primary-dark); }
-.m-topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.m-user { font-size: 13px; color: var(--text); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.m-lang { border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 8px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; }
-.m-lang:hover { border-color: var(--primary); color: var(--primary); }
+/* ---------------- 顶栏 ---------------- */
+.wow-topbar {
+  background: linear-gradient(180deg, #262018 0%, #1a160f 100%);
+  border-bottom: 2px solid var(--gold-line);
+  box-shadow: 0 2px 0 #0b0906, 0 8px 24px rgba(0,0,0,.5);
+}
+.wow-topbar-inner {
+  max-width: 1180px; margin: 0 auto; padding: 9px 20px;
+  display: flex; align-items: center; gap: 20px;
+}
+.wow-brand { display: flex; align-items: center; gap: 11px; flex-shrink: 0; color: var(--parchment); }
+.wow-brand:hover { text-decoration: none; }
+.wow-crest {
+  width: 42px; height: 46px; flex-shrink: 0;
+  background: linear-gradient(180deg, #3b3020, #211a11);
+  border: 2px solid var(--gold-dark);
+  clip-path: polygon(50% 0, 100% 16%, 100% 68%, 50% 100%, 0 68%, 0 16%);
+  display: grid; place-items: center;
+  box-shadow: inset 0 0 12px rgba(216,180,92,.22);
+}
+.wow-crest span { font-size: 20px; color: var(--gold-bright); text-shadow: 0 0 8px rgba(244,217,138,.5); }
+.wow-brand-text b { display: block; font-family: var(--serif); font-size: 19px; letter-spacing: 2.5px; color: var(--gold-bright); line-height: 1.05; }
+.wow-brand-text small { display: block; font-size: 10px; letter-spacing: .4px; color: var(--muted); margin-top: 3px; }
+.wow-nav { display: flex; align-items: center; gap: 3px; flex: 1; flex-wrap: wrap; }
+.wow-nav a {
+  color: var(--parchment-2); font-size: 13px; font-family: var(--serif); letter-spacing: .3px;
+  padding: 8px 13px; border: 1px solid transparent; border-radius: 3px;
+  position: relative;
+}
+.wow-nav a:hover { color: var(--gold-bright); background: rgba(216,180,92,.06); text-decoration: none; }
+.wow-nav a.active {
+  color: #1a140c; font-weight: 600;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  border-color: var(--gold-dark);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 2px 6px rgba(0,0,0,.5);
+}
+.wow-topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.wow-lang {
+  background: #1d1811; color: var(--gold); border: 1px solid var(--gold-line);
+  border-radius: 3px; padding: 6px 9px; font-size: 11.5px; cursor: pointer;
+}
+.wow-lang:hover { border-color: var(--gold); color: var(--gold-bright); }
 
-/* ---------- 横幅 ---------- */
-.m-banner { padding: 9px 20px; font-size: 13px; text-align: center; }
-.m-banner-demo { background: var(--warn-soft); color: var(--warn); border-bottom: 1px solid #f0dcb8; }
-.m-banner-demo a { color: var(--warn); text-decoration: underline; margin-left: 8px; }
+/* 角色状态卡（头像 + 等级 + 声望条） */
+.wow-hero-card { display: flex; align-items: center; gap: 8px; padding-right: 4px; border-right: 1px solid var(--gold-line); }
+.wow-portrait {
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: radial-gradient(circle at 50% 30%, #4a3a22, #1c1610);
+  border: 2px solid var(--gold-dark); border-radius: 4px;
+  display: grid; place-items: center; font-family: var(--serif); font-size: 17px; color: var(--gold-bright);
+  box-shadow: inset 0 0 8px rgba(0,0,0,.7);
+}
+.wow-hero-meta { min-width: 132px; }
+.wow-hero-line { display: flex; align-items: baseline; gap: 7px; }
+.wow-hero-name { font-size: 12.5px; color: var(--parchment); max-width: 92px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wow-hero-level { font-size: 11px; color: var(--gold-bright); font-family: var(--serif); }
+.wow-hero-title { color: var(--muted); }
+.wow-xp {
+  height: 6px; margin-top: 3px; background: #0c0a07;
+  border: 1px solid var(--gold-line); border-radius: 3px; overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.8);
+}
+.wow-xp i {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(180deg, #e8c860, #b8862b);
+  box-shadow: 0 0 6px rgba(232,200,96,.5);
+  transition: width .4s ease;
+}
 
-/* ---------- 主区 ---------- */
-.m-app { flex: 1; width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 26px 20px 48px; }
-.m-loading { text-align: center; color: var(--muted); padding: 80px 0; }
+/* ---------------- 横幅 ---------------- */
+.wow-banner { padding: 8px 20px; font-size: 12.5px; text-align: center; }
+.wow-banner-demo {
+  background: linear-gradient(90deg, rgba(126,74,20,.25), rgba(180,110,30,.2), rgba(126,74,20,.25));
+  border-bottom: 1px solid #6b4a1e; color: #f0c884;
+}
+.wow-banner-demo a { color: #ffd98a; text-decoration: underline; margin-left: 8px; }
 
-/* Hero */
-.m-hero { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 38px 40px; box-shadow: var(--shadow); margin-bottom: 22px; }
-.m-hero h1 { font-size: 32px; margin-bottom: 14px; letter-spacing: -.3px; }
-.m-hero .m-hero-lead { font-size: 17px; color: var(--muted); max-width: 720px; margin-bottom: 22px; }
-.m-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.m-hero-stats { display: flex; gap: 32px; margin-top: 28px; flex-wrap: wrap; }
-.m-stat b { display: block; font-size: 24px; color: var(--primary-dark); }
-.m-stat span { font-size: 12.5px; color: var(--muted); }
+/* ---------------- 主区 ---------------- */
+.wow-main { flex: 1; width: 100%; max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+.wow-loading { text-align: center; color: var(--muted); padding: 80px 0; font-family: var(--serif); letter-spacing: 1px; }
 
-/* 区块标题 */
-.m-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 26px 0 14px; flex-wrap: wrap; }
-.m-section-head h2 { margin: 0; }
-.m-section-head .muted { font-size: 13px; }
+/* 公告板标题（带装饰线） */
+.wow-section-head { display: flex; align-items: center; gap: 14px; margin: 24px 0 16px; flex-wrap: wrap; }
+.wow-section-head h2 { margin: 0; color: var(--gold-bright); text-shadow: 0 2px 4px #000, 0 0 18px rgba(216,180,92,.2); }
+.wow-section-head h2::after {
+  content: ""; display: block; height: 1px; margin-top: 8px;
+  background: linear-gradient(90deg, var(--gold-line), transparent);
+}
+.wow-section-head .wow-muted { font-size: 12.5px; }
+.wow-section-head .spacer { flex: 1; }
 
-/* 卡片网格 */
-.m-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
-.m-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
-.m-card.clickable { cursor: pointer; transition: border-color .15s, transform .15s; }
-.m-card.clickable:hover { border-color: var(--primary); transform: translateY(-2px); }
-.m-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-.m-card-title { font-size: 16px; font-weight: 650; margin: 0 0 4px; line-height: 1.4; }
-.m-card-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-.m-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
-.m-bounty { font-size: 20px; font-weight: 700; color: var(--accent); white-space: nowrap; }
-.m-bounty small { font-size: 12px; font-weight: 600; }
+/* 英雄大厅 */
+.wow-hero {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, rgba(46,38,26,.96), rgba(26,22,16,.96)),
+    repeating-linear-gradient(45deg, rgba(255,255,255,.015) 0 2px, transparent 2px 8px);
+  border: 2px solid var(--gold-dark); border-radius: var(--radius);
+  padding: 34px 38px; box-shadow: inset 0 0 40px rgba(0,0,0,.6), 0 10px 30px rgba(0,0,0,.5);
+}
+.wow-hero::before, .wow-hero::after {
+  content: "◆"; position: absolute; color: var(--gold-dark); font-size: 18px; opacity: .7;
+}
+.wow-hero::before { top: 12px; left: 14px; }
+.wow-hero::after { bottom: 12px; right: 14px; }
+.wow-hero h1 { color: var(--gold-bright); text-shadow: 0 2px 6px #000; font-size: 34px; letter-spacing: 1px; }
+.wow-hero .wow-lead { color: var(--parchment-2); font-size: 16px; max-width: 700px; }
+.wow-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.wow-hero-stats { display: flex; gap: 30px; margin-top: 26px; flex-wrap: wrap; }
+.wow-stat b { display: block; font-family: var(--serif); font-size: 24px; color: var(--gold-bright); }
+.wow-stat span { font-size: 11.5px; color: var(--muted); letter-spacing: .5px; }
 
-/* 徽章 */
-.m-badge { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
-.m-badge.primary { background: var(--primary-soft); color: var(--primary-dark); }
-.m-badge.ok { background: var(--accent-soft); color: var(--accent); }
-.m-badge.warn { background: var(--warn-soft); color: var(--warn); }
-.m-badge.danger { background: var(--danger-soft); color: var(--danger); }
-.m-tag { display: inline-block; font-size: 11.5px; color: var(--muted); background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; }
+/* ---------------- 面板 ---------------- */
+.wow-panel {
+  background: var(--panel);
+  border: 1px solid var(--gold-line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), inset 0 0 30px rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.4);
+  margin-bottom: 16px;
+}
+.wow-panel h2 { color: var(--gold-bright); }
+.wow-panel h3 { color: var(--parchment); border-bottom: 1px solid var(--gold-line); padding-bottom: 7px; margin-top: 20px; }
+.wow-split { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(258px, 1fr); gap: 16px; align-items: start; }
+.wow-kv { display: grid; grid-template-columns: 116px minmax(0,1fr); gap: 7px 12px; font-size: 13px; }
+.wow-kv dt { color: var(--muted); }
+.wow-kv dd { margin: 0; word-break: break-word; }
 
-/* 面板 / 详情 */
-.m-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); margin-bottom: 16px; }
-.m-panel h2 { margin-bottom: 6px; }
-.m-panel h3 { margin-top: 20px; }
-.m-split { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr); gap: 16px; align-items: start; }
-.m-kv { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 8px 14px; font-size: 14px; }
-.m-kv dt { color: var(--muted); }
-.m-kv dd { margin: 0; word-break: break-word; }
+/* ---------------- 悬赏令卡片（核心）---------------- */
+.wow-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(296px, 1fr)); gap: 14px; }
+.wow-contract {
+  position: relative; overflow: hidden;
+  background: linear-gradient(180deg, rgba(48,40,28,.92), rgba(28,23,16,.95));
+  border: 1px solid var(--gold-line);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+  padding: 15px 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.45), inset 0 0 24px rgba(0,0,0,.25);
+}
+.wow-contract.clickable { cursor: pointer; transition: transform .13s, box-shadow .13s, border-color .13s; }
+.wow-contract.clickable:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,.6); }
+.wow-contract::after {
+  /* 羊皮纸钉角 */
+  content: ""; position: absolute; top: -1px; right: -1px;
+  width: 26px; height: 26px;
+  background: linear-gradient(225deg, var(--gold-dark) 0 48%, transparent 48%);
+  opacity: .55;
+}
+/* 稀有度 */
+.wow-contract.r-common    { border-left-color: var(--common); }
+.wow-contract.r-uncommon  { border-left-color: var(--uncommon); box-shadow: 0 6px 16px rgba(0,0,0,.45), inset 0 0 24px rgba(99,209,98,.05); }
+.wow-contract.r-rare      { border-left-color: var(--rare); box-shadow: 0 6px 16px rgba(0,0,0,.45), inset 0 0 26px rgba(91,155,240,.07); }
+.wow-contract.r-epic      { border-left-color: var(--epic); box-shadow: 0 6px 18px rgba(0,0,0,.5), inset 0 0 30px rgba(181,124,232,.09); }
+.wow-contract.r-legendary { border-left-color: var(--legendary); box-shadow: 0 6px 22px rgba(245,145,51,.16), inset 0 0 34px rgba(245,145,51,.11); }
+.wow-contract.r-legendary::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  border: 1px solid rgba(245,145,51,.35); border-radius: var(--radius);
+}
+.wow-contract-head { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+.wow-contract-title { font-family: var(--serif); font-size: 15.5px; color: var(--gold-bright); margin: 0 0 3px; line-height: 1.35; }
+.wow-rarity { font-size: 10px; font-family: var(--serif); letter-spacing: .6px; text-transform: uppercase; }
+.r-common .wow-rarity { color: var(--common); }
+.r-uncommon .wow-rarity { color: var(--uncommon); }
+.r-rare .wow-rarity { color: var(--rare); }
+.r-epic .wow-rarity { color: var(--epic); }
+.r-legendary .wow-rarity { color: var(--legendary); text-shadow: 0 0 8px rgba(245,145,51,.5); }
+.wow-contract-desc { color: var(--parchment-2); font-size: 12.5px; margin: 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.wow-contract-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.wow-contract-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: 13px; padding-top: 11px; border-top: 1px solid rgba(216,180,92,.18);
+}
+/* 金币赏金 */
+.wow-gold {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--serif); font-weight: 700; font-size: 18px; color: var(--gold-bright);
+  text-shadow: 0 1px 2px #000;
+}
+.wow-coin {
+  width: 15px; height: 15px; border-radius: 50%; flex-shrink: 0;
+  background: radial-gradient(circle at 34% 30%, #ffe9a8, #d8a83c 55%, #8a5f1e);
+  border: 1px solid #6b4a1e;
+  box-shadow: inset 0 0 0 2px rgba(138,95,30,.45), 0 0 6px rgba(232,200,96,.4);
+  display: inline-block;
+}
 
-/* 表单与按钮 */
-.m-form .m-field { margin-bottom: 15px; }
-.m-form label, .m-field > label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
-.m-input, .m-select, .m-textarea { width: 100%; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 14px; font-family: inherit; }
-.m-input:focus, .m-select:focus, .m-textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
-.m-textarea { min-height: 110px; resize: vertical; }
-.m-check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
-.m-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.m-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid transparent; border-radius: var(--radius-sm); padding: 10px 16px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
-.m-btn:disabled { opacity: .5; cursor: not-allowed; }
-.m-btn-primary { background: var(--primary); color: #fff; }
-.m-btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
-.m-btn-accent { background: var(--accent); color: #fff; }
-.m-btn-accent:hover:not(:disabled) { background: #0b7257; }
-.m-btn-ghost { background: var(--surface); border-color: var(--border); color: var(--text); }
-.m-btn-ghost:hover:not(:disabled) { border-color: var(--primary); color: var(--primary-dark); }
-.m-btn-danger { background: var(--danger-soft); color: var(--danger); border-color: #f0c9cd; }
-.m-btn-sm { padding: 6px 12px; font-size: 13px; }
-.m-btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+/* ---------------- 徽章 / 标签 / 状态 ---------------- */
+.wow-badge {
+  display: inline-block; font-family: var(--serif); font-size: 10.5px; letter-spacing: .3px;
+  padding: 2px 8px; border: 1px solid var(--gold-line); border-radius: 3px;
+  background: rgba(0,0,0,.3); color: var(--parchment-2); white-space: nowrap;
+}
+.wow-badge.ok { color: #a7e2a0; border-color: #3c6b3a; }
+.wow-badge.warn { color: #f0c884; border-color: #7a5420; }
+.wow-badge.danger { color: #f09a95; border-color: #7a3230; }
+.wow-badge.primary { color: #bcd4f5; border-color: #3a5a86; }
+.wow-tag { display: inline-block; font-size: 11px; color: var(--parchment-2); background: rgba(0,0,0,.3); border: 1px solid var(--gold-line); border-radius: 3px; padding: 1px 7px; }
+
+/* ---------------- 表单 / 按钮 ---------------- */
+.wow-form .wow-field { margin-bottom: 14px; }
+.wow-form label, .wow-field > label { display: block; font-family: var(--serif); font-size: 13px; color: var(--parchment-2); margin-bottom: 5px; }
+.wow-input, .wow-select, .wow-textarea {
+  width: 100%; background: #14100b; color: var(--parchment);
+  border: 1px solid var(--gold-line); border-radius: 3px; padding: 9px 11px;
+  font-size: 13.5px; font-family: inherit;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,.7);
+}
+.wow-input:focus, .wow-select:focus, .wow-textarea:focus {
+  outline: none; border-color: var(--gold); box-shadow: inset 0 1px 4px rgba(0,0,0,.7), 0 0 0 2px rgba(216,180,92,.18);
+}
+.wow-textarea { min-height: 100px; resize: vertical; }
+.wow-check { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; }
+.wow-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.wow-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: var(--serif); font-size: 13px; letter-spacing: .3px;
+  padding: 9px 15px; border-radius: 3px; cursor: pointer;
+  border: 1px solid var(--gold-dark); color: var(--parchment);
+  background: linear-gradient(180deg, #3a3020, #251e14);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 2px 5px rgba(0,0,0,.5);
+  transition: filter .12s, transform .1s;
+}
+.wow-btn:hover:not(:disabled) { filter: brightness(1.18); }
+.wow-btn:active:not(:disabled) { transform: translateY(1px); }
+.wow-btn:disabled { opacity: .45; cursor: not-allowed; }
+.wow-btn-sm { padding: 5px 10px; font-size: 11.5px; }
+.wow-btn-gold {
+  color: #1c1509; font-weight: 700;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold) 55%, var(--bronze));
+  border-color: #5c431b;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 2px 8px rgba(0,0,0,.5);
+}
+.wow-btn-accent { color: #eafff4; border-color: #2f6b4a; background: linear-gradient(180deg, #3b7d57, #245539); }
+.wow-btn-danger { color: #ffd9d6; border-color: #7a3230; background: linear-gradient(180deg, #7d3230, #4c1f1e); }
+.wow-btn-ghost { background: rgba(0,0,0,.25); }
+.wow-btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 
 /* 筛选条 */
-.m-filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
-.m-filters .m-input { width: auto; flex: 1; min-width: 200px; }
-.m-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 18px; flex-wrap: wrap; }
-.m-tabs button { border: none; background: none; color: var(--muted); font-size: 14px; font-weight: 600; padding: 10px 16px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: inherit; }
-.m-tabs button:hover { color: var(--text); }
-.m-tabs button.active { color: var(--primary-dark); border-bottom-color: var(--primary); }
+.wow-filters { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-bottom: 15px; }
+.wow-filters .wow-input { width: auto; flex: 1; min-width: 200px; }
+.wow-tabs { display: flex; gap: 3px; border-bottom: 1px solid var(--gold-line); margin-bottom: 16px; flex-wrap: wrap; }
+.wow-tabs button {
+  border: 1px solid transparent; border-bottom: none; background: transparent;
+  color: var(--muted); font-family: var(--serif); font-size: 13px; padding: 8px 15px;
+  cursor: pointer; border-radius: 3px 3px 0 0;
+}
+.wow-tabs button:hover { color: var(--gold-bright); }
+.wow-tabs button.active {
+  color: var(--gold-bright); background: rgba(216,180,92,.08); border-color: var(--gold-line);
+  box-shadow: inset 0 2px 0 var(--gold);
+}
 
-/* 表格（账本 / 榜单） */
-.m-table-wrap { overflow-x: auto; }
-.m-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-.m-table th, .m-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-.m-table th { color: var(--muted); font-weight: 600; font-size: 12.5px; background: var(--surface-2); }
-.m-table tbody tr:hover { background: var(--surface-2); }
-.m-table .num { text-align: right; font-variant-numeric: tabular-nums; }
-.m-table .pos { color: var(--accent); }
-.m-table .neg { color: var(--danger); }
+/* ---------------- 表格（榜单/账本）---------------- */
+.wow-table-wrap { overflow-x: auto; }
+.wow-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.wow-table th, .wow-table td { text-align: left; padding: 9px 11px; border-bottom: 1px solid rgba(216,180,92,.15); white-space: nowrap; }
+.wow-table th { color: var(--gold-bright); font-family: var(--serif); font-size: 12px; font-weight: 600; background: rgba(0,0,0,.32); }
+.wow-table tbody tr:hover { background: rgba(216,180,92,.05); }
+.wow-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.wow-table .pos { color: var(--ok); } .wow-table .neg { color: var(--danger); }
+/* 名次 */
+.wow-rank-no { display: inline-grid; place-items: center; width: 26px; height: 26px; font-family: var(--serif); font-weight: 700; border: 1px solid var(--gold-line); border-radius: 50%; color: var(--parchment-2); }
+.wow-rank-no.r1 { color: #2a1c05; background: linear-gradient(180deg,#ffe6a0,#d8a83c); border-color: #8a6a2f; box-shadow: 0 0 10px rgba(232,200,96,.4); }
+.wow-rank-no.r2 { color: #201913; background: linear-gradient(180deg,#e8e2d8,#9a9288); border-color: #6a645c; }
+.wow-rank-no.r3 { color: #2a1408; background: linear-gradient(180deg,#e0a973,#a9683a); border-color: #7a4a25; }
+/* 猎人称号 */
+.wow-rank-title { font-size: 11px; color: var(--gold); font-family: var(--serif); }
+.wow-medal { color: var(--gold-bright); margin-right: 3px; }
 
-/* 空态 */
-.m-empty { text-align: center; padding: 56px 20px; color: var(--muted); background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius); }
-.m-empty b { display: block; color: var(--text); font-size: 16px; margin-bottom: 6px; }
+/* ---------------- 空态 / 提示 ---------------- */
+.wow-empty { text-align: center; padding: 52px 20px; color: var(--muted); background: rgba(0,0,0,.2); border: 1px dashed var(--gold-line); border-radius: var(--radius); font-family: var(--serif); }
+.wow-empty b { display: block; color: var(--parchment); font-size: 16px; margin-bottom: 6px; }
+.wow-notice { border-radius: 3px; padding: 11px 13px; font-size: 12.5px; line-height: 1.6; margin-bottom: 15px; border: 1px solid var(--gold-line); }
+.wow-notice.info { background: rgba(60,95,150,.13); border-color: #3a5a86; color: #c4d8f2; }
+.wow-notice.warn { background: rgba(150,95,30,.13); border-color: #7a5420; color: #f0c884; }
+.wow-notice.ok { background: rgba(60,130,75,.13); border-color: #3c6b3a; color: #a7e2a0; }
 
-/* 提示块 */
-.m-notice { border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
-.m-notice.info { background: var(--primary-soft); color: var(--primary-dark); }
-.m-notice.warn { background: var(--warn-soft); color: var(--warn); }
-.m-notice.ok { background: var(--accent-soft); color: var(--accent); }
+/* ---------------- 弹窗 / toast ---------------- */
+.wow-modal-root { position: fixed; inset: 0; background: rgba(6,5,3,.78); display: grid; place-items: center; padding: 20px; z-index: 60; }
+.wow-modal {
+  width: 100%; max-width: 460px; padding: 22px;
+  background: var(--panel); border: 2px solid var(--gold-dark); border-radius: var(--radius);
+  box-shadow: 0 24px 70px rgba(0,0,0,.8), inset 0 0 30px rgba(0,0,0,.5);
+}
+.wow-modal h3 { color: var(--gold-bright); margin-top: 0; }
+.wow-modal p { color: var(--parchment-2); font-size: 13px; }
+.wow-confirm-word { font-family: var(--mono); background: rgba(180,110,30,.18); color: var(--gold-bright); padding: 2px 6px; border-radius: 3px; }
+.wow-toast-root { position: fixed; right: 18px; bottom: 18px; z-index: 70; display: flex; flex-direction: column; gap: 8px; max-width: 380px; }
+.wow-toast {
+  background: linear-gradient(180deg, #31281a, #1d1810); color: var(--parchment);
+  border: 1px solid var(--gold-dark); border-left: 3px solid var(--gold);
+  padding: 10px 13px; border-radius: 3px; font-size: 12.5px; box-shadow: 0 8px 22px rgba(0,0,0,.6);
+  animation: wowtoast .2s ease-out;
+}
+.wow-toast.error { border-left-color: var(--danger); }
+.wow-toast.ok { border-left-color: var(--ok); }
+@keyframes wowtoast { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* 弹窗（人工闸门） */
-.m-modal-root { position: fixed; inset: 0; background: rgba(15, 25, 45, .45); display: grid; place-items: center; padding: 20px; z-index: 50; }
-.m-modal { background: var(--surface); border-radius: var(--radius); max-width: 480px; width: 100%; padding: 24px; box-shadow: 0 20px 60px rgba(15, 25, 45, .25); }
-.m-modal h3 { margin-bottom: 10px; }
-.m-modal p { color: var(--muted); font-size: 14px; }
-.m-modal .m-confirm-word { font-family: var(--mono); background: var(--warn-soft); color: var(--warn); padding: 2px 6px; border-radius: 4px; }
+/* ---------------- 页脚 ---------------- */
+.wow-footer { background: linear-gradient(180deg, #1a160f, #100d09); border-top: 2px solid var(--gold-line); }
+.wow-footer-inner { max-width: 1180px; margin: 0 auto; padding: 20px; font-size: 11.5px; color: var(--muted); }
+.wow-footer-links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
+.wow-footer-sbc { margin-bottom: 5px; }
 
-/* toast */
-.m-toast-root { position: fixed; right: 20px; bottom: 20px; z-index: 60; display: flex; flex-direction: column; gap: 8px; max-width: 380px; }
-.m-toast { background: var(--text); color: #fff; padding: 11px 14px; border-radius: var(--radius-sm); font-size: 13.5px; box-shadow: var(--shadow); animation: mtoast .2s ease-out; }
-.m-toast.error { background: var(--danger); }
-.m-toast.ok { background: var(--accent); }
-@keyframes mtoast { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
-/* 页脚 */
-.m-footer { background: var(--surface); border-top: 1px solid var(--border); }
-.m-footer-inner { max-width: var(--maxw); margin: 0 auto; padding: 22px 20px; font-size: 12.5px; color: var(--muted); }
-.m-footer-links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-.m-footer-sbc { margin-bottom: 6px; }
-.m-muted { color: var(--muted); }
-
-/* ---------- 响应式 ---------- */
-@media (max-width: 860px) {
-  .m-split { grid-template-columns: 1fr; }
-  .m-nav { order: 3; width: 100%; }
-  .m-topbar-inner { flex-wrap: wrap; gap: 12px; }
-  .m-hero { padding: 26px 22px; }
-  .m-hero h1 { font-size: 26px; }
+/* ---------------- 响应式 ---------------- */
+@media (max-width: 900px) {
+  .wow-split { grid-template-columns: 1fr; }
+  .wow-nav { order: 3; width: 100%; }
+  .wow-topbar-inner { flex-wrap: wrap; gap: 12px; }
+  .wow-hero { padding: 26px 22px; }
+  .wow-hero h1 { font-size: 27px; }
 }
 @media (max-width: 560px) {
-  .m-form-row { grid-template-columns: 1fr; }
-  .m-kv { grid-template-columns: 1fr; gap: 2px; }
-  .m-kv dt { margin-top: 6px; }
-  .m-hero-stats { gap: 18px; }
-  .m-user { display: none; }
+  .wow-form-row { grid-template-columns: 1fr; }
+  .wow-kv { grid-template-columns: 1fr; gap: 2px; }
+  .wow-kv dt { margin-top: 5px; }
+  .wow-hero-card { display: none; }
+  .wow-hero-stats { gap: 16px; }
 }

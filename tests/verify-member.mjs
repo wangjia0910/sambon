@@ -93,6 +93,28 @@ async function main() {
   check('VM-21 模型不直判（无自动结算后门 / 状态字段用 state）',
     !/model_decision:\s*['"]approve/.test(js) && /\.state/.test(js));
 
+  // 魔兽世界主题 / 游戏化呈现
+  const css = read(join(OUT, 'member.css'));
+  const mHtml = read(join(OUT, 'member.html'));
+  check('VM-22 稀有度系统（普通/精良/稀有/史诗/传说 + 卡片色带）',
+    /function rarityOf/.test(js) &&
+    ['common', 'uncommon', 'rare', 'epic', 'legendary'].every((k) =>
+      js.includes("'" + k + "'") && css.includes('.wow-contract.r-' + k)) &&
+    /r-\$\{r\.key\}/.test(js));
+  check('VM-23 猎人等级 / 称号 / 声望条（hunterLevel + xp-fill）',
+    /function hunterLevel/.test(js) && /function hunterTitleOf/.test(js) &&
+    /wow-xp-fill/.test(js) && /wow-xp-fill/.test(mHtml) && /\.wow-xp i/.test(css));
+  check('VM-24 赏金猎人榜（金银铜勋章 + 称号 + 双 tab）',
+    /赏金猎人榜/.test(js) && /Hunter Leaderboard/.test(js) &&
+    /function rankMedal/.test(js) && /wow-rank-no/.test(js) && /\.wow-rank-no\.r1/.test(css));
+  check('VM-25 金币赏金渲染（CSS 金币 + coin 帮助函数）',
+    /function coin/.test(js) && /wow-coin/.test(js) && /\.wow-coin/.test(css));
+  check('VM-26 公会主题骨架（徽记 / 角色卡 / 深色石板面板）',
+    /wow-crest/.test(mHtml) && /wow-hero-card/.test(mHtml) &&
+    /--bg:\s*#12100d/.test(css) && /--gold:/.test(css));
+  check('VM-27 主题资源零外链（无图片/字体 CDN，全部 CSS 绘制）',
+    !/https?:\/\//.test(css) && !/@import/.test(css) && !/url\(/.test(css));
+
   const pass = results.filter((r) => r.ok).length;
   const fail = results.length - pass;
   console.log(`\n=== 结果：PASS ${pass} / FAIL ${fail} / 共 ${results.length} 项 ===`);
