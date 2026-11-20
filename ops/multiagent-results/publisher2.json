@@ -1,0 +1,803 @@
+{
+  "agent": "publisher2",
+  "label": "publisher2",
+  "role": null,
+  "email": "pub_ma@test.dev",
+  "userId": "U-c20e322503cd50f64f074e5b",
+  "trace": [
+    {
+      "step": 1,
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:47:28.741Z"
+    },
+    {
+      "step": 2,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:47:28.749Z"
+    },
+    {
+      "step": 3,
+      "method": "POST",
+      "path": "/api/tasks/T-bd32737c9b5e441bd6b72313/verify",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:47:28.754Z"
+    },
+    {
+      "step": 4,
+      "method": "POST",
+      "path": "/api/tasks/T-71cd791030c17f60f36b7b49/dispute",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:47:28.758Z"
+    },
+    {
+      "step": 5,
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:47:28.760Z"
+    },
+    {
+      "step": 6,
+      "method": "GET",
+      "path": "/api/me/export",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:47:28.764Z"
+    },
+    {
+      "step": 7,
+      "method": "GET",
+      "path": "/api/ledger/U-c20e322503cd50f64f074e5b",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:47:28.767Z"
+    }
+  ],
+  "steps": 7,
+  "pass": 7,
+  "fail": 0,
+  "failedSteps": [],
+  "notes": [
+    "本次会话内 available_sbc 未变化（登录时 632.5 → 操作后 632.5）：验收结算是 escrow→接单人、争议是全额继续冻结，均不动发布方可用余额；相对注册基线 1000 已因发布冻结 367.5 变为 632.5",
+    "剧本检查项 7/7 通过"
+  ],
+  "checks": [
+    {
+      "name": "01 login publisher",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "userId": "U-c20e322503cd50f64f074e5b",
+        "role": "publisher",
+        "available_sbc": 632.5,
+        "csrf": true
+      }
+    },
+    {
+      "name": "02 find A+B SUBMITTED",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "maPub": [
+          {
+            "id": "T-71cd791030c17f60f36b7b49",
+            "title": "【MA-pub】争议测试任务 [MA-pub]",
+            "state": "SUBMITTED",
+            "bounty": 150
+          },
+          {
+            "id": "T-bd32737c9b5e441bd6b72313",
+            "title": "【MA-pub】社区海报设计 [MA-pub]",
+            "state": "SUBMITTED",
+            "bounty": 200
+          }
+        ],
+        "A": {
+          "id": "T-bd32737c9b5e441bd6b72313",
+          "state": "SUBMITTED",
+          "bounty": 200
+        },
+        "B": {
+          "id": "T-71cd791030c17f60f36b7b49",
+          "state": "SUBMITTED",
+          "bounty": 150
+        }
+      }
+    },
+    {
+      "name": "03 verify A settlement",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "state": "SETTLED",
+        "bounty": 200,
+        "service_fee": 10,
+        "quality_bonus": {
+          "rule_version": "sbc-rule-v1.0",
+          "applied": true,
+          "amount": 4,
+          "cap": 50,
+          "capped": false
+        },
+        "solver_credit": 204,
+        "expected": {
+          "state": "SETTLED",
+          "bounty": 200,
+          "service_fee": 10,
+          "quality_bonus_amount": 4,
+          "solver_credit": 204
+        }
+      }
+    },
+    {
+      "name": "04 dispute B open",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "state": "DISPUTED",
+        "transferred": false,
+        "model_decision": null,
+        "escrow_total": 157.5,
+        "expected": {
+          "state": "DISPUTED",
+          "transferred": false,
+          "model_decision": null
+        }
+      }
+    },
+    {
+      "name": "05 auth/me balance",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "baseline": 1000,
+        "balanceAtLogin": 632.5,
+        "balanceAfter": 632.5,
+        "changedFromBaseline": true,
+        "changedInSession": false,
+        "expectedAfterFreeze": 632.5
+      }
+    },
+    {
+      "name": "06 GET /api/me/export",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "tasks": 2,
+        "consents": 0,
+        "profile": true,
+        "ledger": true,
+        "notice": "GDPR Art.15 / Art.20 数据可携权导出；不含其他用户的个人数据"
+      }
+    },
+    {
+      "name": "07 ledger balanced",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "balanced": true,
+        "total_delta": 0,
+        "anchor_id": "ANCHOR-b8ff20bafe344299",
+        "pii_on_chain": false,
+        "entries": 14
+      }
+    }
+  ],
+  "checkPass": 7,
+  "checkFail": 0,
+  "taskA": "T-bd32737c9b5e441bd6b72313",
+  "taskB": "T-71cd791030c17f60f36b7b49",
+  "settlement": {
+    "rule_version": "sbc-rule-v1.0",
+    "trigger": "verify",
+    "auto_verified": false,
+    "bounty": 200,
+    "service_fee": 10,
+    "quality_bonus": {
+      "rule_version": "sbc-rule-v1.0",
+      "applied": true,
+      "amount": 4,
+      "cap": 50,
+      "capped": false
+    },
+    "solver_credit": 204,
+    "note": "赏金转付接单人、服务费入平台收入；模型不参与结算裁定"
+  },
+  "disputedId": "T-71cd791030c17f60f36b7b49",
+  "verifyRaw": {
+    "status": 200,
+    "ok": true,
+    "error": null,
+    "data": {
+      "task": {
+        "task_id": "T-bd32737c9b5e441bd6b72313",
+        "state": "SETTLED",
+        "publisher_id": "U-c20e322503cd50f64f074e5b",
+        "solver_id": "U-749404c6c0848be9154e383b",
+        "title": "【MA-pub】社区海报设计 [MA-pub]",
+        "description": "为社区活动设计宣传海报，输出 PNG 源文件，风格简洁明快。",
+        "category": "design",
+        "bounty": 200,
+        "service_fee": 10,
+        "frozen_total": 210,
+        "acceptance_criteria": "提供PNG源文件",
+        "virtual_contact": "虚拟号 170****5093",
+        "online": true,
+        "radius_km": 10,
+        "required_skills": [],
+        "deadline": "2026-11-23T08:36:54.636Z",
+        "deadline_hours": 72,
+        "reject_count": 0,
+        "submit_count": 1,
+        "escrowed": true,
+        "structure": {
+          "degraded": true,
+          "adapter_version": "llm-adapter-rule-fallback-v1.0",
+          "category": "design",
+          "structured": {
+            "标的": "【MA-pub】社区海报设计 [MA-pub]",
+            "线上或线下": "线上",
+            "工作量估计": "中等",
+            "难度系数": 0.3,
+            "验收标准明确度": "已填写"
+          },
+          "quality_score": 1,
+          "structure_completeness": 1,
+          "note": "规则抽取兜底；真实模型接入后此字段可版本化替换，输出仅作特征，不决定结算/推送名单"
+        },
+        "compliance": {
+          "pass": true,
+          "hits": [],
+          "virtual_number": "虚拟号 170****5061",
+          "checked_at_rule": "compliance-precheck-v1.0",
+          "note": "未命中违禁词，进入人工抽检口径"
+        },
+        "settlement": {
+          "rule_version": "sbc-rule-v1.0",
+          "trigger": "verify",
+          "auto_verified": false,
+          "bounty": 200,
+          "service_fee": 10,
+          "quality_bonus": {
+            "rule_version": "sbc-rule-v1.0",
+            "applied": true,
+            "amount": 4,
+            "cap": 50,
+            "capped": false
+          },
+          "solver_credit": 204,
+          "note": "赏金转付接单人、服务费入平台收入；模型不参与结算裁定"
+        },
+        "dispute_reason": null,
+        "created_at": "2026-11-20T08:36:54.636Z",
+        "result_preview": "演示成果：已完成海报设计，联系 [已脱敏] 证件 [已脱敏]",
+        "result_pii_redacted": true
+      },
+      "settlement": {
+        "rule_version": "sbc-rule-v1.0",
+        "trigger": "verify",
+        "auto_verified": false,
+        "bounty": 200,
+        "service_fee": 10,
+        "quality_bonus": {
+          "rule_version": "sbc-rule-v1.0",
+          "applied": true,
+          "amount": 4,
+          "cap": 50,
+          "capped": false
+        },
+        "solver_credit": 204,
+        "note": "赏金转付接单人、服务费入平台收入；模型不参与结算裁定"
+      }
+    }
+  },
+  "disputeRaw": {
+    "status": 200,
+    "ok": true,
+    "error": null,
+    "data": {
+      "task": {
+        "task_id": "T-71cd791030c17f60f36b7b49",
+        "state": "DISPUTED",
+        "publisher_id": "U-c20e322503cd50f64f074e5b",
+        "solver_id": "U-749404c6c0848be9154e383b",
+        "title": "【MA-pub】争议测试任务 [MA-pub]",
+        "description": "制作一份活动说明图，用于后续争议流程测试。",
+        "category": "design",
+        "bounty": 150,
+        "service_fee": 7.5,
+        "frozen_total": 157.5,
+        "acceptance_criteria": "提供清晰可读的说明图",
+        "virtual_contact": "虚拟号 170****5093",
+        "online": true,
+        "radius_km": 10,
+        "required_skills": [],
+        "deadline": "2026-11-23T08:36:54.641Z",
+        "deadline_hours": 72,
+        "reject_count": 0,
+        "submit_count": 1,
+        "escrowed": true,
+        "structure": {
+          "degraded": true,
+          "adapter_version": "llm-adapter-rule-fallback-v1.0",
+          "category": "design",
+          "structured": {
+            "标的": "【MA-pub】争议测试任务 [MA-pub]",
+            "线上或线下": "线上",
+            "工作量估计": "中等",
+            "难度系数": 0.3,
+            "验收标准明确度": "已填写"
+          },
+          "quality_score": 1,
+          "structure_completeness": 1,
+          "note": "规则抽取兜底；真实模型接入后此字段可版本化替换，输出仅作特征，不决定结算/推送名单"
+        },
+        "compliance": {
+          "pass": true,
+          "hits": [],
+          "virtual_number": "虚拟号 170****5061",
+          "checked_at_rule": "compliance-precheck-v1.0",
+          "note": "未命中违禁词，进入人工抽检口径"
+        },
+        "settlement": null,
+        "dispute_reason": "成果与验收标准不符",
+        "created_at": "2026-11-20T08:36:54.641Z",
+        "result_preview": "演示成果：已完成海报设计，联系 [已脱敏] 证件 [已脱敏]（争议测试用）",
+        "result_pii_redacted": true
+      },
+      "escrow_total": 157.5,
+      "transferred": false,
+      "arbitration": "人工裁定（模型 decision=null，仅提供材料摘要）",
+      "model_decision": null,
+      "llm_summary": {
+        "degraded": true,
+        "adapter_version": "llm-adapter-rule-fallback-v1.0",
+        "task_id": "T-71cd791030c17f60f36b7b49",
+        "summary": "规则化摘要：已汇总提交成果与验收记录，未做事实真伪判定。",
+        "facts": [
+          {
+            "key": "提交次数",
+            "value": 1
+          },
+          {
+            "key": "驳回次数",
+            "value": 0
+          },
+          {
+            "key": "赏金托管状态",
+            "value": "全额托管，裁定前不转付"
+          }
+        ],
+        "suggested_actions": [
+          "人工复核成果与验收标准",
+          "按裁定结果分账或全额退回"
+        ],
+        "decision": null,
+        "note": "争议裁定必须由人工完成；模型输出仅为材料摘要，留痕可审计"
+      }
+    }
+  },
+  "exportRaw": {
+    "status": 200,
+    "ok": true,
+    "error": null,
+    "data": {
+      "exported_at": "2026-11-20T08:47:28.764Z",
+      "notice": "GDPR Art.15 / Art.20 数据可携权导出；不含其他用户的个人数据",
+      "profile": {
+        "user_id": "U-c20e322503cd50f64f074e5b",
+        "email": "pub_ma@test.dev",
+        "display_name": "MA发布方",
+        "role": "publisher",
+        "available_sbc": 632.5,
+        "credit_score": 100,
+        "personalized_enabled": false,
+        "email_verified": false,
+        "locale": "en",
+        "gpc_enabled": false,
+        "created_at": "2026-11-20T08:36:54.618Z"
+      },
+      "tasks": [
+        {
+          "task_id": "T-bd32737c9b5e441bd6b72313",
+          "state": "SETTLED",
+          "publisher_id": "U-c20e322503cd50f64f074e5b",
+          "solver_id": "U-749404c6c0848be9154e383b",
+          "title": "【MA-pub】社区海报设计 [MA-pub]",
+          "description": "为社区活动设计宣传海报，输出 PNG 源文件，风格简洁明快。",
+          "category": "design",
+          "bounty": 200,
+          "service_fee": 10,
+          "frozen_total": 210,
+          "acceptance_criteria": "提供PNG源文件",
+          "virtual_contact": "虚拟号 170****5093",
+          "online": true,
+          "radius_km": 10,
+          "required_skills": [],
+          "deadline": "2026-11-23T08:36:54.636Z",
+          "deadline_hours": 72,
+          "reject_count": 0,
+          "submit_count": 1,
+          "escrowed": true,
+          "structure": {
+            "degraded": true,
+            "adapter_version": "llm-adapter-rule-fallback-v1.0",
+            "category": "design",
+            "structured": {
+              "标的": "【MA-pub】社区海报设计 [MA-pub]",
+              "线上或线下": "线上",
+              "工作量估计": "中等",
+              "难度系数": 0.3,
+              "验收标准明确度": "已填写"
+            },
+            "quality_score": 1,
+            "structure_completeness": 1,
+            "note": "规则抽取兜底；真实模型接入后此字段可版本化替换，输出仅作特征，不决定结算/推送名单"
+          },
+          "compliance": {
+            "pass": true,
+            "hits": [],
+            "virtual_number": "虚拟号 170****5061",
+            "checked_at_rule": "compliance-precheck-v1.0",
+            "note": "未命中违禁词，进入人工抽检口径"
+          },
+          "settlement": {
+            "rule_version": "sbc-rule-v1.0",
+            "trigger": "verify",
+            "auto_verified": false,
+            "bounty": 200,
+            "service_fee": 10,
+            "quality_bonus": {
+              "rule_version": "sbc-rule-v1.0",
+              "applied": true,
+              "amount": 4,
+              "cap": 50,
+              "capped": false
+            },
+            "solver_credit": 204,
+            "note": "赏金转付接单人、服务费入平台收入；模型不参与结算裁定"
+          },
+          "dispute_reason": null,
+          "created_at": "2026-11-20T08:36:54.636Z",
+          "result_preview": "演示成果：已完成海报设计，联系 [已脱敏] 证件 [已脱敏]",
+          "result_pii_redacted": true
+        },
+        {
+          "task_id": "T-71cd791030c17f60f36b7b49",
+          "state": "DISPUTED",
+          "publisher_id": "U-c20e322503cd50f64f074e5b",
+          "solver_id": "U-749404c6c0848be9154e383b",
+          "title": "【MA-pub】争议测试任务 [MA-pub]",
+          "description": "制作一份活动说明图，用于后续争议流程测试。",
+          "category": "design",
+          "bounty": 150,
+          "service_fee": 7.5,
+          "frozen_total": 157.5,
+          "acceptance_criteria": "提供清晰可读的说明图",
+          "virtual_contact": "虚拟号 170****5093",
+          "online": true,
+          "radius_km": 10,
+          "required_skills": [],
+          "deadline": "2026-11-23T08:36:54.641Z",
+          "deadline_hours": 72,
+          "reject_count": 0,
+          "submit_count": 1,
+          "escrowed": true,
+          "structure": {
+            "degraded": true,
+            "adapter_version": "llm-adapter-rule-fallback-v1.0",
+            "category": "design",
+            "structured": {
+              "标的": "【MA-pub】争议测试任务 [MA-pub]",
+              "线上或线下": "线上",
+              "工作量估计": "中等",
+              "难度系数": 0.3,
+              "验收标准明确度": "已填写"
+            },
+            "quality_score": 1,
+            "structure_completeness": 1,
+            "note": "规则抽取兜底；真实模型接入后此字段可版本化替换，输出仅作特征，不决定结算/推送名单"
+          },
+          "compliance": {
+            "pass": true,
+            "hits": [],
+            "virtual_number": "虚拟号 170****5061",
+            "checked_at_rule": "compliance-precheck-v1.0",
+            "note": "未命中违禁词，进入人工抽检口径"
+          },
+          "settlement": null,
+          "dispute_reason": "成果与验收标准不符",
+          "created_at": "2026-11-20T08:36:54.641Z",
+          "result_preview": "演示成果：已完成海报设计，联系 [已脱敏] 证件 [已脱敏]（争议测试用）",
+          "result_pii_redacted": true
+        }
+      ],
+      "ledger": {
+        "entries": [
+          {
+            "seq": 2,
+            "event_id": "EVT-068f26d3daa369a6ca963414",
+            "task_id": null,
+            "account": "user:U-c20e322503cd50f64f074e5b",
+            "delta": 1000,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "grant:新账号平台内贡献积分初始额度(生态激励池)",
+            "created_at": "2026-11-20T08:36:54.618Z",
+            "prev_hash": "8fd797b057918d64e36366e791a293cf93733f3c3bcabcde7724e40a758eb72e",
+            "hash": "741dcfb93939300dbbd1c0a8a841aede63a70e51caab6a4fbe8320a197c92601"
+          },
+          {
+            "seq": 3,
+            "event_id": "EVT-MA-review-1795164102357-rzgtbw5",
+            "task_id": "T-bd32737c9b5e441bd6b72313",
+            "account": "user:U-c20e322503cd50f64f074e5b",
+            "delta": -210,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "freeze:审核通过冻结赏金+5%服务费",
+            "created_at": "2026-11-20T08:41:42.360Z",
+            "prev_hash": "741dcfb93939300dbbd1c0a8a841aede63a70e51caab6a4fbe8320a197c92601",
+            "hash": "7003ea9b5d2590decf9efe59982ef25d766efb4720ac63527ab44b70d825c6e8"
+          },
+          {
+            "seq": 4,
+            "event_id": "EVT-MA-review-1795164102357-rzgtbw5",
+            "task_id": "T-bd32737c9b5e441bd6b72313",
+            "account": "subject:frozen",
+            "delta": 210,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "freeze:审核通过冻结赏金+5%服务费",
+            "created_at": "2026-11-20T08:41:42.360Z",
+            "prev_hash": "7003ea9b5d2590decf9efe59982ef25d766efb4720ac63527ab44b70d825c6e8",
+            "hash": "abfe8eb94f26d8373049b05185ee2e06de67897707a8166421f017b5cf6ff055"
+          },
+          {
+            "seq": 5,
+            "event_id": "EVT-MA-review-1795164102362-pmgibq0",
+            "task_id": "T-71cd791030c17f60f36b7b49",
+            "account": "user:U-c20e322503cd50f64f074e5b",
+            "delta": -157.5,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "freeze:审核通过冻结赏金+5%服务费",
+            "created_at": "2026-11-20T08:41:42.365Z",
+            "prev_hash": "abfe8eb94f26d8373049b05185ee2e06de67897707a8166421f017b5cf6ff055",
+            "hash": "13ae366823e7b5f7d3465648cd2f8aa474eb0c9d986c622b12d94ad900a7e77f"
+          },
+          {
+            "seq": 6,
+            "event_id": "EVT-MA-review-1795164102362-pmgibq0",
+            "task_id": "T-71cd791030c17f60f36b7b49",
+            "account": "subject:frozen",
+            "delta": 157.5,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "freeze:审核通过冻结赏金+5%服务费",
+            "created_at": "2026-11-20T08:41:42.365Z",
+            "prev_hash": "13ae366823e7b5f7d3465648cd2f8aa474eb0c9d986c622b12d94ad900a7e77f",
+            "hash": "a56e8fbc8da369612cdf59328cea40763091cd043b43a4aa6a8fa7c183e6687e"
+          },
+          {
+            "seq": 15,
+            "event_id": "EVT-MA-acceptA-1795164342329-47nv2ag",
+            "task_id": "T-bd32737c9b5e441bd6b72313",
+            "account": "subject:frozen",
+            "delta": -210,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "escrow:接单全额转托管(裁定前不转付)",
+            "created_at": "2026-11-20T08:45:42.331Z",
+            "prev_hash": "1e9ee0fb402eff61260561978761f415545dfaa16ccaa421e0bc593b0c19ebad",
+            "hash": "a4122e43c0cdafa416afb3c7f070999862d7ae97d7524b2b1d3267ce7d504d30"
+          },
+          {
+            "seq": 16,
+            "event_id": "EVT-MA-acceptA-1795164342329-47nv2ag",
+            "task_id": "T-bd32737c9b5e441bd6b72313",
+            "account": "subject:escrow",
+            "delta": 210,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "escrow:接单全额转托管(裁定前不转付)",
+            "created_at": "2026-11-20T08:45:42.331Z",
+            "prev_hash": "a4122e43c0cdafa416afb3c7f070999862d7ae97d7524b2b1d3267ce7d504d30",
+            "hash": "715a668077fb0983bf00c839034cff136ebc486782d87ddada75162800b168b6"
+          },
+          {
+            "seq": 17,
+            "event_id": "EVT-MA-acceptB-1795164342339-h4283nb",
+            "task_id": "T-71cd791030c17f60f36b7b49",
+            "account": "subject:frozen",
+            "delta": -157.5,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "escrow:接单全额转托管(裁定前不转付)",
+            "created_at": "2026-11-20T08:45:42.340Z",
+            "prev_hash": "715a668077fb0983bf00c839034cff136ebc486782d87ddada75162800b168b6",
+            "hash": "4beebd3bc53e686e05b3f36a188b24cf6bcd6983b4985bf2a699cce6d04f2256"
+          },
+          {
+            "seq": 18,
+            "event_id": "EVT-MA-acceptB-1795164342339-h4283nb",
+            "task_id": "T-71cd791030c17f60f36b7b49",
+            "account": "subject:escrow",
+            "delta": 157.5,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "escrow:接单全额转托管(裁定前不转付)",
+            "created_at": "2026-11-20T08:45:42.340Z",
+            "prev_hash": "4beebd3bc53e686e05b3f36a188b24cf6bcd6983b4985bf2a699cce6d04f2256",
+            "hash": "df53e6d83fd149bfb68701a1d5c1c71be59c2987b10a17db3b4bfb3c358fdbc9"
+          },
+          {
+            "seq": 21,
+            "event_id": "EVT-MA-verifyA2-1795164448750-slfc348",
+            "task_id": "T-bd32737c9b5e441bd6b72313",
+            "account": "subject:escrow",
+            "delta": -210,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "settle:verify结算(赏金转付+服务费+高质量奖励)",
+            "created_at": "2026-11-20T08:47:28.754Z",
+            "prev_hash": "95cc88032aefd4a5e7372a0cf06276d7d42c8c58e166b3ab24594f86ec5d00d1",
+            "hash": "56def911c2772e8168b653de9e0efc2c73097b49fe823c2da8f1350b26dd2afd"
+          },
+          {
+            "seq": 22,
+            "event_id": "EVT-MA-verifyA2-1795164448750-slfc348",
+            "task_id": "T-bd32737c9b5e441bd6b72313",
+            "account": "user:U-749404c6c0848be9154e383b",
+            "delta": 200,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "settle:verify结算(赏金转付+服务费+高质量奖励)",
+            "created_at": "2026-11-20T08:47:28.754Z",
+            "prev_hash": "56def911c2772e8168b653de9e0efc2c73097b49fe823c2da8f1350b26dd2afd",
+            "hash": "2c5712493de65883a124e3103fc8b8d9c2c3e6e7c0c2055caf7271a9ad2e4cc5"
+          },
+          {
+            "seq": 23,
+            "event_id": "EVT-MA-verifyA2-1795164448750-slfc348",
+            "task_id": "T-bd32737c9b5e441bd6b72313",
+            "account": "subject:platform_revenue",
+            "delta": 10,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "settle:verify结算(赏金转付+服务费+高质量奖励)",
+            "created_at": "2026-11-20T08:47:28.754Z",
+            "prev_hash": "2c5712493de65883a124e3103fc8b8d9c2c3e6e7c0c2055caf7271a9ad2e4cc5",
+            "hash": "08d9ff899c202ec00cd5c03334bbfcef64b1f32583793cfc16a5d2ddd65f3d5b"
+          },
+          {
+            "seq": 24,
+            "event_id": "EVT-MA-verifyA2-1795164448750-slfc348",
+            "task_id": "T-bd32737c9b5e441bd6b72313",
+            "account": "subject:eco_incentive",
+            "delta": -4,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "settle:verify结算(赏金转付+服务费+高质量奖励)",
+            "created_at": "2026-11-20T08:47:28.754Z",
+            "prev_hash": "08d9ff899c202ec00cd5c03334bbfcef64b1f32583793cfc16a5d2ddd65f3d5b",
+            "hash": "7e4bf0de0e9cada4ae2badd4e30701df581ebe6b4b80fe380a497d88a31c901b"
+          },
+          {
+            "seq": 25,
+            "event_id": "EVT-MA-verifyA2-1795164448750-slfc348",
+            "task_id": "T-bd32737c9b5e441bd6b72313",
+            "account": "user:U-749404c6c0848be9154e383b",
+            "delta": 4,
+            "rule_version": "sbc-rule-v1.0",
+            "memo": "settle:verify结算(赏金转付+服务费+高质量奖励)",
+            "created_at": "2026-11-20T08:47:28.754Z",
+            "prev_hash": "7e4bf0de0e9cada4ae2badd4e30701df581ebe6b4b80fe380a497d88a31c901b",
+            "hash": "7a53d5e0e4224c0a1b9ba37e8603e6caf54b781b2c964d49c046f91891de9afb"
+          }
+        ],
+        "balance_check": {
+          "balanced": true,
+          "total_delta": 0,
+          "note": "五科目守恒：每一笔用户入账必对应一个平台科目出账，全表 delta 之和恒为 0"
+        },
+        "anchor": {
+          "anchor_id": "ANCHOR-b8ff20bafe344299",
+          "merkle_root": "3708479e926f8bc5977c2f8dcd0190b9464ee97410a97aca41354d0e7539ac07",
+          "leaf_count": 25,
+          "pii_on_chain": false,
+          "task_body_on_chain": false,
+          "note": "本地哈希链 / Merkle 摘要，未接公链；零 PII、零任务正文"
+        }
+      },
+      "consents": [],
+      "reports": []
+    }
+  },
+  "login": {
+    "status": 200,
+    "error": null,
+    "userId": "U-c20e322503cd50f64f074e5b",
+    "available_sbc": 632.5
+  },
+  "tasksFound": {
+    "status": 200,
+    "A": {
+      "id": "T-bd32737c9b5e441bd6b72313",
+      "title": "【MA-pub】社区海报设计 [MA-pub]",
+      "state": "SUBMITTED",
+      "bounty": 200
+    },
+    "B": {
+      "id": "T-71cd791030c17f60f36b7b49",
+      "title": "【MA-pub】争议测试任务 [MA-pub]",
+      "state": "SUBMITTED",
+      "bounty": 150
+    }
+  },
+  "verifyA": {
+    "status": 200,
+    "error": null,
+    "state": "SETTLED",
+    "settlement": {
+      "rule_version": "sbc-rule-v1.0",
+      "trigger": "verify",
+      "auto_verified": false,
+      "bounty": 200,
+      "service_fee": 10,
+      "quality_bonus": {
+        "rule_version": "sbc-rule-v1.0",
+        "applied": true,
+        "amount": 4,
+        "cap": 50,
+        "capped": false
+      },
+      "solver_credit": 204,
+      "note": "赏金转付接单人、服务费入平台收入；模型不参与结算裁定"
+    }
+  },
+  "disputeB": {
+    "status": 200,
+    "error": null,
+    "state": "DISPUTED",
+    "transferred": false,
+    "model_decision": null,
+    "escrow_total": 157.5,
+    "arbitration": "人工裁定（模型 decision=null，仅提供材料摘要）"
+  },
+  "me": {
+    "status": 200,
+    "baseline": 1000,
+    "balanceAtLogin": 632.5,
+    "balanceAfter": 632.5,
+    "changedFromBaseline": true,
+    "changedInSession": false
+  },
+  "export": {
+    "status": 200,
+    "tasks": 2,
+    "consents": 0,
+    "profile": true,
+    "ledger": true,
+    "exported_at": "2026-11-20T08:47:28.764Z"
+  },
+  "ledger": {
+    "status": 200,
+    "balanced": true,
+    "total_delta": 0,
+    "anchor_id": "ANCHOR-b8ff20bafe344299",
+    "merkle_root": "3708479e926f8bc5977c2f8dcd0190b9464ee97410a97aca41354d0e7539ac07",
+    "pii_on_chain": false,
+    "entries": 14
+  }
+}

@@ -1,0 +1,948 @@
+{
+  "agent": "admin2",
+  "label": "admin2",
+  "role": null,
+  "email": "admin_ma@test.dev",
+  "userId": "U-3c3e604a6b794c3305054682",
+  "trace": [
+    {
+      "step": 1,
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.348Z"
+    },
+    {
+      "step": 2,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.357Z"
+    },
+    {
+      "step": 3,
+      "method": "POST",
+      "path": "/api/tasks/T-bd32737c9b5e441bd6b72313/review",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.362Z"
+    },
+    {
+      "step": 4,
+      "method": "POST",
+      "path": "/api/tasks/T-71cd791030c17f60f36b7b49/review",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.367Z"
+    },
+    {
+      "step": 5,
+      "method": "GET",
+      "path": "/api/tasks",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.370Z"
+    },
+    {
+      "step": 6,
+      "method": "POST",
+      "path": "/api/tasks/T-71cd791030c17f60f36b7b49/dispatch",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.376Z"
+    },
+    {
+      "step": 7,
+      "method": "POST",
+      "path": "/api/tasks/T-bd32737c9b5e441bd6b72313/dispatch",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.381Z"
+    },
+    {
+      "step": 8,
+      "method": "GET",
+      "path": "/api/admin/metrics",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.386Z"
+    },
+    {
+      "step": 9,
+      "method": "GET",
+      "path": "/api/admin/audit",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.390Z"
+    },
+    {
+      "step": 10,
+      "method": "GET",
+      "path": "/api/admin/risk",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.393Z"
+    },
+    {
+      "step": 11,
+      "method": "GET",
+      "path": "/api/admin/backup",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.407Z"
+    },
+    {
+      "step": 12,
+      "method": "GET",
+      "path": "/api/admin/ops",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.409Z"
+    },
+    {
+      "step": 13,
+      "method": "POST",
+      "path": "/api/admin/anchor",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.411Z"
+    },
+    {
+      "step": 14,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:42.413Z"
+    },
+    {
+      "step": 15,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:43.921Z"
+    },
+    {
+      "step": 16,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:45.423Z"
+    },
+    {
+      "step": 17,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:46.936Z"
+    },
+    {
+      "step": 18,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:48.439Z"
+    },
+    {
+      "step": 19,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:49.947Z"
+    },
+    {
+      "step": 20,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:51.462Z"
+    },
+    {
+      "step": 21,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:52.973Z"
+    },
+    {
+      "step": 22,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:54.485Z"
+    },
+    {
+      "step": 23,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:56.002Z"
+    },
+    {
+      "step": 24,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:57.509Z"
+    },
+    {
+      "step": 25,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:41:59.021Z"
+    },
+    {
+      "step": 26,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:00.542Z"
+    },
+    {
+      "step": 27,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:02.045Z"
+    },
+    {
+      "step": 28,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:03.558Z"
+    },
+    {
+      "step": 29,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:05.077Z"
+    },
+    {
+      "step": 30,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:06.582Z"
+    },
+    {
+      "step": 31,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:08.095Z"
+    },
+    {
+      "step": 32,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:09.604Z"
+    },
+    {
+      "step": 33,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:11.122Z"
+    },
+    {
+      "step": 34,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:12.634Z"
+    },
+    {
+      "step": 35,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:14.142Z"
+    },
+    {
+      "step": 36,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:15.658Z"
+    },
+    {
+      "step": 37,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:17.179Z"
+    },
+    {
+      "step": 38,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:18.691Z"
+    },
+    {
+      "step": 39,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:20.200Z"
+    },
+    {
+      "step": 40,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:21.715Z"
+    },
+    {
+      "step": 41,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:23.219Z"
+    },
+    {
+      "step": 42,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:24.724Z"
+    },
+    {
+      "step": 43,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:26.244Z"
+    },
+    {
+      "step": 44,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:27.761Z"
+    },
+    {
+      "step": 45,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:29.276Z"
+    },
+    {
+      "step": 46,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:30.785Z"
+    },
+    {
+      "step": 47,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:32.295Z"
+    },
+    {
+      "step": 48,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:33.808Z"
+    },
+    {
+      "step": 49,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:35.312Z"
+    },
+    {
+      "step": 50,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:36.826Z"
+    },
+    {
+      "step": 51,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:38.328Z"
+    },
+    {
+      "step": 52,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:39.830Z"
+    },
+    {
+      "step": 53,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:41.332Z"
+    },
+    {
+      "step": 54,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:42.839Z"
+    },
+    {
+      "step": 55,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:44.352Z"
+    },
+    {
+      "step": 56,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:45.854Z"
+    },
+    {
+      "step": 57,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:47.360Z"
+    },
+    {
+      "step": 58,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:48.869Z"
+    },
+    {
+      "step": 59,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:50.378Z"
+    },
+    {
+      "step": 60,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:51.897Z"
+    },
+    {
+      "step": 61,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:53.410Z"
+    },
+    {
+      "step": 62,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:54.924Z"
+    },
+    {
+      "step": 63,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:56.429Z"
+    },
+    {
+      "step": 64,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:57.947Z"
+    },
+    {
+      "step": 65,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:42:59.457Z"
+    },
+    {
+      "step": 66,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:43:00.972Z"
+    },
+    {
+      "step": 67,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:43:02.474Z"
+    },
+    {
+      "step": 68,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:43:03.992Z"
+    },
+    {
+      "step": 69,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:43:05.496Z"
+    },
+    {
+      "step": 70,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:43:07.002Z"
+    },
+    {
+      "step": 71,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:43:08.511Z"
+    },
+    {
+      "step": 72,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:43:10.021Z"
+    },
+    {
+      "step": 73,
+      "method": "GET",
+      "path": "/api/admin/queue",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:43:11.542Z"
+    },
+    {
+      "step": 74,
+      "method": "GET",
+      "path": "/api/events",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:43:13.053Z"
+    }
+  ],
+  "steps": 74,
+  "pass": 74,
+  "fail": 0,
+  "failedSteps": [],
+  "notes": [
+    "[FAIL] 07 queue DISPUTED [MA-pub] → {\"done\":false,\"timeout\":true,\"matched\":0,\"ids\":[]}",
+    "等待 90s 未出现 MA-pub DISPUTED 任务（发布方未发起争议或接单人未提交），未裁定，不伪造",
+    "剧本检查项 14/15 通过"
+  ],
+  "checks": [
+    {
+      "name": "01 login admin",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "csrf": true,
+        "userId": "U-3c3e604a6b794c3305054682",
+        "bootstrapped": false
+      }
+    },
+    {
+      "name": "02 queue pending_review [MA-pub]",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "done": true,
+        "timeout": false,
+        "matched": 2,
+        "ids": [
+          "T-bd32737c9b5e441bd6b72313",
+          "T-71cd791030c17f60f36b7b49"
+        ]
+      }
+    },
+    {
+      "name": "03 review T-bd32737c9b5e441bd6b72313",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "state": "PUBLISHED",
+        "error": null
+      }
+    },
+    {
+      "name": "03 review T-71cd791030c17f60f36b7b49",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "state": "PUBLISHED",
+        "error": null
+      }
+    },
+    {
+      "name": "04 tasks PUBLISHED [MA-pub]",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "done": true,
+        "timeout": false,
+        "matched": 2,
+        "ids": [
+          "T-71cd791030c17f60f36b7b49",
+          "T-bd32737c9b5e441bd6b72313"
+        ]
+      }
+    },
+    {
+      "name": "05 dispatch T-71cd791030c17f60f36b7b49",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "dispatch_id": "D-c254cfa0c2e75ec4f03ae594",
+        "error": null
+      }
+    },
+    {
+      "name": "05 dispatch T-bd32737c9b5e441bd6b72313",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "dispatch_id": "D-65fb3eef2bab8213929fce6e",
+        "error": null
+      }
+    },
+    {
+      "name": "06 GET /api/admin/metrics",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "06 GET /api/admin/audit",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "06 GET /api/admin/risk",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "06 GET /api/admin/backup",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "06 GET /api/admin/ops",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "06 POST /api/admin/anchor",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null
+      }
+    },
+    {
+      "name": "07 queue DISPUTED [MA-pub]",
+      "pass": false,
+      "detail": {
+        "done": false,
+        "timeout": true,
+        "matched": 0,
+        "ids": []
+      }
+    },
+    {
+      "name": "08 GET /api/events",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null
+      }
+    }
+  ],
+  "checkPass": 14,
+  "checkFail": 1,
+  "reviewedIds": [
+    {
+      "id": "T-bd32737c9b5e441bd6b72313",
+      "status": 200,
+      "state": "PUBLISHED",
+      "pass": true
+    },
+    {
+      "id": "T-71cd791030c17f60f36b7b49",
+      "status": 200,
+      "state": "PUBLISHED",
+      "pass": true
+    }
+  ],
+  "pushedIds": [
+    {
+      "id": "T-71cd791030c17f60f36b7b49",
+      "status": 200,
+      "dispatch_id": "D-c254cfa0c2e75ec4f03ae594",
+      "pass": true
+    },
+    {
+      "id": "T-bd32737c9b5e441bd6b72313",
+      "status": 200,
+      "dispatch_id": "D-65fb3eef2bab8213929fce6e",
+      "pass": true
+    }
+  ],
+  "resolvedId": null,
+  "login": {
+    "status": 200,
+    "error": null,
+    "userId": "U-3c3e604a6b794c3305054682",
+    "role": null,
+    "bootstrapped": false
+  },
+  "pendingReview": {
+    "matched": 2,
+    "ids": [
+      "T-bd32737c9b5e441bd6b72313",
+      "T-71cd791030c17f60f36b7b49"
+    ]
+  },
+  "reviewed": [
+    {
+      "id": "T-bd32737c9b5e441bd6b72313",
+      "status": 200,
+      "state": "PUBLISHED",
+      "pass": true
+    },
+    {
+      "id": "T-71cd791030c17f60f36b7b49",
+      "status": 200,
+      "state": "PUBLISHED",
+      "pass": true
+    }
+  ],
+  "published": {
+    "matched": 2,
+    "ids": [
+      "T-71cd791030c17f60f36b7b49",
+      "T-bd32737c9b5e441bd6b72313"
+    ]
+  },
+  "pushed": [
+    {
+      "id": "T-71cd791030c17f60f36b7b49",
+      "status": 200,
+      "dispatch_id": "D-c254cfa0c2e75ec4f03ae594",
+      "pass": true
+    },
+    {
+      "id": "T-bd32737c9b5e441bd6b72313",
+      "status": 200,
+      "dispatch_id": "D-65fb3eef2bab8213929fce6e",
+      "pass": true
+    }
+  ],
+  "opsEndpoints": {
+    "/api/admin/metrics": 200,
+    "/api/admin/audit": 200,
+    "/api/admin/risk": 200,
+    "/api/admin/backup": 200,
+    "/api/admin/ops": 200
+  },
+  "anchor": {
+    "status": 200,
+    "error": null,
+    "data": {
+      "merkle_root": "5d8db5e95a36f1df914179ebe267c6eda28fe82214a5c56bba69ef2e2582cf30",
+      "entry_count": 6,
+      "anchored_at": "2026-11-20T08:41:42.411Z",
+      "balanced": true,
+      "hash_chain_valid": true,
+      "pii_on_chain": false,
+      "note": "本地哈希摘要，未接任何公链"
+    }
+  },
+  "disputed": {
+    "matched": 0,
+    "ids": [],
+    "timeout": true
+  },
+  "events": {
+    "status": 200,
+    "count": 20,
+    "recentTypes": [
+      "TaskUpdated",
+      "CreditFrozen",
+      "PreferenceChanged",
+      "TaskPublished",
+      "TaskPublished",
+      "NotificationQueued",
+      "CreditChanged",
+      "LedgerAnchored",
+      "BackupCreated",
+      "BackupCreated"
+    ]
+  }
+}

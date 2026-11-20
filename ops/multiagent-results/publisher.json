@@ -1,0 +1,1597 @@
+{
+  "agent": "publisher",
+  "label": "publisher",
+  "role": "publisher",
+  "email": "pub_ma@test.dev",
+  "userId": "U-c20e322503cd50f64f074e5b",
+  "trace": [
+    {
+      "step": 1,
+      "method": "POST",
+      "path": "/api/auth/register",
+      "status": 201,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:36:54.631Z"
+    },
+    {
+      "step": 2,
+      "method": "POST",
+      "path": "/api/tasks",
+      "status": 201,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:36:54.643Z"
+    },
+    {
+      "step": 3,
+      "method": "POST",
+      "path": "/api/tasks",
+      "status": 201,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:36:54.647Z"
+    },
+    {
+      "step": 4,
+      "method": "GET",
+      "path": "/api/tasks",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:36:54.650Z"
+    },
+    {
+      "step": 5,
+      "method": "GET",
+      "path": "/api/leaderboard/tasks",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:36:54.654Z"
+    },
+    {
+      "step": 6,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:36:54.657Z"
+    },
+    {
+      "step": 7,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:36:56.161Z"
+    },
+    {
+      "step": 8,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:36:57.664Z"
+    },
+    {
+      "step": 9,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:36:59.169Z"
+    },
+    {
+      "step": 10,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:00.677Z"
+    },
+    {
+      "step": 11,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:02.189Z"
+    },
+    {
+      "step": 12,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:03.696Z"
+    },
+    {
+      "step": 13,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:05.200Z"
+    },
+    {
+      "step": 14,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:06.702Z"
+    },
+    {
+      "step": 15,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:08.221Z"
+    },
+    {
+      "step": 16,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:09.730Z"
+    },
+    {
+      "step": 17,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:11.240Z"
+    },
+    {
+      "step": 18,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:12.744Z"
+    },
+    {
+      "step": 19,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:14.256Z"
+    },
+    {
+      "step": 20,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:15.768Z"
+    },
+    {
+      "step": 21,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:17.279Z"
+    },
+    {
+      "step": 22,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:18.788Z"
+    },
+    {
+      "step": 23,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:20.302Z"
+    },
+    {
+      "step": 24,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:21.811Z"
+    },
+    {
+      "step": 25,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:23.321Z"
+    },
+    {
+      "step": 26,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:24.831Z"
+    },
+    {
+      "step": 27,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:26.337Z"
+    },
+    {
+      "step": 28,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:27.859Z"
+    },
+    {
+      "step": 29,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:29.372Z"
+    },
+    {
+      "step": 30,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:30.875Z"
+    },
+    {
+      "step": 31,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:32.380Z"
+    },
+    {
+      "step": 32,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:33.887Z"
+    },
+    {
+      "step": 33,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:35.403Z"
+    },
+    {
+      "step": 34,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:36.911Z"
+    },
+    {
+      "step": 35,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:38.429Z"
+    },
+    {
+      "step": 36,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:39.951Z"
+    },
+    {
+      "step": 37,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:41.468Z"
+    },
+    {
+      "step": 38,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:42.976Z"
+    },
+    {
+      "step": 39,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:44.493Z"
+    },
+    {
+      "step": 40,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:45.998Z"
+    },
+    {
+      "step": 41,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:47.501Z"
+    },
+    {
+      "step": 42,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:49.016Z"
+    },
+    {
+      "step": 43,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:50.526Z"
+    },
+    {
+      "step": 44,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:52.043Z"
+    },
+    {
+      "step": 45,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:53.547Z"
+    },
+    {
+      "step": 46,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:55.066Z"
+    },
+    {
+      "step": 47,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:56.583Z"
+    },
+    {
+      "step": 48,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:58.099Z"
+    },
+    {
+      "step": 49,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:37:59.602Z"
+    },
+    {
+      "step": 50,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:01.118Z"
+    },
+    {
+      "step": 51,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:02.636Z"
+    },
+    {
+      "step": 52,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:04.159Z"
+    },
+    {
+      "step": 53,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:05.664Z"
+    },
+    {
+      "step": 54,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:07.177Z"
+    },
+    {
+      "step": 55,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:08.688Z"
+    },
+    {
+      "step": 56,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:10.201Z"
+    },
+    {
+      "step": 57,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:11.708Z"
+    },
+    {
+      "step": 58,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:13.210Z"
+    },
+    {
+      "step": 59,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:14.717Z"
+    },
+    {
+      "step": 60,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:16.227Z"
+    },
+    {
+      "step": 61,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:17.742Z"
+    },
+    {
+      "step": 62,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:19.263Z"
+    },
+    {
+      "step": 63,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:20.785Z"
+    },
+    {
+      "step": 64,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:22.303Z"
+    },
+    {
+      "step": 65,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:23.815Z"
+    },
+    {
+      "step": 66,
+      "method": "POST",
+      "path": "/api/tasks/T-bd32737c9b5e441bd6b72313/verify",
+      "status": 400,
+      "ok": false,
+      "code": "ILLEGAL_TRANSITION",
+      "at": "2026-11-20T08:38:25.325Z"
+    },
+    {
+      "step": 67,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:25.328Z"
+    },
+    {
+      "step": 68,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:26.847Z"
+    },
+    {
+      "step": 69,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:28.369Z"
+    },
+    {
+      "step": 70,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:29.883Z"
+    },
+    {
+      "step": 71,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:31.398Z"
+    },
+    {
+      "step": 72,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:32.917Z"
+    },
+    {
+      "step": 73,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:34.435Z"
+    },
+    {
+      "step": 74,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:35.947Z"
+    },
+    {
+      "step": 75,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:37.454Z"
+    },
+    {
+      "step": 76,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:38.959Z"
+    },
+    {
+      "step": 77,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:40.476Z"
+    },
+    {
+      "step": 78,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:41.981Z"
+    },
+    {
+      "step": 79,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:43.489Z"
+    },
+    {
+      "step": 80,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:44.995Z"
+    },
+    {
+      "step": 81,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:46.505Z"
+    },
+    {
+      "step": 82,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:48.021Z"
+    },
+    {
+      "step": 83,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:49.534Z"
+    },
+    {
+      "step": 84,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:51.040Z"
+    },
+    {
+      "step": 85,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:52.556Z"
+    },
+    {
+      "step": 86,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:54.068Z"
+    },
+    {
+      "step": 87,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:55.577Z"
+    },
+    {
+      "step": 88,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:57.090Z"
+    },
+    {
+      "step": 89,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:38:58.592Z"
+    },
+    {
+      "step": 90,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:00.097Z"
+    },
+    {
+      "step": 91,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:01.612Z"
+    },
+    {
+      "step": 92,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:03.117Z"
+    },
+    {
+      "step": 93,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:04.636Z"
+    },
+    {
+      "step": 94,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:06.141Z"
+    },
+    {
+      "step": 95,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:07.656Z"
+    },
+    {
+      "step": 96,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:09.168Z"
+    },
+    {
+      "step": 97,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:10.684Z"
+    },
+    {
+      "step": 98,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:12.195Z"
+    },
+    {
+      "step": 99,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:13.707Z"
+    },
+    {
+      "step": 100,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:15.222Z"
+    },
+    {
+      "step": 101,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:16.741Z"
+    },
+    {
+      "step": 102,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:18.249Z"
+    },
+    {
+      "step": 103,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:19.762Z"
+    },
+    {
+      "step": 104,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:21.277Z"
+    },
+    {
+      "step": 105,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:22.784Z"
+    },
+    {
+      "step": 106,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:24.288Z"
+    },
+    {
+      "step": 107,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:25.806Z"
+    },
+    {
+      "step": 108,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:27.314Z"
+    },
+    {
+      "step": 109,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:28.824Z"
+    },
+    {
+      "step": 110,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:30.345Z"
+    },
+    {
+      "step": 111,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:31.850Z"
+    },
+    {
+      "step": 112,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:33.372Z"
+    },
+    {
+      "step": 113,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:34.889Z"
+    },
+    {
+      "step": 114,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:36.411Z"
+    },
+    {
+      "step": 115,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:37.931Z"
+    },
+    {
+      "step": 116,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:39.451Z"
+    },
+    {
+      "step": 117,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:40.963Z"
+    },
+    {
+      "step": 118,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:42.480Z"
+    },
+    {
+      "step": 119,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:43.999Z"
+    },
+    {
+      "step": 120,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:45.511Z"
+    },
+    {
+      "step": 121,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:47.031Z"
+    },
+    {
+      "step": 122,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:48.534Z"
+    },
+    {
+      "step": 123,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:50.050Z"
+    },
+    {
+      "step": 124,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:51.571Z"
+    },
+    {
+      "step": 125,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:53.075Z"
+    },
+    {
+      "step": 126,
+      "method": "GET",
+      "path": "/api/tasks?include_terminal=true",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:54.591Z"
+    },
+    {
+      "step": 127,
+      "method": "POST",
+      "path": "/api/tasks/T-71cd791030c17f60f36b7b49/dispute",
+      "status": 400,
+      "ok": false,
+      "code": "ILLEGAL_TRANSITION",
+      "at": "2026-11-20T08:39:56.109Z"
+    },
+    {
+      "step": 128,
+      "method": "GET",
+      "path": "/api/me/export",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:56.113Z"
+    },
+    {
+      "step": 129,
+      "method": "GET",
+      "path": "/api/me/notifications",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:56.116Z"
+    },
+    {
+      "step": 130,
+      "method": "POST",
+      "path": "/api/preferences/personalized",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:56.118Z"
+    },
+    {
+      "step": 131,
+      "method": "GET",
+      "path": "/api/leaderboard/tasks",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:56.121Z"
+    },
+    {
+      "step": 132,
+      "method": "POST",
+      "path": "/api/me/locale",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:56.123Z"
+    },
+    {
+      "step": 133,
+      "method": "POST",
+      "path": "/api/consents",
+      "status": 400,
+      "ok": false,
+      "code": "INVALID_KIND",
+      "at": "2026-11-20T08:39:56.125Z"
+    },
+    {
+      "step": 134,
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "ok": true,
+      "code": null,
+      "at": "2026-11-20T08:39:56.126Z"
+    }
+  ],
+  "steps": 134,
+  "pass": 131,
+  "fail": 3,
+  "failedSteps": [
+    {
+      "step": 66,
+      "method": "POST",
+      "path": "/api/tasks/T-bd32737c9b5e441bd6b72313/verify",
+      "status": 400,
+      "ok": false,
+      "code": "ILLEGAL_TRANSITION",
+      "at": "2026-11-20T08:38:25.325Z"
+    },
+    {
+      "step": 127,
+      "method": "POST",
+      "path": "/api/tasks/T-71cd791030c17f60f36b7b49/dispute",
+      "status": 400,
+      "ok": false,
+      "code": "ILLEGAL_TRANSITION",
+      "at": "2026-11-20T08:39:56.109Z"
+    },
+    {
+      "step": 133,
+      "method": "POST",
+      "path": "/api/consents",
+      "status": 400,
+      "ok": false,
+      "code": "INVALID_KIND",
+      "at": "2026-11-20T08:39:56.125Z"
+    }
+  ],
+  "notes": [
+    "[FAIL] 06 wait task A SUBMITTED → {\"done\":false,\"timeout\":true,\"lastState\":\"PENDING_REVIEW\",\"taskId\":\"T-bd32737c9b5e441bd6b72313\"}",
+    "任务 A 未在 90 秒内到达 SUBMITTED（最后状态 PENDING_REVIEW）：管理员审核/推送或接单人接单提交环节可能未完成，不伪造结果",
+    "[FAIL] 07 verify task A settlement → {\"status\":400,\"error\":{\"code\":\"ILLEGAL_TRANSITION\",\"message\":\"验收仅允许 SUBMITTED 状态，当前 PENDING_REVIEW（争议须经人工裁定）\"},\"settlement\":null,\"precheck\":\"PENDING_REVIEW\"}",
+    "[FAIL] 08 wait task B SUBMITTED → {\"done\":false,\"timeout\":true,\"lastState\":\"PENDING_REVIEW\",\"taskId\":\"T-71cd791030c17f60f36b7b49\"}",
+    "任务 B 未在 90 秒内到达 SUBMITTED（最后状态 PENDING_REVIEW），争议发起可能因状态非法而失败",
+    "[FAIL] 08 dispute task B open → {\"status\":400,\"error\":{\"code\":\"ILLEGAL_TRANSITION\",\"message\":\"非法状态迁移：PENDING_REVIEW → DISPUTED\"},\"state\":null,\"escrow_total\":null,\"precheck\":\"PENDING_REVIEW\"}",
+    "[FAIL] 11 consent marketing=false → {\"status\":400,\"error\":{\"code\":\"INVALID_KIND\",\"message\":\"未知的同意类型\"},\"data\":null}",
+    "consents kind='marketing' 被服务端拒绝（INVALID_KIND）：API 允许的 kind 为 cookie/privacy/tos/aup/analytics，剧本取值与接口枚举不一致，已如实记录未伪造成功",
+    "[FAIL] 12 auth/me balance changed → {\"status\":200,\"error\":null,\"before\":1000,\"after\":1000,\"role\":\"publisher\",\"prefs\":{\"personalized_enabled\":false,\"locale\":\"en\"}}",
+    "剧本检查项 10/16 通过"
+  ],
+  "checks": [
+    {
+      "name": "01 register publisher",
+      "pass": true,
+      "detail": {
+        "status": 201,
+        "error": null,
+        "userId": "U-c20e322503cd50f64f074e5b",
+        "available_sbc": 1000,
+        "csrf": true
+      }
+    },
+    {
+      "name": "02 create task A",
+      "pass": true,
+      "detail": {
+        "status": 201,
+        "error": null,
+        "taskId": "T-bd32737c9b5e441bd6b72313",
+        "state": "PENDING_REVIEW",
+        "bounty": 200,
+        "title": "【MA-pub】社区海报设计 [MA-pub]"
+      }
+    },
+    {
+      "name": "03 create task B",
+      "pass": true,
+      "detail": {
+        "status": 201,
+        "error": null,
+        "taskId": "T-71cd791030c17f60f36b7b49",
+        "state": "PENDING_REVIEW",
+        "bounty": 150,
+        "title": "【MA-pub】争议测试任务 [MA-pub]"
+      }
+    },
+    {
+      "name": "04 list tasks PENDING_REVIEW",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "count": 2,
+        "A": "PENDING_REVIEW",
+        "B": "PENDING_REVIEW"
+      }
+    },
+    {
+      "name": "05 leaderboard tasks",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "mode": "natural",
+        "items": 2
+      }
+    },
+    {
+      "name": "06 wait task A SUBMITTED",
+      "pass": false,
+      "detail": {
+        "done": false,
+        "timeout": true,
+        "lastState": "PENDING_REVIEW",
+        "taskId": "T-bd32737c9b5e441bd6b72313"
+      }
+    },
+    {
+      "name": "07 verify task A settlement",
+      "pass": false,
+      "detail": {
+        "status": 400,
+        "error": {
+          "code": "ILLEGAL_TRANSITION",
+          "message": "验收仅允许 SUBMITTED 状态，当前 PENDING_REVIEW（争议须经人工裁定）"
+        },
+        "settlement": null,
+        "precheck": "PENDING_REVIEW"
+      }
+    },
+    {
+      "name": "08 wait task B SUBMITTED",
+      "pass": false,
+      "detail": {
+        "done": false,
+        "timeout": true,
+        "lastState": "PENDING_REVIEW",
+        "taskId": "T-71cd791030c17f60f36b7b49"
+      }
+    },
+    {
+      "name": "08 dispute task B open",
+      "pass": false,
+      "detail": {
+        "status": 400,
+        "error": {
+          "code": "ILLEGAL_TRANSITION",
+          "message": "非法状态迁移：PENDING_REVIEW → DISPUTED"
+        },
+        "state": null,
+        "escrow_total": null,
+        "precheck": "PENDING_REVIEW"
+      }
+    },
+    {
+      "name": "09 GET /api/me/export",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "tasks": 2,
+        "profile": true
+      }
+    },
+    {
+      "name": "09 GET /api/me/notifications",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "data": {
+          "items": [
+            {
+              "id": 1,
+              "user_id": "U-c20e322503cd50f64f074e5b",
+              "kind": "EMAIL_VERIFICATION",
+              "title": "验证邮箱 / Verify your email",
+              "body": "Verification token: 7bff6686d5cd582ce033302d44af1af1ef4f6b07ed2b08a0 (expires 2026-11-21T08:36:54.619Z). 请在操作台输入完成验证。",
+              "task_id": null,
+              "status": "PENDING",
+              "attempts": 0,
+              "created_at": "2026-11-20T08:36:54.619Z",
+              "sent_at": null,
+              "read_at": null
+            }
+          ],
+          "unread_count": 1
+        }
+      }
+    },
+    {
+      "name": "10 disable personalized",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "data": {
+          "personalized_enabled": false,
+          "enforcement": "server_side",
+          "account_level": true,
+          "user_id": "U-c20e322503cd50f64f074e5b",
+          "neutral_sort_rule": "time + distance"
+        }
+      }
+    },
+    {
+      "name": "10 leaderboard neutral",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "mode": "neutral",
+        "personalized": false
+      }
+    },
+    {
+      "name": "11 set locale en",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "data": {
+          "locale": "en",
+          "enforcement": "server_side"
+        }
+      }
+    },
+    {
+      "name": "11 consent marketing=false",
+      "pass": false,
+      "detail": {
+        "status": 400,
+        "error": {
+          "code": "INVALID_KIND",
+          "message": "未知的同意类型"
+        },
+        "data": null
+      }
+    },
+    {
+      "name": "12 auth/me balance changed",
+      "pass": false,
+      "detail": {
+        "status": 200,
+        "error": null,
+        "before": 1000,
+        "after": 1000,
+        "role": "publisher",
+        "prefs": {
+          "personalized_enabled": false,
+          "locale": "en"
+        }
+      }
+    }
+  ],
+  "checkPass": 10,
+  "checkFail": 6,
+  "taskA": {
+    "status": 201,
+    "error": null,
+    "taskId": "T-bd32737c9b5e441bd6b72313",
+    "state": "PENDING_REVIEW",
+    "title": "【MA-pub】社区海报设计 [MA-pub]"
+  },
+  "taskB": {
+    "status": 201,
+    "error": null,
+    "taskId": "T-71cd791030c17f60f36b7b49",
+    "state": "PENDING_REVIEW",
+    "title": "【MA-pub】争议测试任务 [MA-pub]"
+  },
+  "settlement": null,
+  "register": {
+    "status": 201,
+    "error": null,
+    "userId": "U-c20e322503cd50f64f074e5b",
+    "available_sbc": 1000
+  },
+  "pending": {
+    "status": 200,
+    "A": "PENDING_REVIEW",
+    "B": "PENDING_REVIEW",
+    "count": 2
+  },
+  "boardInitial": {
+    "status": 200,
+    "mode": "natural",
+    "items": 2
+  },
+  "waitA": {
+    "done": false,
+    "timeout": true,
+    "lastState": "PENDING_REVIEW"
+  },
+  "verifyA": {
+    "status": 400,
+    "error": {
+      "code": "ILLEGAL_TRANSITION",
+      "message": "验收仅允许 SUBMITTED 状态，当前 PENDING_REVIEW（争议须经人工裁定）"
+    },
+    "state": null,
+    "settlement": null
+  },
+  "waitB": {
+    "done": false,
+    "timeout": true,
+    "lastState": "PENDING_REVIEW"
+  },
+  "disputeB": {
+    "status": 400,
+    "error": {
+      "code": "ILLEGAL_TRANSITION",
+      "message": "非法状态迁移：PENDING_REVIEW → DISPUTED"
+    },
+    "state": null,
+    "escrow_total": null,
+    "arbitration": null
+  },
+  "export": {
+    "status": 200,
+    "tasks": 2,
+    "consents": 0,
+    "ledger": true
+  },
+  "notifications": {
+    "status": 200,
+    "data": {
+      "items": [
+        {
+          "id": 1,
+          "user_id": "U-c20e322503cd50f64f074e5b",
+          "kind": "EMAIL_VERIFICATION",
+          "title": "验证邮箱 / Verify your email",
+          "body": "Verification token: 7bff6686d5cd582ce033302d44af1af1ef4f6b07ed2b08a0 (expires 2026-11-21T08:36:54.619Z). 请在操作台输入完成验证。",
+          "task_id": null,
+          "status": "PENDING",
+          "attempts": 0,
+          "created_at": "2026-11-20T08:36:54.619Z",
+          "sent_at": null,
+          "read_at": null
+        }
+      ],
+      "unread_count": 1
+    }
+  },
+  "preferences": {
+    "status": 200,
+    "error": null,
+    "data": {
+      "personalized_enabled": false,
+      "enforcement": "server_side",
+      "account_level": true,
+      "user_id": "U-c20e322503cd50f64f074e5b",
+      "neutral_sort_rule": "time + distance"
+    }
+  },
+  "boardNeutral": {
+    "status": 200,
+    "mode": "neutral",
+    "personalized": false
+  },
+  "locale": {
+    "status": 200,
+    "error": null,
+    "data": {
+      "locale": "en",
+      "enforcement": "server_side"
+    }
+  },
+  "consent": {
+    "status": 400,
+    "error": {
+      "code": "INVALID_KIND",
+      "message": "未知的同意类型"
+    },
+    "data": null
+  },
+  "me": {
+    "status": 200,
+    "before": 1000,
+    "after": 1000,
+    "changed": false,
+    "role": "publisher",
+    "preferences": {
+      "personalized_enabled": false,
+      "locale": "en"
+    }
+  }
+}
