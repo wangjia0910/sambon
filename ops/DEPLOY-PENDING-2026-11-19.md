@@ -1,10 +1,15 @@
-# 交付部署状态与待办（v3 · 2026-11-20）
+# 交付部署状态与待办（v4 · 2026-11-20）
 
 ## 结论速览
 | 通道 | 状态 | 地址 / 产物 |
 |---|---|---|
 | **WorkBuddy 在线评审站** | ✅ **已部署并实测通过**（2026-11-20） | `https://sambon-demo-console.app.workbuddy.host/?sharecode=CCHOH4VO5W` |
-| GitHub → Cloudflare Pages（正式生产） | ⏳ 网络已通，**仅差 PAT 凭据** | 5 提交待推送，HEAD `6f0cb11` |
+| GitHub → Cloudflare Pages（正式生产） | ✅ **代码已推送**（2026-11-20），待 Cloudflare 侧自动构建完成 | `4f7c65e..2673ae2`，远端与本地同步（ahead=0） |
+
+> PAT 由提供方一次性经临时 askpass 注入完成推送；脚本已删除、未写入 `.git/config`、仓库内无 token 残留。
+> 推送后本机无法核验线上：`sambon.net` / `sambon.pages.dev` 的 HTTPS 在本机仍被 TLS 拦截
+> （TCP 443 通、TLS 握手失败 `ERR_SSL_PACKET_LENGTH_TOO_LONG` / schannel `SEC_E_INVALID_TOKEN`），
+> 与部署无关；Cloudflare 侧 Git 集成自动部署不受本机网络影响，需在网络放行环境或用外部监测复核线上。
 
 ## 一、WorkBuddy 在线评审站（已上线，可访问）
 - 发布方式：Node HTTP 服务（`ops/deploy-server.mjs`，绑定 `0.0.0.0:$PORT`，零依赖）。
@@ -17,11 +22,14 @@
   - 本轮两个 Critical 修复已在线生效：`getElementById('m-toast'|'m-modal'|'m-demo-banner')` 与 `if (opts.silent401) return null;`。
 - 注意：`/api/*` 与子资源请求必须保留 `?sharecode=...` 参数；分享链接网关据此鉴权，缺失会返回「链接不完整」。
 
-## 二、正式生产通道（Cloudflare Pages + D1）— 待注入 PAT
-### 本地状态
-- 分支 `main`，HEAD = `6f0cb11`，远端 `origin/main` = `4f7c65e`，**领先 5 个提交、无分叉**（fast-forward）：
-  - `80ab342` 项目文档集 + 用户版产品站；`4590994` 魔兽主题；`6308a97` 审计修复 + SEO；`823301b` 在线评审站服务；`6f0cb11` 部署记录 v2。
+## 二、正式生产通道（Cloudflare Pages + D1）— 已推送，待 Cloudflare 构建
+### 推送结果（2026-11-20）
+- `git push origin main --force-with-lease=main:4f7c65e…` 成功：`4f7c65e..2673ae2 main -> main`。
+- 共 6 个提交：`80ab342` 文档集+产品站、`4590994` 魔兽主题、`6308a97` 审计修复+SEO、`823301b` 在线评审站服务、`6f0cb11` 部署记录 v2、`2673ae2` 部署记录 v3。
+- 本地 = 远端 = `2673ae2`，ahead=0，工作区干净。
 - 全套回归 282 项断言全绿；`cloudflare/` 产物 22 文件就绪。
+- 触发方式：`git push origin main` → Cloudflare Git 集成自动部署（输出目录 `cloudflare`）。
+- 线上复核（需在 TLS 正常的环境执行）：`node tests/verify-deployment.mjs`，核验 D-13/D-13b/D-13c。
 
 ### 网络已恢复（2026-11-20 核实）
 - `github.com` / `api.github.com`：HTTP 200，`ssl_verify_result=0`。
