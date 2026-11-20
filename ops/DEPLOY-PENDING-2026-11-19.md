@@ -1,59 +1,56 @@
-# 交付部署状态与待办（2026-11-19，v2）
+# 交付部署状态与待办（v3 · 2026-11-20）
 
-## 本地状态（已提交、工作区干净）
-- 分支：`main`，HEAD = `823301b`（完整 `823301be17c1f37ddeaa38d4df77a67af34fd741`）
-- 远端 `origin/main` = `4f7c65e`（完整 `4f7c65e5b0fc2f432635b5eefcea901e815b5f6a`）
-- **领先 4 个提交，无分叉**：
-  - `80ab342` 规范项目文档集 + 用户版悬赏平台 Web 产品站（主入口 /）
-  - `4590994` 用户版前端魔兽世界主题（赏金猎人公会）
-  - `6308a97` feat(audit+seo): 全盘代码审计修复与 SEO 强化
-  - `823301b` feat(deploy): 在线评审站服务（0.0.0.0/$PORT + 真实后端 + 优雅降级）
-- 全套回归 **282 项断言全绿**（20/32/14/10/7/32/7/25/18/117）。
-- 代码与构建产物（`cloudflare/`，22 文件）100% 就绪。
+## 结论速览
+| 通道 | 状态 | 地址 / 产物 |
+|---|---|---|
+| **WorkBuddy 在线评审站** | ✅ **已部署并实测通过**（2026-11-20） | `https://sambon-demo-console.app.workbuddy.host/?sharecode=CCHOH4VO5W` |
+| GitHub → Cloudflare Pages（正式生产） | ⏳ 网络已通，**仅差 PAT 凭据** | 5 提交待推送，HEAD `6f0cb11` |
 
-## 生产部署（Cloudflare Pages + D1）阻塞原因
-两条发布通道均被本机网络阻断，非项目缺陷：
+## 一、WorkBuddy 在线评审站（已上线，可访问）
+- 发布方式：Node HTTP 服务（`ops/deploy-server.mjs`，绑定 `0.0.0.0:$PORT`，零依赖）。
+- appId：`wbapp_fBhlu1O6pqiaPK20RAzeN5`（复用同一应用，链接稳定）。
+- 分享链接：`https://sambon-demo-console.app.workbuddy.host/?sharecode=CCHOH4VO5W`
+- **线上实测**（2026-11-20，均带 sharecode 参数）：
+  - 首页 200；`<title>三宝殿 · 悬赏互助平台 — 无事不登三宝殿 …</title>`；`<h1 id="seo-h1">无事不登三宝殿</h1>`。
+  - 静态资源 200 且 MIME 正确：`member.js` / `seo.js` / `legal-lang.js`（text/javascript）、`robots.txt`（text/plain）、`sitemap.xml`（application/xml）。
+  - `/api/health` 真实响应：`mode=production / db=d1 / v3.0.0`（注：后端为内存 SQLite mock，见下方边界）。
+  - 本轮两个 Critical 修复已在线生效：`getElementById('m-toast'|'m-modal'|'m-demo-banner')` 与 `if (opts.silent401) return null;`。
+- 注意：`/api/*` 与子资源请求必须保留 `?sharecode=...` 参数；分享链接网关据此鉴权，缺失会返回「链接不完整」。
 
-1. **GitHub push**：
-   - 默认 schannel 后端 `CRYPT_E_REVOCATION_OFFLINE (0x80092013)` → 加 `-c http.sslBackend=openssl` 可连通。
-   - 本机无持久 GitHub 凭据、无 `gh` CLI、无环境变量 PAT → `could not read Username`。
-   - 探测：`github.com` / `api.github.com` 经本地代理 `127.0.0.1:57567` 均 TLS 失败（curl 返回 000）。
-2. **WorkBuddy 站点发布**（本轮换用的备用通道）：
-   - 上传阶段失败：`SITES_UPLOAD_FAILED`（retryable=true）。
-   - 数据面错误：`ERR_SSL_WRONG_VERSION_NUMBER`（boringssl TLS 握手失败），
-     同源本地代理拦截所致。按工具约定：已如实告知用户并**提供一次重试**，未自动重试、未改参数硬闯、未另建应用。
+## 二、正式生产通道（Cloudflare Pages + D1）— 待注入 PAT
+### 本地状态
+- 分支 `main`，HEAD = `6f0cb11`，远端 `origin/main` = `4f7c65e`，**领先 5 个提交、无分叉**（fast-forward）：
+  - `80ab342` 项目文档集 + 用户版产品站；`4590994` 魔兽主题；`6308a97` 审计修复 + SEO；`823301b` 在线评审站服务；`6f0cb11` 部署记录 v2。
+- 全套回归 282 项断言全绿；`cloudflare/` 产物 22 文件就绪。
 
-> 根因：本机 HTTP(S) 代理 `127.0.0.1:57567` 公司网络 TLS 拦截。需在网络侧放行或对上述域名直连后重试。
+### 网络已恢复（2026-11-20 核实）
+- `github.com` / `api.github.com`：HTTP 200，`ssl_verify_result=0`。
+- `git -c http.sslBackend=openssl ls-remote origin HEAD` 成功 → `4f7c65e…`。
+- 本地代理 `127.0.0.1:57567` 仍在环境变量，但对上述域名链路已通；推送时按既有做法 `env -u` 清代理。
 
-## 通道 A：注入 PAT 后推送（正式生产路径）
-在 bash 中执行（`<PAT>` 换成有 repo 权限的 GitHub PAT；token 不写进命令历史/文件）：
+### 唯一剩余阻塞：凭据
+- 无 `gh` CLI、无 `credential.helper`、无 `GH_TOKEN`/`GITHUB_TOKEN` → 非交互推送报
+  `fatal: could not read Username for 'https://github.com': terminal prompts disabled`。
+- 按项目约定：PAT 只经环境变量/stdin **一次性注入**，不写入 `.git/config`、不落盘、不打印。
 
+### 一键推送（由持有 PAT 的一方执行；token 不写进历史/文件）
 ```bash
 cd /e/SKILLS/sambon
 GIT_ASKPASS=/tmp/gh_askpass.sh \
 env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy \
-git -c http.sslBackend=openssl push origin main \
-  --force-with-lease=main:4f7c65e5b0fc2f432635b5eefcea901e815b5f6a
+GIT_TERMINAL_PROMPT=1 git -c http.sslBackend=openssl push origin main
 ```
 `/tmp/gh_askpass.sh`（用 Write 创建、用完即删、不落仓库）：
 ```sh
 #!/bin/sh
 echo "<PAT>"
 ```
-推送后：Cloudflare Git 集成自动部署（输出目录 `cloudflare`）→ `node tests/verify-deployment.mjs` 只读核验。
+- 因是 fast-forward，无需 `--force-with-lease`；若远端被他人更新过，改用
+  `--force-with-lease=main:4f7c65e5b0fc2f432635b5eefcea901e815b5f6a` 防止覆盖。
+- 推送后：Cloudflare Git 集成自动部署（输出目录 `cloudflare`）→ `node tests/verify-deployment.mjs` 只读核验。
 
-## 通道 B：WorkBuddy 站点发布（在线评审站）
-网络恢复后重试一次即可（复用同一 appId `wbapp_fBhlu1O6pqiaPK20RAzeN5`，链接稳定）：
-```
-directory = E:\SKILLS\sambon
-language = node, port = 3000
-startCmd = node ops/deploy-server.mjs   （installCmd 留空，零依赖）
-```
-`ops/deploy-server.mjs` 已实现：绑定 0.0.0.0:$PORT、托管 cloudflare/ 静态产物、
-`/api/*` 走真实后端（内存 D1）、后端不可用时降级为只读静态站、现场重建产物。
-本地已实测：首页标题/SEO h1 正确、`/api/health` 真实响应、seo.js/legal-lang.js MIME 正确。
-
-## 合规边界（不变）
-- 在线评审站数据为**内存 SQLite，重启即清空**；不是 Cloudflare Pages + D1 正式生产。
-- docs/13 的 20 项外部证据闸门 0/20 → NOT READY；C-01 结算双花为正式运营一号阻塞。
-- 不得表述为「平台已正式上线 / 已通过备案 / 网信办认证」。
+## 三、合规边界（不变）
+- WorkBuddy 链接是**在线评审站**：数据为内存 SQLite，**重启即清空**；`/api/health` 因绑定内存库而显示 `mode=production/db=d1`，这是后端逻辑口径，**不代表已接入 Cloudflare D1 正式生产**。
+- 正式运营就绪门禁：代码能力 16/16，外部证据闸门 **2/20**（E-01/E-02 已核销，18 项待真人/律师/第三方留痕）→ NOT READY。
+- C-01 结算并发双花为正式运营一号阻塞，尚未修复。
+- 对外不得表述为「平台已正式上线 / 已通过备案 / 网信办认证」；E-20 签发前一律称「演示/评审环境」。
