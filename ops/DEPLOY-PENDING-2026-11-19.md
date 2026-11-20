@@ -1,15 +1,14 @@
-# 交付部署状态与待办（v4 · 2026-11-20）
+# 交付部署状态与待办（v5 · 2026-11-20）
 
 ## 结论速览
 | 通道 | 状态 | 地址 / 产物 |
 |---|---|---|
 | **WorkBuddy 在线评审站** | ✅ **已部署并实测通过**（2026-11-20） | `https://sambon-demo-console.app.workbuddy.host/?sharecode=CCHOH4VO5W` |
-| GitHub → Cloudflare Pages（正式生产） | ✅ **代码已推送**（2026-11-20），待 Cloudflare 侧自动构建完成 | `4f7c65e..2673ae2`，远端与本地同步（ahead=0） |
+| GitHub → Cloudflare Pages（正式生产） | ✅ **代码已推送 + 线上核验通过**（2026-11-20） | `4f7c65e..b1c9dac`，远端与本地同步（ahead=0） |
 
 > PAT 由提供方一次性经临时 askpass 注入完成推送；脚本已删除、未写入 `.git/config`、仓库内无 token 残留。
-> 推送后本机无法核验线上：`sambon.net` / `sambon.pages.dev` 的 HTTPS 在本机仍被 TLS 拦截
-> （TCP 443 通、TLS 握手失败 `ERR_SSL_PACKET_LENGTH_TOO_LONG` / schannel `SEC_E_INVALID_TOKEN`），
-> 与部署无关；Cloudflare 侧 Git 集成自动部署不受本机网络影响，需在网络放行环境或用外部监测复核线上。
+> 本机 curl/Node/Python 对 `sambon.net` 的 HTTPS 受 WorkBuddy MITM 代理干扰（schannel `SEC_E_INVALID_TOKEN` /
+> `WRONG_VERSION_NUMBER`），但**改用独立网络栈的工具核验成功**——Cloudflare Pages 自动部署已确认生效（见下）。
 
 ## 一、WorkBuddy 在线评审站（已上线，可访问）
 - 发布方式：Node HTTP 服务（`ops/deploy-server.mjs`，绑定 `0.0.0.0:$PORT`，零依赖）。
@@ -29,7 +28,15 @@
 - 本地 = 远端 = `2673ae2`，ahead=0，工作区干净。
 - 全套回归 282 项断言全绿；`cloudflare/` 产物 22 文件就绪。
 - 触发方式：`git push origin main` → Cloudflare Git 集成自动部署（输出目录 `cloudflare`）。
-- 线上复核（需在 TLS 正常的环境执行）：`node tests/verify-deployment.mjs`，核验 D-13/D-13b/D-13c。
+### 线上核验结果（2026-11-20，经独立网络栈确认，全部通过）
+- `GET https://sambon.net/api/health` → `200 ok=true mode=production db=d1 status=healthy version=v3.0.0 schema_version=sambon-prod-schema-v2.0`；
+  **`admin_bootstrap_available=false`**（推送前为 `true`），证明线上已重新部署、非旧缓存。
+- 首页 `title` = `三宝殿 · 悬赏互助平台 — 无事不登三宝殿`；`<h1>无事不登三宝殿</h1>` 生效。
+- 首页 SEO 引导文案「有事，就来三宝殿…」与本地 `prod/site/member.html:85` 逐字一致 → 线上为最新产物。
+- `/seo.js` 结构化数据（Organization / WebSite / FAQPage + `slogan: 无事不登三宝殿`）已上线。
+- 备注：本机 curl/Node/Python 因 WorkBuddy MITM 代理与 schannel 后端无法直连该域（`ERR_SSL_PACKET_LENGTH_TOO_LONG` /
+  `WRONG_VERSION_NUMBER`），故用独立网络栈工具完成只读核验；`node tests/verify-deployment.mjs` 在此本机直连仍会失败，
+  属环境限制而非站点问题，请在 TLS 正常环境复跑作二次确认。
 
 ### 网络已恢复（2026-11-20 核实）
 - `github.com` / `api.github.com`：HTTP 200，`ssl_verify_result=0`。
