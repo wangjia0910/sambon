@@ -127,6 +127,18 @@ export const SCHEMA_STATEMENTS = [
     created_at TEXT NOT NULL
   )`,
 
+  // C-01 结算双花原子守卫：task_id 为主键，一个任务终生只能占位一次。
+  // settleTask 在写账本前用 INSERT OR IGNORE 抢占位，changes=0 即已有结算在途/完成，
+  // 直接拒绝，从数据库层消除 hVerify / hDispute(resolve pay_solver) 并发双结算。
+  // 仅记录 task_id 与结算触发信息，零 PII（CONTRACT §10.2 / §10.6）。
+  `CREATE TABLE IF NOT EXISTS settlement_guards (
+    task_id TEXT PRIMARY KEY,
+    trigger TEXT NOT NULL,
+    event_id TEXT,
+    actor_id TEXT,
+    created_at TEXT NOT NULL
+  )`,
+
   `CREATE TABLE IF NOT EXISTS dispatches (
     dispatch_id TEXT PRIMARY KEY,
     task_id TEXT NOT NULL,

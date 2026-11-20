@@ -7,8 +7,9 @@
   "scripts": {
     "start": "node src/server.mjs",
     "build": "node tools/build-cloudflare.mjs",
-    "test": "node tests/smoke.mjs && node tests/verify-local.mjs && node tests/verify-cloudflare.mjs && node tests/verify-site-selfcheck.mjs && node tests/verify-member.mjs && node tests/verify-member-runtime.mjs && node tests/verify-seo.mjs && node --disable-warning=ExperimentalWarning tests/verify-member-api.mjs && node --disable-warning=ExperimentalWarning tests/verify-production.mjs",
+    "test": "node tests/smoke.mjs && node tests/verify-local.mjs && node tests/verify-cloudflare.mjs && node tests/verify-site-selfcheck.mjs && node tests/verify-member.mjs && node tests/verify-member-runtime.mjs && node tests/verify-seo.mjs && node --disable-warning=ExperimentalWarning tests/verify-member-api.mjs && node --disable-warning=ExperimentalWarning tests/verify-production.mjs && node --disable-warning=ExperimentalWarning tests/verify-settlement-concurrency.mjs",
     "test:production": "node --disable-warning=ExperimentalWarning tests/verify-production.mjs",
+    "test:concurrency": "node --disable-warning=ExperimentalWarning tests/verify-settlement-concurrency.mjs",
     "check": "node tests/predeploy-check.mjs",
     "check:ready": "node tests/readiness-check.mjs",
     "check:ready:strict": "node tests/readiness-check.mjs --strict",

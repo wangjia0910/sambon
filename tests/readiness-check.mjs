@@ -88,6 +88,22 @@ const CODE_CHECKS = [
     (read('tests/verify-production.mjs').match(/check\('P-\d+/g) || []).length >= 110],
   ['C-16', '契约 D-14 与本文档已登记', () =>
     read('CONTRACT.md').includes('| D-14 |') && read('docs/13-完全体能力与运营就绪.md').length > 1000],
+  // C-01 结算双花修复（2026-11-20）：独立代码能力项，不改外部 20 项闸门。
+  ['C-17', '结算双花原子守卫已落地（C-01 修复）', () => {
+    const api = read('prod/lib/api.js');
+    const schema = read('prod/lib/schema.js');
+    return schema.includes('CREATE TABLE IF NOT EXISTS settlement_guards')
+      && schema.includes('task_id TEXT PRIMARY KEY')
+      && api.includes('INSERT OR IGNORE INTO settlement_guards')
+      && api.includes("'SETTLEMENT_CONFLICT'")
+      && api.includes('async function claimSettlementGuard')
+      // 两条资金终局路径都必须受守卫覆盖
+      && api.includes("trigger: 'dispute_resolution'")
+      && api.includes("'dispute_refund'")
+      // 并发回归测试存在且含真实并发断言
+      && read('tests/verify-settlement-concurrency.mjs').includes('Promise.all')
+      && read('package.json').includes('verify-settlement-concurrency');
+  }],
 ];
 
 /**

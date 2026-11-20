@@ -346,8 +346,49 @@ function taskForScoring(row) {
   };
 }
 
-/** 结算：赏金转付 + 5% 服务费入平台收入 + 可选高质量奖励（生态激励池支出） */
-async function settleTask(db, row, { rating = 0, auto = false, eventId = null, trigger = 'verify', actorId = null }) {
+/**
+ * C-01 结算双花原子守卫：task_id 为主键，INSERT OR IGNORE 在数据库层保证
+ * 「同一任务只有一次资金终局（结算/退款/关闭）能占位」。
+ * hVerify(SUBMITTED) 与 hDispute(resolve, DISPUTED) 的所有资金终局路径共用此守卫：
+ * 两个并发请求只有一个 changes=1，另一个 changes=0 直接拒绝 —— 从根上消除双花，
+ * 不再依赖「读 row → 写 batch」之间无法原子的检查。
+ * @returns {void} 抢到守卫则正常返回；否则抛 SETTLEMENT_CONFLICT(409)
+ */
+async function claimSettlementGuard(db, row, trigger, eventId = null, actorId = null) {
+  const guard = await db.run(
+    'INSERT OR IGNORE INTO settlement_guards (task_id, trigger, event_id, actor_id, created_at) VALUES (?, ?, ?, ?, ?)',
+    [row.task_id, trigger, eventId || null, actorId || null, iso()],
+  );
+  if (Number(guard.changes) === 0) {
+    fail('SETTLEMENT_CONFLICT', '该任务已结算、退款或终局在途，禁止重复资金处置', 409);
+  }
+}
+
+/** 释放守卫：资金终局 batch 未提交时调用，允许合法重试（与 withIdempotency 同构） */
+async function releaseSettlementGuard(db, row, trigger) {
+  await db.run('DELETE FROM settlement_guards WHERE task_id = ? AND trigger = ?', [row.task_id, trigger]);
+}
+
+/**
+ * 结算总入口：先抢原子守卫，再执行实际结算编排。
+ * 守卫成功后进入 settleTaskCommitted；后者抛错（batch 未提交）时释放守卫允许合法重试。
+ * pay_solver 争议裁定走此入口；refund/close 分支单独抢同一 task_id 守卫（见 hDispute），
+ * 因 settlement_guards.task_id 主键唯一，两条资金终局路径天然互斥。
+ */
+async function settleTask(db, row, opts) {
+  const { eventId = null, trigger = 'verify', actorId = null } = opts;
+  await claimSettlementGuard(db, row, trigger, eventId, actorId);
+  try {
+    return await settleTaskCommitted(db, row, opts);
+  } catch (e) {
+    // 结算未提交：释放守卫，允许合法重试（tasks 状态仍为 SUBMITTED / DISPUTED）
+    await releaseSettlementGuard(db, row, trigger);
+    throw e;
+  }
+}
+
+/** 已抢到结算守卫后的实际结算编排（仅 settleTask 内部调用） */
+async function settleTaskCommitted(db, row, { rating = 0, auto = false, eventId = null, trigger = 'verify', actorId = null }) {
   const total = round2(Number(row.frozen_total));
   const bounty = round2(Number(row.bounty));
   const fee = round2(Number(row.service_fee));
@@ -1041,31 +1082,61 @@ async function hDispute(c) {
       const statements = [];
       if (resolution === 'pay_solver') {
         // 付接单人：走与验收通过相同的结算编排（人工裁定后才分账）
+        // settleTask 内部已抢 settlement_guards 原子守卫，与 refund 分支互斥。
         await settleTask(c.db, row, {
           rating: 0, eventId: c.body.event_id || null,
           trigger: 'dispute_resolution', actorId: u.user_id,
         });
       } else {
-        await postLegs(c.db, {
-          eventId: c.body.event_id || uuid('EVT'), taskId: row.task_id,
-          memo: 'refund:争议裁定全额退回发布方（含 5% 服务费）',
-          legs: [
-            { account: 'subject:escrow', delta: -total },
-            { account: `user:${row.publisher_id}`, delta: +total },
-          ], statements,
+        // 退款/关闭：与 pay_solver 争抢同一 task_id 守卫，避免「既付接单人又退发布方」双花
+        await claimSettlementGuard(c.db, row, 'dispute_refund', c.body.event_id || null, u.user_id);
+        try {
+          await postLegs(c.db, {
+            eventId: c.body.event_id || uuid('EVT'), taskId: row.task_id,
+            memo: 'refund:争议裁定全额退回发布方（含 5% 服务费）',
+            legs: [
+              { account: 'subject:escrow', delta: -total },
+              { account: `user:${row.publisher_id}`, delta: +total },
+            ], statements,
+          });
+          statements.push({
+            sql: 'UPDATE tasks SET state = ?, version = version + 1 WHERE task_id = ?',
+            params: [resolution === 'close' ? 'CLOSED' : 'CANCELLED', row.task_id],
+          });
+          statements.push(await appendEvent(c.db, {
+            type: 'CreditChanged', taskId: row.task_id, eventId: c.body.event_id || null, actor: 'ledger',
+            payload: { task_id: row.task_id, subjects_changed: ['escrow', 'available'] },
+          }));
+          statements.push(await appendEvent(c.db, {
+            type: 'DisputeResolved', taskId: row.task_id, eventId: c.body.event_id || null,
+            payload: { task_id: row.task_id, resolution, state: 'CANCELLED', arbitrator: '人工裁定', model_decision: null },
+          }));
+          statements.push({
+            sql: 'INSERT INTO audit_log (actor_id, action, target_id, detail_json, created_at) VALUES (?, ?, ?, ?, ?)',
+            params: [u.user_id, 'DISPUTE_RESOLVED_MANUAL', row.task_id,
+              JSON.stringify(safePayload({ resolution, decision: 'resolve' })), iso()],
+          });
+          await c.db.batch(statements);
+        } catch (e) {
+          await releaseSettlementGuard(c.db, row, 'dispute_refund');
+          throw e;
+        }
+        const disputeLlm = await llm.disputeSummary(c.env, {
+          materials: [String(c.body.reason || ''), String(row.dispute_reason || '')].join(' ').slice(0, 800),
         });
-        statements.push({
-          sql: 'UPDATE tasks SET state = ?, version = version + 1 WHERE task_id = ?',
-          params: [resolution === 'close' ? 'CLOSED' : 'CANCELLED', row.task_id],
-        });
-        statements.push(await appendEvent(c.db, {
-          type: 'CreditChanged', taskId: row.task_id, eventId: c.body.event_id || null, actor: 'ledger',
-          payload: { task_id: row.task_id, subjects_changed: ['escrow', 'available'] },
-        }));
+        return {
+          data: {
+            task: taskView(await loadTask(c.db, row.task_id)), resolution,
+            arbitrator: '人工裁定', model_decision: null,
+            llm_summary: disputeLlm.summary, llm_degraded: disputeLlm.degraded,
+            note: '裁定完成后才按结果分账；模型全程不直判，摘要仅供人工参考',
+          },
+        };
       }
+      // pay_solver：settleTask 已提交结算 batch，这里补记裁定事件与审计（不再动资金）
       statements.push(await appendEvent(c.db, {
         type: 'DisputeResolved', taskId: row.task_id, eventId: c.body.event_id || null,
-        payload: { task_id: row.task_id, resolution, state: resolution === 'pay_solver' ? 'SETTLED' : 'CANCELLED', arbitrator: '人工裁定', model_decision: null },
+        payload: { task_id: row.task_id, resolution, state: 'SETTLED', arbitrator: '人工裁定', model_decision: null },
       }));
       statements.push({
         sql: 'INSERT INTO audit_log (actor_id, action, target_id, detail_json, created_at) VALUES (?, ?, ?, ?, ?)',

@@ -89,6 +89,13 @@ CREATE TABLE IF NOT EXISTS idempotency (
     response_json TEXT,
     created_at TEXT NOT NULL
   );
+CREATE TABLE IF NOT EXISTS settlement_guards (
+    task_id TEXT PRIMARY KEY,
+    trigger TEXT NOT NULL,
+    event_id TEXT,
+    actor_id TEXT,
+    created_at TEXT NOT NULL
+  );
 CREATE TABLE IF NOT EXISTS dispatches (
     dispatch_id TEXT PRIMARY KEY,
     task_id TEXT NOT NULL,
