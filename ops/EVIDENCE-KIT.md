@@ -16,6 +16,7 @@
 | `cron/worker.js` | E-04 | Cloudflare Worker Cron 备选模板 | 同上 |
 | `backup-runbook.md` | E-05 | 备份/恢复演练手册 | 一次真实恢复演练记录 |
 | `waf-rules.md` | E-14 | WAF/速率限制/风控名单/滥用 SLA 建议 | 控制台实际配置 + 处置样例 |
+| `E09-PRIVACY-COMPLIANCE-REVIEW.md` | E-09（兼 E-10/E-11/E-12） | **隐私政策合规体检：27 项差距清单（阻断10/高8/中6/低3）+ 律师签署请求清单 + 核销验收标准** | **律师按清单出正式稿并署名；AI 体检报告不构成核销** |
 | `legal-drafts.md` | E-09 | 隐私/ToS/AUP 双语法务**草稿（待律师定稿）** | 律师审定签字 |
 | `compliance-evidence-pack.md` | E-06/E-07/E-08/E-10/E-11/E-12/E-18 | docs/07 29 项跟踪 + 律师签署请求清单 | 各责任方补证据/签字 |
 
