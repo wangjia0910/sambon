@@ -651,9 +651,19 @@ async function main() {
   try { adminClient = await setupAdmin(cfg); }
   catch (e) { recordException({ phase: 'admin', action: 'setup', actor: cfg.admin.email, error: e }); }
   if (!adminClient) {
+    // 一期已启用自动闸门（有权人 2026-11-23 风险接受）：非本地环境下 admin 凭据
+    // 已配置却拿不到会话 = 凭据错误/账号失效，必须硬性失败，禁止静默跳过完成环节
+    // 造成「发布了 10 个但完成 0」的假成功。本地 dry-run 仍允许降级。
+    if (!cfg.local && cfg.admin.email && cfg.admin.password) {
+      throw new Error(
+        'ADMIN_AUTO_GATE_ENABLED_BUT_NO_SESSION: 一期自动闸门模式要求有效 admin 会话，' +
+        '但 ADMIN_EMAIL/ADMIN_PASSWORD 登录失败（凭据错误或账号不存在）。' +
+        '请核对 GitHub Secrets 中的 admin 凭据；未取得会话前不会发布任务，避免产生无法完成的脏数据。',
+      );
+    }
     report.notes.push({
       type: 'NO_ADMIN_SESSION',
-      note: '未取得 admin 会话（生产站 admin 已关闭）。验收仍用 publisher 本人 approve；review/dispatch 走人工等待或标记跳过。',
+      note: '本地 dry-run：未取得 admin 会话，验收仍用 publisher 本人 approve；review/dispatch 走人工等待或标记跳过。',
     });
   }
 
