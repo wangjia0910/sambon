@@ -24,5 +24,7 @@ ops/readiness.json
 ops/deployment-verification.json
 # 一次性生产密钥本地留存（绝不入库；用完建议轮换）
 ops/*.secret.txt
+# 每日多智能体互动的运行时报告（含账号邮箱，本地留存不入库）
+ops/daily-agents/reports/
 
 # 注：.workbuddy/ 为项目相关数据，不属于临时缓存，禁止删除或忽略

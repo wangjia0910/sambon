@@ -1,0 +1,145 @@
+# =============================================================================
+# 三宝殿平台 · 每日多智能体互动（GitHub Actions）
+# -----------------------------------------------------------------------------
+# 为什么必须用 GitHub Actions 云端执行，而不是本机 cron？
+#   本机所在公司网络会对 https://sambon.net 做 TLS 拦截（中间人证书），
+#   导致本机 Node 进程无法与该域名建立可信 HTTPS 连接，写操作会被拦截/失败。
+#   GitHub 托管的 runner 运行在云端，网络链路不经过公司代理，能够正常访问
+#   https://sambon.net。因此把每日任务放到云端执行，绕开本机网络限制。
+#
+# 本工作流做什么：
+#   每天（UTC 01:00 = 北京时间 09:00）运行一次 ops/daily-agents/daily-run.mjs：
+#     - 以若干「发布者」账号，每日合计发布 10 个任务；
+#     - 以若干「完成者」账号，每日完成 1~2 个任务；
+#     - 脚本把执行结果写到 ops/daily-agents/reports/YYYY-MM-DD.json；
+#   随后把报告目录上传为 artifact，保留 30 天，便于事后核对。
+#
+# 首次使用（必读）：
+#   1) 在仓库 Settings → Secrets and variables → Actions 中配置下方列出的
+#      Repository secrets（账号邮箱/密码）。secret 值在日志中会被 GitHub 自动打码，
+#      本工作流也只把它们注入环境变量，不通过命令行参数传递，且不主动打印值。
+#   2) schedule 定时触发在某些仓库默认是停用的：
+#      若首次没有按点运行，请到 Actions 页面点击启用工作流（I understand /
+#      Enable workflows），或先手动 Run workflow 一次。
+#      另外注意：GitHub 在高峰期可能延迟几分钟触发；若仓库 60 天无任何活动，
+#      定时任务会被自动暂停，需手动恢复。
+# =============================================================================
+
+name: 每日多智能体互动
+
+# 触发方式：
+#   schedule        —— 每天 UTC 01:00（cron 使用 UTC；UTC+8 即北京时间 09:00）
+#   workflow_dispatch —— 允许在 Actions 页面手动点「Run workflow」立即执行一次
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+# 防止重复运行：同一时间只允许一个「每日互动」实例存在。
+# group 固定为仓库级名称；cancel-in-progress: false 表示后到的运行会排队等待，
+# 而不是中断正在发布任务的运行（避免任务只发布了一半、产生脏数据）。
+concurrency:
+  group: daily-agents-${{ github.ref }}
+  cancel-in-progress: false
+
+# 最小权限：checkout 只需读取仓库内容；上传 artifact 需要 actions 写权限。
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  daily-run:
+    name: 每日发布与完成（Node ${{ matrix.node-version }}）
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        node-version: [20]
+
+    # -------------------------------------------------------------------------
+    # 所有需要保密的值都放在 job 级 env，供各步骤共享。
+    # env 名称与脚本读取的 process.env.XXX 一一对应；日常使用请保持这层映射不变。
+    # API_BASE / 数量阈值不是秘密，直接写死在这里，便于审计。
+    # -------------------------------------------------------------------------
+    env:
+      API_BASE: https://sambon.net
+      DAILY_PUBLISH_COUNT: '10'
+      DAILY_COMPLETE_COUNT: '2'
+
+      # ---------------------------------------------------------------------
+      # 账号池：脚本 ops/daily-agents/daily-run.mjs 读取 PUBLISHER_ACCOUNTS /
+      # SOLVER_ACCOUNTS（JSON 数组，形如 [{"email":"..","password":"..","display_name":".."}]）。
+      # 这里把 3 个发布者 secret 组装成 JSON，与脚本契约严格对齐。
+      # ---------------------------------------------------------------------
+      PUBLISHER_ACCOUNTS: ${{ secrets.PUBLISHER_ACCOUNTS }}
+      SOLVER_ACCOUNTS: ${{ secrets.SOLVER_ACCOUNTS }}
+
+      # 管理员闸门（可选）：生产站 admin bootstrap 已关闭。
+      #   - 不配置 → 发布停在 PENDING_REVIEW，脚本诚实记录「等待人工审核」并跳过完成环节，
+      #              不触碰人工闸门红线（合规推荐，符合 CONTRACT §10.3 / D-17⑤）。
+      #   - 配置已有 admin 凭据 → 脚本可自动 review+dispatch 以走完「完成 1~2 个」，
+      #              但这把「任务审核人工兜底」自动化，触碰红线；须有权人书面风险接受。
+      #   - 无论是否配置，脚本【绝不调用 auto_accept】；验收 approve 始终由发布方本人完成。
+      ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+
+    steps:
+      # 1. 拉取仓库代码（含另一智能体写的 ops/daily-agents/daily-run.mjs）
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      # 2. 安装 Node 20（项目零运行时依赖，无需 npm install）
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: 确认 Node 版本
+        run: node --version
+
+      # 3. 计算报告日期，仅用于给 artifact 命名（不参与业务逻辑）。
+      #    使用 UTC 日期，与报告文件名 YYYY-MM-DD.json 的口径一致。
+      - name: 计算报告日期
+        id: date
+        run: echo "value=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      # 4. 凭据自检（可选但建议）：只检查「是否为空」，绝不打印具体值。
+      #    这样首次配置漏填某个 secret 时，日志会给出明确提示而不是让脚本静默失败。
+      #    注意：GitHub 本身也会对 secret 值自动打码，这里只是提前诊断。
+      - name: 检查凭据是否已配置（不输出具体值）
+        run: |
+          missing=0
+          for name in PUBLISHER_ACCOUNTS SOLVER_ACCOUNTS; do
+            value="${!name}"
+            if [ -z "$value" ]; then
+              echo "::warning::尚未配置 secret: $name（该项为空）"
+              missing=1
+            fi
+          done
+          if [ "$missing" -eq 1 ]; then
+            echo "::error::缺少账号池 secret，脚本将拒绝启动。请在仓库 Settings → Secrets 配置 PUBLISHER_ACCOUNTS / SOLVER_ACCOUNTS（JSON 数组，至少各 2 个账号）。"
+            exit 1
+          fi
+          # admin 凭据为可选：不配置则走人工闸门降级路径，不算错误。
+          if [ -z "$ADMIN_EMAIL" ] || [ -z "$ADMIN_PASSWORD" ]; then
+            echo "::notice::未配置 ADMIN_EMAIL/ADMIN_PASSWORD → 走人工闸门：任务停在 PENDING_REVIEW，完成环节将跳过（不触碰审核自动化红线）。"
+          else
+            echo "::warning::已配置 admin 凭据 → 脚本将自动 review+dispatch 以完成 1~2 个任务；此行为把任务审核自动化，须有权人已书面接受风险（CONTRACT §10.3 / D-17⑤）。"
+          fi
+
+      # 5. 核心执行：凭据仅通过环境变量注入，不进入命令行，避免在进程列表/日志中泄露。
+      #    脚本读取 PUBLISHER_ACCOUNTS / SOLVER_ACCOUNTS（JSON）与可选 ADMIN_*，
+      #    并把报告写到 ops/daily-agents/reports/YYYY-MM-DD.json。
+      - name: 运行每日互动脚本
+        run: node ops/daily-agents/daily-run.mjs
+
+      # 6. 上传报告为 artifact，保留 30 天。
+      #    用通配符匹配日期文件；即使某天脚本未产出文件也只告警、不让整个工作流失败。
+      - name: 上传报告
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-agents-report-${{ steps.date.outputs.value }}-${{ github.run_id }}
+          path: ops/daily-agents/reports/*.json
+          retention-days: 30
+          if-no-files-found: warn
