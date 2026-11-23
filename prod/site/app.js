@@ -45,8 +45,8 @@ const I18N = {
     'topbar.notLoggedIn': '未登录',
     'topbar.userChip': '{name}（{email}）· 角色 {role}',
     'topbar.notifications': '通知 ({n})',
-    'l1.title': 'L1 状态声明',
-    'l1.body': '本站为生产系统演示环境，未完成 docs/07 的 G1–G7 与 V1–V8 全部核销，不构成正式运营许可；不承诺任何服务等级（SLA）或可用性指标。',
+    'l1.title': '分期状态声明',
+    'l1.body': '本站为一期正式上线版本（CONTRACT §11 D-17）：真实账号、真实账本、人工闸门与安全护栏均已就位。原 20 项外部合规证据转入二期准入，本站不宣称已通过合规审查、已备案或获得官方背书；不承诺任何服务等级（SLA）或可用性指标。',
     'demo.body': '演示模式：后端未绑定 D1 持久化，写操作不可用。',
     'demo.link': 'L0 演示台',
     'demo.writeLocked': '演示模式：后端未绑定 D1 持久化，写操作不可用',
@@ -72,7 +72,7 @@ const I18N = {
 
     /* 认证视图 */
     'auth.title': '账号接入',
-    'auth.subtitle': '本站为生产系统演示环境，账号接入仅用于内部核验，不构成服务对外开放或运营许可。',
+    'auth.subtitle': '本站为一期正式上线版本，账号注册与登录已对外开放；平台积分 SBC 为平台内贡献积分，不可兑付、不可转让。',
     'auth.tab.login': '登录',
     'auth.tab.register': '注册',
     'auth.email': '邮箱',
@@ -85,7 +85,7 @@ const I18N = {
     'auth.register': '注册',
     'auth.csrfNote': '登录 / 注册响应中的 <code>data.session.csrf_token</code> 将用于后续所有写操作的 <code>X-CSRF-Token</code> 请求头；会话 Cookie 为 httpOnly，由浏览器自动携带。',
     'auth.complianceTitle': '合规要点 / Compliance Notes',
-    'auth.comp1': '本站仅为演示环境，docs/07 的 G1–G7 / V1–V8 尚未全部核销，未取得运营许可。',
+    'auth.comp1': '一期已正式上线；原 G1–G7 / V1–V8 外部证据闸门转入二期，不宣称已通过合规审查或备案。',
     'auth.comp2': 'SBC 为平台内贡献积分，不可兑付、不可转让；不构成资产、证券或电子货币，平台不提供任何价值保证。',
     'auth.comp3': '结算、争议裁定、任务审核与账号处罚均为须经人工确认的人工闸门。',
     'auth.comp4': 'AI 辅助排序已披露，个性化可关闭且由服务端强制生效（enforcement: server_side）。',
@@ -135,7 +135,7 @@ const I18N = {
 
     /* 合规要点卡片 */
     'compliance.title': '合规要点 / Compliance Notes',
-    'compliance.1': '本站仅为演示环境，docs/07 的 G1–G7 与 V1–V8 尚未全部核销，未取得运营许可。',
+    'compliance.1': '一期已正式上线；外部合规证据（原 G1–G7 / V1–V8）转二期，本站不宣称已通过合规审查、已备案或官方背书。',
     'compliance.2': 'SBC 为平台内贡献积分，不可兑付、不可转让；不构成资产、证券或电子货币，平台不提供任何价值保证。',
     'compliance.3': '结算、争议裁定、任务审核与处罚均为由管理员人工确认的人工闸门；自动裁决不产生法律效力。',
     'compliance.4': 'AI 辅助候选排序通过 weight_version / algorithm_degraded 披露；个性化可在此关闭，且由服务端强制生效（enforcement: server_side）。',
@@ -416,8 +416,8 @@ const I18N = {
     'topbar.notLoggedIn': 'Not signed in',
     'topbar.userChip': '{name} ({email}) · role {role}',
     'topbar.notifications': 'Notifications ({n})',
-    'l1.title': 'L1 Status Declaration',
-    'l1.body': 'This site is a production-system demonstration environment. The G1–G7 and V1–V8 gates in docs/07 have not all been discharged and no operating licence is granted. No service level agreement (SLA) or availability commitment is made.',
+    'l1.title': 'Phased Status Declaration',
+    'l1.body': 'This is the Phase 1 production launch (CONTRACT §11 D-17): real accounts, real ledger, human-in-the-loop gates and security controls are live. The 20 external compliance evidence gates have moved to Phase 2; this site does not claim regulatory approval, filing, or official endorsement. No SLA or availability commitment is made.',
     'demo.body': 'Demo mode: D1 persistence is not bound; all write operations are disabled.',
     'demo.link': 'L0 demo console',
     'demo.writeLocked': 'Demo mode: D1 persistence is not bound; writes are disabled',
@@ -443,7 +443,7 @@ const I18N = {
 
     /* Auth view */
     'auth.title': 'Account access',
-    'auth.subtitle': 'This is a production-system demonstration environment. Account access exists solely for internal verification; it is neither a public launch nor an operating licence.',
+    'auth.subtitle': 'Phase 1 is now live; registration and login are open to the public. SBC is an in-platform contribution credit — not redeemable, not transferable.',
     'auth.tab.login': 'Sign in',
     'auth.tab.register': 'Register',
     'auth.email': 'Email',
@@ -456,7 +456,7 @@ const I18N = {
     'auth.register': 'Register',
     'auth.csrfNote': 'The <code>data.session.csrf_token</code> returned by sign-in / registration is used as the <code>X-CSRF-Token</code> header on every subsequent write. The session cookie is httpOnly and sent by the browser automatically.',
     'auth.complianceTitle': 'Compliance Notes',
-    'auth.comp1': 'Demonstration environment only; the G1–G7 / V1–V8 gates in docs/07 are not fully discharged and no operating licence is granted.',
+    'auth.comp1': 'Phase 1 is live; the G1–G7 / V1–V8 external evidence gates have moved to Phase 2. No claim of regulatory approval or filing is made.',
     'auth.comp2': 'SBC is an in-platform contribution point, non-redeemable and non-transferable; it is not an asset, security or e-money, and the platform offers no value guarantee.',
     'auth.comp3': 'Settlement, dispute resolution, task review and account sanctions are human gates requiring explicit human confirmation.',
     'auth.comp4': 'AI-assisted ranking is disclosed; personalisation can be disabled and is enforced server-side (enforcement: server_side).',
@@ -506,7 +506,7 @@ const I18N = {
 
     /* Compliance card */
     'compliance.title': 'Compliance Notes',
-    'compliance.1': 'Demonstration environment only. The G1–G7 and V1–V8 gates in docs/07 are not fully discharged; no operating licence is granted.',
+    'compliance.1': 'Phase 1 is live. External compliance evidence (former G1–G7 / V1–V8) has moved to Phase 2; no claim of regulatory approval, filing, or official endorsement is made.',
     'compliance.2': 'SBC is an in-platform contribution point, non-redeemable and non-transferable; it is not an asset, security or e-money, and the platform offers no value guarantee.',
     'compliance.3': 'Settlement, dispute resolution, task review and sanctions are human gates confirmed by an administrator; no automated adjudication has legal effect.',
     'compliance.4': 'AI-assisted candidate ranking is disclosed via weight_version / algorithm_degraded. Personalisation can be disabled here and is enforced server-side (enforcement: server_side).',

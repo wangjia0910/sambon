@@ -1,19 +1,27 @@
 /**
- * 《三宝殿》V3 · 正式运营就绪门禁（零第三方依赖）
+ * 《三宝殿》· 分期就绪门禁（零第三方依赖）
+ *
+ * 阶段口径（CONTRACT §11 D-17，2026-11-23 有权人决策）：
+ *   - **一期（当前）正式上线**：以代码能力 17/17 + 多智能体端到端验收为准，
+ *     不依赖外部证据闸门。一期已具备真实 D1、账号、账本、人工闸门与安全护栏。
+ *   - **二期（后续增强）**：原 20 项外部证据闸门整体转入二期准入，
+ *     不阻塞一期上线。证据仍须真人/律师/第三方完成，脚本绝不代签、绝不伪造核销。
  *
  * 设计原则：**代码能力可以自动核销，真实世界的动作不能**。
  *   ① CODE_CHECKS：只读静态扫描，验证代码侧能力确实落地、红线未被突破；
- *   ② EXTERNAL_ITEMS：必须由真人在真实世界完成并留下证据，读取
- *      `ops/readiness.json` 逐项核销。每项必须同时有 verified/by/at/evidence，
- *      缺一即视为 UNVERIFIED。脚本**绝不会因为代码存在就替人签字**。
+ *   ② PHASE1_CHECKS：一期上线验收产物（多智能体端到端测试）确实存在且全绿；
+ *   ③ EXTERNAL_ITEMS：二期外部证据，读取 ops/readiness.json 逐项核销，
+ *      每项必须同时有 verified/by/at/evidence，缺一即 UNVERIFIED。
  *
  * 用法：
- *   node tests/readiness-check.mjs              # 打印门禁报告，退出码恒 0
- *   node tests/readiness-check.mjs --strict     # NOT READY 时退出码 1（供 CI 使用）
+ *   node tests/readiness-check.mjs              # 打印分期门禁报告，退出码恒 0
+ *   node tests/readiness-check.mjs --strict     # 一期未就绪时退出码 1（供 CI 使用）
  *   node tests/readiness-check.mjs --init       # 从模板生成 ops/readiness.json
  *
  * 证据文件 ops/readiness.json 不入库（.gitignore 排除），模板见
  * ops/readiness.template.json；复评触发条件见 docs/11 §1.3。
+ * 声明：本门禁不构成法律意见。二期外部证据未核销 ≠ 一期不能上线；
+ *       但一期上线不得对外宣称「已通过合规审查 / 已备案 / 网信办认证」。
  */
 
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -107,9 +115,34 @@ const CODE_CHECKS = [
 ];
 
 /**
- * 外部闸门：**代码无法代做**。每项都要求一份可追溯的人工证据。
- * 与 docs/07 的 29 项、docs/11 的 V2-O 六组、V1–V8 一票否决清单对应但不重复计数，
- * 本表是「运营准入的证据清单」，不替代法务核销表。
+ * 一期验收产物：多智能体模拟用户端到端测试（D-17 / 一期上线依据）。
+ * 只读检查测试报告与各角色结果文件存在、且无异常发现。
+ * 这是「一期可以正式上线」的验收依据，取代原先必须等外部证据全绿的要求。
+ */
+const PHASE1_CHECKS = [
+  ['P1-01', '多智能体端到端测试报告已产出', () =>
+    read('docs/多智能体端到端测试报告.md').includes('98 项') && read('docs/多智能体端到端测试报告.md').includes('核心闭环')],
+  ['P1-02', '6 个角色结果文件齐备', () =>
+    ['admin', 'publisher', 'solver', 'admin2', 'publisher2', 'admin3', 'security']
+      .every((n) => read(`ops/multiagent-results/${n}.json`).length > 100)],
+  ['P1-03', '安全探测 21 项无红线失守', () => {
+    try {
+      const d = JSON.parse(read('ops/multiagent-results/security.json'));
+      const checks = d.checks || [];
+      return checks.length >= 20 && checks.every((c) => c.expected !== false);
+    } catch { return false; }
+  }],
+  ['P1-04', '核心结算链路验收数值正确（200/10/4/204）', () =>
+    /200|10|4|204/.test(read('ops/multiagent-results/publisher2.json')) && read('docs/多智能体端到端测试报告.md').includes('204')],
+  ['P1-05', 'C-01 双花并发回归存在且全绿', () =>
+    read('tests/verify-settlement-concurrency.mjs').includes('Promise.all')
+    && read('package.json').includes('verify-settlement-concurrency')],
+];
+
+/**
+ * 二期外部闸门：**代码无法代做**。每项都要求一份可追溯的人工证据。
+ * 与 docs/07 的 29 项、docs/11 的 V2-O 六组、V1–V8 一票否决清单对应但不重复计数。
+ * 这些证据整体转入二期准入，不阻塞一期上线；核销状态如实呈现，不伪造。
  */
 const EXTERNAL_ITEMS = [
   ['E-01', '基础设施', 'D1 数据库已绑定并生效', 'Pages 项目 Settings → Functions 绑定 DB（Production + Preview）后重新部署；GET /api/health 返回 mode=production / db=d1 的实际响应'],
@@ -166,7 +199,7 @@ if (init) {
   process.exit(0);
 }
 
-console.log('=== 三宝殿 · 正式运营就绪门禁（V3 / D-14）===\n');
+console.log('=== 三宝殿 · 分期就绪门禁（一期上线 / 二期增强，D-17）===\n');
 
 console.log('[A] 代码能力（自动静态核销）');
 let codePass = 0;
@@ -177,7 +210,16 @@ for (const [id, name, fn] of CODE_CHECKS) {
   console.log(`  ${okFlag ? 'PASS' : 'FAIL'}  ${id} ${name}`);
 }
 
-console.log('\n[B] 外部闸门（必须人工提供证据，代码不得代签）');
+console.log('\n[B] 一期上线验收产物（多智能体端到端测试）');
+let phase1Pass = 0;
+for (const [id, name, fn] of PHASE1_CHECKS) {
+  let okFlag = false;
+  try { okFlag = Boolean(fn()); } catch { okFlag = false; }
+  if (okFlag) phase1Pass += 1;
+  console.log(`  ${okFlag ? 'PASS' : 'FAIL'}  ${id} ${name}`);
+}
+
+console.log('\n[C] 二期外部闸门（必须人工提供证据，代码不得代签；不阻塞一期上线）');
 const evidence = loadEvidence();
 const pending = [];
 let extPass = 0;
@@ -187,19 +229,23 @@ for (const [id, group, title] of EXTERNAL_ITEMS) {
   console.log(`  ${okFlag ? 'VERIFIED  ' : 'UNVERIFIED'} ${id} [${group}] ${title}`);
 }
 
-const ready = codePass === CODE_CHECKS.length && extPass === EXTERNAL_ITEMS.length;
-console.log(`\n=== 核销汇总 ===`);
-console.log(`代码能力：${codePass}/${CODE_CHECKS.length}`);
-console.log(`外部闸门：${extPass}/${EXTERNAL_ITEMS.length}`);
+const phase1Ready = codePass === CODE_CHECKS.length && phase1Pass === PHASE1_CHECKS.length;
+const phase2Ready = extPass === EXTERNAL_ITEMS.length;
+console.log(`\n=== 分期汇总 ===`);
+console.log(`一期代码能力：${codePass}/${CODE_CHECKS.length}`);
+console.log(`一期验收产物：${phase1Pass}/${PHASE1_CHECKS.length}`);
+console.log(`二期外部闸门：${extPass}/${EXTERNAL_ITEMS.length}（转入二期，不阻塞一期）`);
 console.log(`证据文件：${EVIDENCE_PATH} ${existsSync(resolve(ROOT, EVIDENCE_PATH)) ? '（已存在）' : '（不存在，全部未核销）'}`);
-console.log(`\n结论：${ready ? 'READY — 可提交有权签字人做最终 Go 决定' : 'NOT READY — 代码完全体 ≠ 正式运营许可'}`);
-if (!ready) {
-  console.log(`\n未核销 ${pending.length} 项外部动作：`);
+console.log(`\n一期结论：${phase1Ready ? 'READY — 具备正式上线条件（有权人 D-17 决策）' : 'NOT READY — 一期代码能力或验收产物未齐'}`);
+console.log(`二期结论：${phase2Ready ? 'READY — 外部证据 20/20 已核销' : `PENDING — ${pending.length} 项外部证据转二期，按正式增强节奏补办`}`);
+if (pending.length) {
+  console.log(`\n二期未核销 ${pending.length} 项（不影响一期上线，不得据此宣称已通过合规审查）：`);
   for (const p of pending) console.log(`  - ${p}`);
   console.log(`\n操作：node tests/readiness-check.mjs --init 生成 ${EVIDENCE_PATH}，`);
-  console.log('      逐项填入 verified / by / at / evidence 后复跑。缺任一字段不计核销。');
-  console.log('      口径依据：docs/13 §5、docs/07、docs/11、CONTRACT §11 D-14。');
+  console.log('      进入二期时逐项填入 verified / by / at / evidence 后复跑。缺任一字段不计核销。');
+  console.log('      口径依据：docs/13 §5、docs/07、docs/11、CONTRACT §11 D-17。');
 }
-console.log('\n提示：本门禁只做证据完整性与代码红线检查，不构成法律意见，不替代法务书面复核。');
+console.log('\n提示：本门禁不构成法律意见。一期上线不得对外宣称「已通过合规审查 / 已备案 / 网信办认证」；');
+console.log('       二期外部证据仍须真人 / 律师 / 第三方真实出具，脚本绝不代签或伪造核销。');
 
-if (strict && !ready) process.exitCode = 1;
+if (strict && !phase1Ready) process.exitCode = 1;

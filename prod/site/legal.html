@@ -57,9 +57,9 @@
 </header>
 
 <div class="banner-l1">
-  <strong>L1 状态声明</strong>
-  <span>本站为生产系统演示环境，未完成 docs/07 的 G1–G7 与 V1–V8 全部核销，不构成正式运营许可；下列政策为演示文本，不承诺任何服务等级（SLA）或可用性指标。</span>
-  <span class="en">Demonstration environment only — G1–G7 and V1–V8 (docs/07) are not fully discharged and no operating licence is granted. No SLA or availability commitment is made.</span>
+  <strong>分期状态声明</strong>
+  <span>本站为一期正式上线版本（CONTRACT §11 D-17）：真实账号、账本与人工闸门已就位。原 20 项外部合规证据转入二期准入；本站不宣称已通过合规审查、已备案或获得官方背书，不承诺任何服务等级（SLA）或可用性指标。下列政策为一期适用文本。</span>
+  <span class="en">Phase 1 production launch (CONTRACT §11 D-17): real accounts, ledger and human-in-the-loop gates are live. The 20 external compliance evidence gates have moved to Phase 2. No claim of regulatory approval, filing, or official endorsement. No SLA or availability commitment is made.</span>
 </div>
 
 <div class="legal-wrap">
@@ -101,8 +101,8 @@
     <div class="topic" id="status">
       <section class="card legal-section" lang="zh-CN">
         <h2>一、状态与适用范围</h2>
-        <p>本站为生产系统演示环境，未完成 <code>docs/07</code> 的 G1–G7 与 V1–V8 全部核销，<strong>不构成正式运营许可</strong>；账号接入仅用于内部核验，未开放注册，不构成服务对外开放。我们不承诺任何具体的可用性、响应时间、处理时限或服务等级（SLA）数字。</p>
-        <p>本页政策为演示文本，可能随合规核销进度更新，更新后在本页呈现。若中英文本存在理解差异，以中文文本为解释基准；英文版本为面向海外用户的完整译文，不采用逐字机翻。</p>
+        <p>本站为一期正式上线版本（CONTRACT §11 D-17），面向公众开放注册与登录，账号、账本、事件均为真实写入。原 <code>docs/07</code> 的 G1–G7 与 V1–V8 外部合规证据闸门已转入二期准入，本站<strong>不宣称已通过合规审查、已备案或获得官方背书</strong>。我们不承诺任何具体的可用性、响应时间、处理时限或服务等级（SLA）数字。</p>
+        <p>本页政策为一期适用文本，将随二期合规核销进度更新，更新后在本页呈现。若中英文本存在理解差异，以中文文本为解释基准；英文版本为面向海外用户的完整译文，不采用逐字机翻。</p>
         <p class="note-box">本服务仅面向年满 18 周岁的用户，不面向儿童；面向海外用户时默认以英文界面呈现（可在页面右上角切换语言）。</p>
       </section>
       <section class="card legal-section" lang="en">
@@ -133,7 +133,7 @@
         <h3>2.2 处理目的与法律依据</h3>
         <p>上述数据仅用于：（a）履行账号与任务服务所必需；（b）遵守法定义务与保存审计记录；（c）在取得同意的前提下进行匿名统计；（d）为安全与防滥用所必需的合法利益。我们不出售个人数据，不将个人数据用于第三方广告投放，不进行与任务撮合无关的用户画像。</p>
         <h3>2.3 留存</h3>
-        <p>留存以完成处理目的所需的最短期限为原则，并遵守适用法律：账号数据于账号存续期间保留；任务与事件审计记录在任务生命周期及法定争议期间内保留；访问日志按安全审计必要期限保留；同意记录保留至撤回后一段合理期间以证明合规；通知在用户已读或账号注销后按最短必要期限清理。账号注销后，除法律要求必须保留的记录外，个人数据予以删除或不可逆转地匿名化；匿名化后的汇总数据不再属于个人数据。本演示环境不对具体留存天数、响应时间或处理时限作出数字承诺。</p>
+        <p>留存以完成处理目的所需的最短期限为原则，并遵守适用法律：账号数据于账号存续期间保留；任务与事件审计记录在任务生命周期及法定争议期间内保留；访问日志按安全审计必要期限保留；同意记录保留至撤回后一段合理期间以证明合规；通知在用户已读或账号注销后按最短必要期限清理。账号注销后，除法律要求必须保留的记录外，个人数据予以删除或不可逆转地匿名化；匿名化后的汇总数据不再属于个人数据。本站不对具体留存天数、响应时间或处理时限作出数字承诺。</p>
         <h3>2.4 安全</h3>
         <p>会话 Cookie 为 httpOnly，前端脚本不读取 Cookie 内容；所有写操作携带 <code>X-CSRF-Token</code> 请求头以缓解跨站请求伪造；成果正文展示前经过 PII 脱敏；角色与状态校验在服务端强制生效（<code>enforcement: server_side</code>），客户端展示不构成授权。</p>
       </section>
@@ -212,7 +212,7 @@
           <li>补充措施包括传输加密（TLS）、最小必要数据收集、httpOnly 会话 Cookie、CSRF 令牌、PII 脱敏展示、按角色的服务端强制鉴权与审计事件留痕；</li>
           <li>你可向 <code>privacy@sambon.net</code> 索取上述保障措施的副本或说明（占位地址，正式运营前将替换为有效联系方式）。</li>
         </ul>
-        <p class="note-box">本演示环境尚未完成 docs/07 的 G1–G7 与 V1–V8 全部核销，上述传输机制为合规设计说明，不构成已完成审计或取得正式运营许可的声明。</p>
+        <p class="note-box">原 docs/07 的 G1–G7 与 V1–V8 外部合规证据已转入二期准入，上述传输机制为一期适用的合规设计说明，不构成已完成审计、已备案或取得官方背书的声明。</p>
       </section>
       <section class="card legal-section" lang="en">
         <h2>4. Cross-Border Transfers and the Cloudflare DPA / SCC</h2>
@@ -261,7 +261,7 @@
     <div class="topic" id="sbc">
       <section class="card legal-section" lang="zh-CN">
         <h2>六、SBC 非资产声明</h2>
-        <p class="note-box"><strong>SBC 为平台内贡献积分，不可兑付、不可转让。</strong>它仅用于在本演示环境内度量任务悬赏、服务费、冻结与记账流水，不构成资产、证券、电子货币、支付工具、投资标的或任何形式的财产权益。</p>
+        <p class="note-box"><strong>SBC 为平台内贡献积分，不可兑付、不可转让。</strong>它仅用于在本平台内度量任务悬赏、服务费、冻结与记账流水，不构成资产、证券、电子货币、支付工具、投资标的或任何形式的财产权益。</p>
         <ul>
             <li>SBC 不与任何货币计价挂钩，不具有货币价值；</li>
             <li>SBC 不可转让，无任何流转机制；</li>
@@ -334,13 +334,13 @@
       <section class="card legal-section" lang="zh-CN">
         <h2>九、服务条款</h2>
         <h3>9.1 服务性质</h3>
-        <p>本站为任务信息撮合与协作管理操作台的演示环境，提供任务发布、审核、分派、接单、成果提交、验收、争议处理、通知与审计回放等功能。账号接入仅用于内部核验，不构成服务对外开放或运营许可；SBC 仅为平台内贡献积分，不可兑付、不可转让。我们不承诺任何具体可用性、响应时间或服务等级（SLA）数字。</p>
+        <p>本站为任务信息撮合与协作管理平台的一期正式上线版本，提供任务发布、审核、分派、接单、成果提交、验收、争议处理、通知与审计回放等功能，面向公众开放。结算、争议裁定与处罚均保留人工确认闸门；SBC 仅为平台内贡献积分，不可兑付、不可转让。我们不承诺任何具体可用性、响应时间或服务等级（SLA）数字。</p>
         <h3>9.2 账号与邮箱验证</h3>
         <p>注册时须提供真实邮箱、密码与显示名，并选择角色（发布方 publisher 或 解决方 solver）；管理员账号由服务端另行配置。注册后可能要求邮箱验证（<code>POST /api/auth/verify-email</code>），未验证账号不得发布任务或接单。你须妥善保管凭据，对账号下的操作负责。会话失效（HTTP 401）时前端会统一清理登录态并回到认证视图。</p>
         <h3>9.3 任务与人工闸门</h3>
         <p>任务提交后进入待审核状态，由管理员人工审核；候选推送为算法辅助且默认 dry_run 预演；成果验收、争议裁定、自动验收、风控处置与处罚均为<strong>人工闸门</strong>，须经人工二次确认后由服务端执行。发布方或管理员可在任务进入终态前撤回任务（<code>POST /api/tasks/:id/cancel</code>）。服务端按角色与任务状态强制校验，前端展示不代表授权。任何结算类动作仅调整平台内贡献积分的记账科目，不涉及外部资金。</p>
         <h3>9.4 责任限制与终止</h3>
-        <p>在法律允许的最大范围内，本演示环境按「现状」提供，不承担间接或后果性损失。你可随时通过「删除我的账号」终止账号。我们可在合规或安全必要时暂停功能，并对重大变更在本页更新文本。适用法律与争议解决地将在正式运营前补充（占位）；当前演示环境不构成对任何司法辖区的商业承诺。</p>
+        <p>在法律允许的最大范围内，本站按「现状」提供，不承担间接或后果性损失。你可随时通过「删除我的账号」终止账号。我们可在合规或安全必要时暂停功能，并对重大变更在本页更新文本。适用法律与争议解决地（二期待补）尚未在本文本中明确；本站不构成对任何司法辖区的合规背书或商业承诺。</p>
       </section>
       <section class="card legal-section" lang="en">
         <h2>9. Terms of Service</h2>
@@ -422,8 +422,8 @@
       <section class="card legal-section" lang="zh-CN">
         <h2>十二、联系方式与文本状态</h2>
         <p>数据保护、权利行使、举报与合规问询：<code>privacy@sambon.net</code>。</p>
-        <p class="note-box">该地址为<strong>占位地址</strong>，用于演示环境文本占位；在取得正式运营许可前将替换为有效联系方式。本站不对任何具体响应时限、处理时限、可用性或服务等级（SLA）数字作出承诺。</p>
-        <p>本页文本与操作台中的 L1 状态声明一致：本站为生产系统演示环境，未完成 docs/07 的 G1–G7 与 V1–V8 全部核销，不构成正式运营许可。政策文本可能随合规核销进度更新，更新后以中英双语同步呈现。</p>
+        <p class="note-box">该地址目前仍为<strong>占位地址</strong>（二期待补为有效联系方式）。本站不对任何具体响应时限、处理时限、可用性或服务等级（SLA）数字作出承诺。</p>
+        <p>本页文本与操作台中的分期状态声明一致：本站为一期正式上线版本（CONTRACT §11 D-17），原 G1–G7 / V1–V8 外部证据转入二期，本站不宣称已通过合规审查或备案。政策文本将随二期合规进度更新，更新后以中英双语同步呈现。</p>
         <p style="margin-top:14px"><a class="btn btn-ghost" href="/">返回操作台</a></p>
       </section>
       <section class="card legal-section" lang="en">
@@ -439,7 +439,7 @@
 </div>
 
 <footer class="footer">
-  <div class="footer-links"><span>三宝殿 · sambon.net — 法律与合规声明（演示环境文本） / Legal &amp; Compliance (demonstration text)</span></div>
+  <div class="footer-links"><span>三宝殿 · sambon.net — 法律与合规声明（一期适用文本） / Legal &amp; Compliance (Phase 1 terms)</span></div>
   <div class="muted">SBC 为平台内贡献积分，不可兑付、不可转让；不构成资产或投资标的。 / SBC is a non-redeemable, non-transferable in-platform contribution point, not an asset or investment product.</div>
 </footer>
 
