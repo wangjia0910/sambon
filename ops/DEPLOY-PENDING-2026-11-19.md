@@ -70,7 +70,12 @@ echo "<PAT>"
 - C-01 结算并发双花已于 2026-11-20 从数据库层修复（D-16 / C-17，12 项并发回归），不再是阻塞项。
 - 一期已正式上线（D-17），对外可称「一期正式上线版本」；但不得表述为「已通过合规审查 / 已备案 / 网信办认证 / 官方背书」，二期外部证据 2/20 仍待补。
 
-## 四、待推送提交（2026-11-23 网络中断）
-- 本地 HEAD `e0c9176`（D-17 一期上线 + 文字优化），其前 `9a84212`（多智能体测试）；上次成功推送点为 `2897d49`（C-01 修复）。本地领先远端 **2 个提交**。
+## 四、待推送提交（2026-11-23 网络中断，持续阻断）
+- 本地 HEAD `207071d`（部署待办修正），其前 `e0c9176`（D-17 一期上线 + 文字优化）、`9a84212`（多智能体测试）；上次成功推送点为 `2897d49`（C-01 修复）。**本地领先远端 3 个提交**，工作区干净。
 - 2026-11-23 09:41 尝试推送：`ls-remote`（默认 / HTTP1.1 / openssl）与 `git push` 均连不上 `github.com:443`（Connection reset / 21s 超时），按约定不反复重试；askpass 已删、PAT 无残留。
-- **网络恢复后**：`git push origin main`（安全锁 `--force-with-lease=refs/heads/main:2897d49e39b99a7d74bd7d3c931196c5a8137beb`）。推送后 Cloudflare 自动部署生效，线上文案从「演示环境」变为「一期正式上线」。
+- 2026-11-23 再次执行「拉取 + 推送」：`git fetch`（沙箱 / 非沙箱通道）、`git push`（HTTP1.1 + openssl，均已清代理）依旧 `Connection reset` / `21s 超时`。确认 `github.com:443` 在 TCP 层被阻断，**非代理配置或凭据问题**（环境变量无 `GH_TOKEN`/`GITHUB_TOKEN`、无 askpass 残留）。按约定不再重试。
+- **只读通道核验结果（2026-11-23）**：
+  - `api.github.com` 最新提交仍为 `2897d49`（父 `481ebff`），证实远端确实未收到后续 3 个提交，无他人并发更新。
+  - `https://sambon.net/api/health` → `ok=true / mode=production / db=d1 / version=v3.0.0 / status=healthy`，线上生产后端正常。
+  - `https://sambon.net/app.js` 仍为旧口径：`l1.body`、`auth.subtitle`、`auth.comp1`、`compliance.1` **4 处「演示环境」**；未出现「一期正式上线」——证实 D-17 文案尚未上线，push 确有必要。
+- **网络恢复后**：先 `git fetch origin main` 确认远端无变化，再 `git push origin main`（安全锁 `--force-with-lease=refs/heads/main:2897d49e39b99a7d74bd7d3c931196c5a8137beb`）。推送后 Cloudflare 自动部署生效，线上文案从「演示环境」变为「一期正式上线」。若需凭据，仍按一次性 askpass 注入，不落盘、不打印。
