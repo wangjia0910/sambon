@@ -318,7 +318,7 @@ async function main() {
     // === ⑫ 结算编排事件名收敛 + 人工兜底（阶段 C 主代理裁决：路径 A，不采用 SettlementRequested） ===
     const ev12 = await call('GET', `/api/events?task_id=${t1Id}`);
     const types12 = ev12.ok ? ev12.data.events.map((e) => e.type) : [];
-    // CONTRACT §4 登记集合（主代理 v0.2：原 8 类 + 补登记 RiskBlocked / PreferenceChanged）
+    // 业务规范 §4 登记集合（主代理 v0.2：原 8 类 + 补登记 RiskBlocked / PreferenceChanged）
     const S4_EVENTS = new Set([
       'TaskPublished', 'TaskUpdated', 'CreditFrozen', 'CreditTransferred', 'CreditChanged',
       'DispatchRequested', 'DispatchScored', 'DispatchSent', 'DispatchExposed', 'DispatchIgnored',
@@ -348,7 +348,7 @@ async function main() {
       noModelDecision12 && noTransferBeforeArbitration12,
       `outside=[${outside12.join(',')}] allOutside=[${outsideAll12.join(',')}] allTypes=${allTypes12.length} ct=${ctIdx12} sc=${scIdx12} noModel=${noModelDecision12} disputeNoTransfer=${noTransferBeforeArbitration12}`);
 
-    // === ⑬ 未成年人限制 / 举报入口合规钩子（CONTRACT §10.5 / docs/03 §4） ===
+    // === ⑬ 未成年人限制 / 举报入口合规钩子（业务规范 §10.5 / 规范文档 §4） ===
     const cfg13 = await call('GET', '/api/config');
     const hooksOK = cfg13.ok && cfg13.data.compliance.minor_restriction_hook === true &&
       cfg13.data.compliance.report_entry_hook === true &&
@@ -369,7 +369,7 @@ async function main() {
       minor.error.code === 'MINOR_RESTRICTION_BLOCKED' && frontHooks,
       `hooks=${hooksOK} block=${!minor.ok && minor.error.code} front=${frontHooks}`);
 
-    // === ⑭ 反向流水冲正（CONTRACT §5 记账铁律 / docs/03 §4 §10.1，仓储单元级） ===
+    // === ⑭ 反向流水冲正（业务规范 §5 记账铁律 / 规范文档 §4 §10.1，仓储单元级） ===
     const unitStore = createStore();
     const base14 = unitStore.balanceCheck();
     const orig14 = unitStore.postLegs({
@@ -486,7 +486,7 @@ async function main() {
       rej9.ok && notInDefault && inAudit && notInBoard && acceptEventsOK,
       `reject=${dump(rej9)} notInDefault=${notInDefault} inAudit=${inAudit} notInBoard=${notInBoard} events=${acceptEventsOK}`);
 
-    // === ⑲ 提交成果 PII 脱敏（CONTRACT §10.2 / PRD US-06 验收条件③） ===
+    // === ⑲ 提交成果 PII 脱敏（业务规范 §10.2 / PRD US-06 验收条件③） ===
     const t10 = await newTask('T10');
     const t10Id = t10.ok ? t10.data.task.task_id : null;
     await review(t10Id, 'T10');

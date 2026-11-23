@@ -9,7 +9,7 @@
  *
  * 【源码契约确认——全部来自必读源码，不靠猜测】
  *   1. prod/lib/api.js:47        INITIAL_SBC_DEFAULT = 1000；SBC 为平台内贡献积分，
- *                                非资产、不可兑付（CONTRACT.md §1 / §10.1）。
+ *                                非资产、不可兑付。
  *   2. prod/lib/domain.js:93     computeFreeze(bounty) → service_fee = bounty*5%，
  *                                total = bounty + service_fee；发布时仅预检，
  *                                审核通过（PUBLISHED）才冻结。
@@ -651,12 +651,12 @@ async function main() {
   try { adminClient = await setupAdmin(cfg); }
   catch (e) { recordException({ phase: 'admin', action: 'setup', actor: cfg.admin.email, error: e }); }
   if (!adminClient) {
-    // 一期已启用自动闸门（有权人 2026-11-23 风险接受）：非本地环境下 admin 凭据
-    // 已配置却拿不到会话 = 凭据错误/账号失效，必须硬性失败，禁止静默跳过完成环节
-    // 造成「发布了 10 个但完成 0」的假成功。本地 dry-run 仍允许降级。
+    // 非本地环境下 admin 凭据已配置却拿不到会话 = 凭据错误/账号失效，
+    // 必须硬性失败，禁止静默跳过完成环节造成「发布了 10 个但完成 0」的假成功。
+    // 本地 dry-run 仍允许降级。
     if (!cfg.local && cfg.admin.email && cfg.admin.password) {
       throw new Error(
-        'ADMIN_AUTO_GATE_ENABLED_BUT_NO_SESSION: 一期自动闸门模式要求有效 admin 会话，' +
+        'ADMIN_AUTO_GATE_ENABLED_BUT_NO_SESSION: 自动审核模式要求有效 admin 会话，' +
         '但 ADMIN_EMAIL/ADMIN_PASSWORD 登录失败（凭据错误或账号不存在）。' +
         '请核对 GitHub Secrets 中的 admin 凭据；未取得会话前不会发布任务，避免产生无法完成的脏数据。',
       );

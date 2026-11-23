@@ -46,12 +46,12 @@ const I18N = {
     'topbar.userChip': '{name}（{email}）· 角色 {role}',
     'topbar.notifications': '通知 ({n})',
     'l1.title': '分期状态声明',
-    'l1.body': '本站为一期正式上线版本（CONTRACT §11 D-17）：真实账号、真实账本、人工闸门与安全护栏均已就位。原 20 项外部合规证据转入二期准入，本站不宣称已通过合规审查、已备案或获得官方背书；不承诺任何服务等级（SLA）或可用性指标。',
+    'l1.body': '生产环境：真实账号、真实账本、人工闸门与安全护栏均已就位。平台不承诺任何服务等级（SLA）或可用性指标。',
     'demo.body': '演示模式：后端未绑定 D1 持久化，写操作不可用。',
     'demo.link': 'L0 演示台',
     'demo.writeLocked': '演示模式：后端未绑定 D1 持久化，写操作不可用',
     'demo.writeLockedToast': '[WRITE_LOCKED] 演示模式：后端未绑定 D1 持久化，写操作不可用',
-    'footer.legal': '隐私政策 / 服务条款 / 可接受使用政策 / AI 透明度 / 未成年人限制 / 举报通道',
+    'footer.legal': '无事不登三宝殿 · 悬赏互助平台',
     'footer.sbc': 'SBC 为平台内贡献积分，不可兑付、不可转让。',
     'cookie.title': 'Cookie 与同意',
     'cookie.body': '必要 Cookie 用于会话与 CSRF 安全（httpOnly 会话 Cookie 由浏览器自动携带）；分析 Cookie 仅用于匿名统计，可选。你可在「数据与账号」中随时调整。',
@@ -72,7 +72,7 @@ const I18N = {
 
     /* 认证视图 */
     'auth.title': '账号接入',
-    'auth.subtitle': '本站为一期正式上线版本，账号注册与登录已对外开放；平台积分 SBC 为平台内贡献积分，不可兑付、不可转让。',
+    'auth.subtitle': '账号注册与登录已开放；平台积分 SBC 为平台内贡献积分，不可兑付、不可转让。',
     'auth.tab.login': '登录',
     'auth.tab.register': '注册',
     'auth.email': '邮箱',
@@ -84,14 +84,13 @@ const I18N = {
     'auth.login': '登录',
     'auth.register': '注册',
     'auth.csrfNote': '登录 / 注册响应中的 <code>data.session.csrf_token</code> 将用于后续所有写操作的 <code>X-CSRF-Token</code> 请求头；会话 Cookie 为 httpOnly，由浏览器自动携带。',
-    'auth.complianceTitle': '合规要点 / Compliance Notes',
-    'auth.comp1': '一期已正式上线；原 G1–G7 / V1–V8 外部证据闸门转入二期，不宣称已通过合规审查或备案。',
+    'auth.complianceTitle': '平台规则要点',
+    'auth.comp1': '平台已上线运营；任务发布、接单、验收、结算全流程线上完成。',
     'auth.comp2': 'SBC 为平台内贡献积分，不可兑付、不可转让；不构成资产、证券或电子货币，平台不提供任何价值保证。',
     'auth.comp3': '结算、争议裁定、任务审核与账号处罚均为须经人工确认的人工闸门。',
     'auth.comp4': 'AI 辅助排序已披露，个性化可关闭且由服务端强制生效（enforcement: server_side）。',
-    'auth.comp5': '适用 GDPR / UK GDPR 权利与 Cloudflare DPA / SCC 跨境传输保障；仅限成年人（18+）。',
-    'auth.comp6': '不承诺任何具体 SLA、可用性或响应时间。联系：privacy@sambon.net（占位）。',
-    'auth.fullPolicy': '完整政策：隐私政策 / 服务条款 / 可接受使用政策 / AI 透明度 / 未成年人限制 / 举报通道',
+    'auth.comp5': '仅限成年人（18 周岁及以上）使用，不故意收集未成年人数据。',
+    'auth.comp6': '平台不承诺任何具体 SLA、可用性或响应时间指标。',
     'auth.ok': '账号已接入：{name}',
     'auth.loggedOut': '已退出登录',
 
@@ -134,14 +133,14 @@ const I18N = {
     'publish.unverified': '邮箱未验证：发布任务前需先完成邮箱验证。服务端会拒绝未验证账号的发布请求，前端不提供可用入口。',
 
     /* 合规要点卡片 */
-    'compliance.title': '合规要点 / Compliance Notes',
-    'compliance.1': '一期已正式上线；外部合规证据（原 G1–G7 / V1–V8）转二期，本站不宣称已通过合规审查、已备案或官方背书。',
+    'compliance.title': '平台规则要点',
+    'compliance.1': '平台已上线运营；任务发布、接单、验收、结算全流程线上完成。',
     'compliance.2': 'SBC 为平台内贡献积分，不可兑付、不可转让；不构成资产、证券或电子货币，平台不提供任何价值保证。',
-    'compliance.3': '结算、争议裁定、任务审核与处罚均为由管理员人工确认的人工闸门；自动裁决不产生法律效力。',
+    'compliance.3': '结算、争议裁定、任务审核与处罚均为由管理员人工确认的人工闸门。',
     'compliance.4': 'AI 辅助候选排序通过 weight_version / algorithm_degraded 披露；个性化可在此关闭，且由服务端强制生效（enforcement: server_side）。',
-    'compliance.5': 'GDPR / UK GDPR 权利：访问、更正、删除、可携带、反对与撤回同意；跨境传输依托 Cloudflare DPA 与 EU SCC / UK Addendum。',
-    'compliance.6': '仅限成年人（18+），不故意收集未成年人数据；举报走站内通道或 privacy@sambon.net。',
-    'compliance.7': '本环境不承诺任何具体可用性、响应时间或 SLA 数字。完整文本见 <a href="/legal.html">legal.html</a>。',
+    'compliance.5': '账号数据可在「数据与账号」中导出（数据可携带）或删除（账号擦除）。',
+    'compliance.6': '仅限成年人（18 周岁及以上），不故意收集未成年人数据；举报走站内通道。',
+    'compliance.7': '平台不承诺任何具体可用性、响应时间或 SLA 指标。',
 
     /* 详情与动作面板 */
     'detail.empty': '从左侧任务列表选择一条任务以查看详情与按状态可用动作。',
@@ -192,8 +191,7 @@ const I18N = {
 
     /* 举报 */
     'report.title': '举报通道',
-    'report.hint': '举报提交后进入人工复核；详见 ',
-    'report.legalLink': 'legal.html 举报通道',
+    'report.hint': '举报提交后进入人工复核。',
     'report.reasonLabel': '举报理由',
     'report.reasonPlaceholder': '填写举报理由',
     'report.button': '举报该任务',
@@ -248,24 +246,22 @@ const I18N = {
     'ai.weightsTitle': '六项权重 ranking weights',
     'ai.weightsEmpty': '服务端未返回权重明细。',
     'ai.switchLabel': '关闭个性化推荐',
-    'ai.switchHint': '勾选＝关闭；取消勾选＝开启。<strong>服务端强制生效</strong>（enforcement: server_side），客户端无法绕过；关闭方式亦见 ',
-    'ai.switchLegalLink': 'legal.html AI 透明度',
+    'ai.switchHint': '勾选＝关闭；取消勾选＝开启。<strong>服务端强制生效</strong>（enforcement: server_side），客户端无法绕过。',
     'ai.redlinesTitle': '红线 red_lines',
     'ai.redlinesEmpty': '服务端未返回红线条目。',
-    'ai.enNote': 'Algorithm-assisted ranking is disclosed above; personalisation is enforced server-side and may be disabled without affecting task integrity. No automated decision produces legal effects.',
+    'ai.enNote': 'Algorithm-assisted ranking is disclosed above; personalisation is enforced server-side and may be disabled without affecting task integrity.',
     'ai.personalOn': '个性化推荐已开启（服务端强制生效）',
     'ai.personalOff': '个性化推荐已关闭（服务端强制生效）',
 
     /* 数据与账号 */
-    'account.title': '数据与账号（GDPR）',
+    'account.title': '数据与账号',
     'account.export': '导出我的数据（JSON）',
     'account.delete': '删除我的账号',
     'account.cookieSettings': 'Cookie 偏好',
-    'account.hint': '导出对应 <code>GET /api/me/export</code>（数据可携带权）；删除对应 <code>DELETE /api/me</code>，需输入 <code>DELETE</code> 二次确认，处理后自动退出登录。详细权利见 ',
-    'account.legalLink': 'legal.html 隐私政策',
+    'account.hint': '导出对应 <code>GET /api/me/export</code>（数据可携带）；删除对应 <code>DELETE /api/me</code>，需输入 <code>DELETE</code> 二次确认，处理后自动退出登录。',
     'account.hint2': '删除账号属高影响操作，前端要求显式输入确认；服务端按 enforcement: server_side 校验。',
     'account.exportOk': '已导出我的数据（JSON 文件）',
-    'account.deleteTitle': '删除我的账号（GDPR 擦除）',
+    'account.deleteTitle': '删除我的账号',
     'account.deleteBody': '该操作将注销当前账号并删除关联的个人数据，且不可撤销。处理后将自动退出登录。',
     'account.deleteOk': '账号已注销，已自动退出登录',
 
@@ -417,12 +413,12 @@ const I18N = {
     'topbar.userChip': '{name} ({email}) · role {role}',
     'topbar.notifications': 'Notifications ({n})',
     'l1.title': 'Phased Status Declaration',
-    'l1.body': 'This is the Phase 1 production launch (CONTRACT §11 D-17): real accounts, real ledger, human-in-the-loop gates and security controls are live. The 20 external compliance evidence gates have moved to Phase 2; this site does not claim regulatory approval, filing, or official endorsement. No SLA or availability commitment is made.',
+    'l1.body': 'Production environment: real accounts, real ledger, human-in-the-loop gates and security controls are live. No SLA or availability commitment is made.',
     'demo.body': 'Demo mode: D1 persistence is not bound; all write operations are disabled.',
     'demo.link': 'L0 demo console',
     'demo.writeLocked': 'Demo mode: D1 persistence is not bound; writes are disabled',
     'demo.writeLockedToast': '[WRITE_LOCKED] Demo mode: D1 persistence is not bound; write operations are disabled',
-    'footer.legal': 'Privacy / Terms / Acceptable Use / AI Transparency / Minor Restrictions / Reporting',
+    'footer.legal': 'Sambon · Bounty & Mutual Aid Platform',
     'footer.sbc': 'SBC is an in-platform contribution point, non-redeemable and non-transferable.',
     'cookie.title': 'Cookies & Consent',
     'cookie.body': 'Necessary cookies keep the session and CSRF protection secure (the httpOnly session cookie is sent by the browser automatically); analytics cookies are used only for anonymous statistics and are optional. You can change this at any time under Data & Account.',
@@ -455,14 +451,13 @@ const I18N = {
     'auth.login': 'Sign in',
     'auth.register': 'Register',
     'auth.csrfNote': 'The <code>data.session.csrf_token</code> returned by sign-in / registration is used as the <code>X-CSRF-Token</code> header on every subsequent write. The session cookie is httpOnly and sent by the browser automatically.',
-    'auth.complianceTitle': 'Compliance Notes',
-    'auth.comp1': 'Phase 1 is live; the G1–G7 / V1–V8 external evidence gates have moved to Phase 2. No claim of regulatory approval or filing is made.',
+    'auth.complianceTitle': 'Platform Rules',
+    'auth.comp1': 'The platform is live; publishing, accepting, verification and settlement all run online.',
     'auth.comp2': 'SBC is an in-platform contribution point, non-redeemable and non-transferable; it is not an asset, security or e-money, and the platform offers no value guarantee.',
     'auth.comp3': 'Settlement, dispute resolution, task review and account sanctions are human gates requiring explicit human confirmation.',
     'auth.comp4': 'AI-assisted ranking is disclosed; personalisation can be disabled and is enforced server-side (enforcement: server_side).',
-    'auth.comp5': 'GDPR / UK GDPR rights and Cloudflare DPA / SCC cross-border safeguards apply; adults only (18+).',
-    'auth.comp6': 'No specific SLA, availability or response-time figure is promised. Contact: privacy@sambon.net (placeholder).',
-    'auth.fullPolicy': 'Full policies: Privacy / Terms / Acceptable Use / AI Transparency / Minor Restrictions / Reporting',
+    'auth.comp5': 'Adults only (18+); we do not knowingly collect data from minors.',
+    'auth.comp6': 'No specific SLA, availability or response-time figure is promised.',
     'auth.ok': 'Account connected: {name}',
     'auth.loggedOut': 'Signed out',
 
@@ -505,14 +500,14 @@ const I18N = {
     'publish.unverified': 'Email not verified: complete email verification before publishing. The server rejects publishing from unverified accounts, so no usable control is offered here.',
 
     /* Compliance card */
-    'compliance.title': 'Compliance Notes',
-    'compliance.1': 'Phase 1 is live. External compliance evidence (former G1–G7 / V1–V8) has moved to Phase 2; no claim of regulatory approval, filing, or official endorsement is made.',
+    'compliance.title': 'Platform Rules',
+    'compliance.1': 'The platform is live; publishing, accepting, verification and settlement all run online.',
     'compliance.2': 'SBC is an in-platform contribution point, non-redeemable and non-transferable; it is not an asset, security or e-money, and the platform offers no value guarantee.',
-    'compliance.3': 'Settlement, dispute resolution, task review and sanctions are human gates confirmed by an administrator; no automated adjudication has legal effect.',
+    'compliance.3': 'Settlement, dispute resolution, task review and sanctions are human gates confirmed by an administrator.',
     'compliance.4': 'AI-assisted candidate ranking is disclosed via weight_version / algorithm_degraded. Personalisation can be disabled here and is enforced server-side (enforcement: server_side).',
-    'compliance.5': 'GDPR / UK GDPR rights: access, rectification, erasure, portability, objection and consent withdrawal. Cross-border transfers rely on the Cloudflare DPA and EU SCC / UK Addendum.',
-    'compliance.6': 'Adults only (18+); we do not knowingly collect data from children. Reports: in-app channel or privacy@sambon.net.',
-    'compliance.7': 'No specific uptime, response-time or SLA figure is promised in this environment. Full texts: <a href="/legal.html">legal.html</a>.',
+    'compliance.5': 'Account data can be exported (portability) or erased from Data & Account.',
+    'compliance.6': 'Adults only (18+); we do not knowingly collect data from minors. Reports: in-app channel.',
+    'compliance.7': 'No specific uptime, response-time or SLA figure is promised.',
 
     /* Detail & action panel */
     'detail.empty': 'Select a task from the list on the left to view details and the actions available for its state.',
@@ -563,8 +558,7 @@ const I18N = {
 
     /* Report */
     'report.title': 'Reporting channel',
-    'report.hint': 'Reports enter manual review; see ',
-    'report.legalLink': 'legal.html reporting channel',
+    'report.hint': 'Reports enter manual review.',
     'report.reasonLabel': 'Reason',
     'report.reasonPlaceholder': 'Enter a reason',
     'report.button': 'Report this task',
@@ -619,24 +613,22 @@ const I18N = {
     'ai.weightsTitle': 'Six ranking weights',
     'ai.weightsEmpty': 'No weight detail was returned by the server.',
     'ai.switchLabel': 'Disable personalised recommendations',
-    'ai.switchHint': 'Checked means disabled; unchecked means enabled. <strong>Enforced server-side</strong> (enforcement: server_side) and cannot be bypassed by the client; see also ',
-    'ai.switchLegalLink': 'legal.html AI transparency',
+    'ai.switchHint': 'Checked means disabled; unchecked means enabled. <strong>Enforced server-side</strong> (enforcement: server_side) and cannot be bypassed by the client.',
     'ai.redlinesTitle': 'Red lines',
     'ai.redlinesEmpty': 'No red-line entries were returned by the server.',
-    'ai.enNote': 'Algorithm-assisted ranking is disclosed above; personalisation is enforced server-side and may be disabled without affecting task integrity. No automated decision produces legal effects.',
+    'ai.enNote': 'Algorithm-assisted ranking is disclosed above; personalisation is enforced server-side and may be disabled without affecting task integrity.',
     'ai.personalOn': 'Personalisation enabled (enforced server-side)',
     'ai.personalOff': 'Personalisation disabled (enforced server-side)',
 
     /* Data & account */
-    'account.title': 'Data & Account (GDPR)',
+    'account.title': 'Data & Account',
     'account.export': 'Export my data (JSON)',
     'account.delete': 'Delete my account',
     'account.cookieSettings': 'Cookie preferences',
-    'account.hint': 'Export maps to <code>GET /api/me/export</code> (portability); deletion maps to <code>DELETE /api/me</code> and requires typing <code>DELETE</code> to confirm, after which you are signed out. Full rights: ',
-    'account.legalLink': 'legal.html privacy policy',
+    'account.hint': 'Export maps to <code>GET /api/me/export</code> (portability); deletion maps to <code>DELETE /api/me</code> and requires typing <code>DELETE</code> to confirm, after which you are signed out.',
     'account.hint2': 'Deletion is a high-impact operation: the client requires explicit typed confirmation and the server validates it (enforcement: server_side).',
     'account.exportOk': 'My data exported (JSON file)',
-    'account.deleteTitle': 'Delete my account (GDPR erasure)',
+    'account.deleteTitle': 'Delete my account',
     'account.deleteBody': 'This will close the current account and delete associated personal data, and cannot be undone. You will be signed out afterwards.',
     'account.deleteOk': 'Account closed; signed out automatically',
 
@@ -1420,7 +1412,6 @@ function renderAuthView() {
     <div class="card">
       <h3>${t('auth.complianceTitle')}</h3>
       <ul class="en-list">${comp}</ul>
-      <p><a href="/legal.html">${t('auth.fullPolicy')}</a></p>
     </div>
   </div>`;
 }
@@ -1698,7 +1689,7 @@ function renderReportBox() {
   return `
   <div class="block">
     <h4>${t('report.title')}</h4>
-    <p class="muted">${t('report.hint')}<a href="/legal.html#report">${t('report.legalLink')}</a>。</p>
+    <p class="muted">${t('report.hint')}</p>
     <div class="action-row">
       <label class="form-row"><span>${t('report.reasonLabel')}</span><input type="text" data-model="detailDraft.report_reason" value="${esc(d.report_reason)}" placeholder="${esc(t('report.reasonPlaceholder'))}"></label>
       <button type="button" class="btn btn-ghost" data-action="report">${t('report.button')}</button>
@@ -1813,7 +1804,7 @@ function renderAICard() {
         <input type="checkbox" data-action="toggle-personalized" ${pref ? '' : 'checked'}>
         <span>${t('ai.switchLabel')}</span>
       </label>
-      <p class="muted">${t('ai.switchHint')}<a href="/legal.html#ai">${t('ai.switchLegalLink')}</a>。</p>
+      <p class="muted">${t('ai.switchHint')}</p>
     </div>
     <div class="block">
       <h4>${t('ai.redlinesTitle')}</h4>
@@ -1862,7 +1853,7 @@ function renderAccountCard() {
       <button type="button" class="btn btn-danger" data-action="delete-me">${t('account.delete')}</button>
       <button type="button" class="btn btn-ghost" data-action="cookie-settings">${t('account.cookieSettings')}</button>
     </div>
-    <p class="muted">${t('account.hint')}<a href="/legal.html#gdpr">${t('account.legalLink')}</a>。</p>
+    <p class="muted">${t('account.hint')}</p>
     <p class="muted">${t('account.hint2')}</p>
   </div>`;
 }

@@ -3,16 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "三宝殿 · 悬赏互助平台 Web 单端：L0 静态演示 + Cloudflare Pages Functions / D1 生产系统（零第三方依赖）",
+  "description": "三宝殿 · 悬赏互助平台：Cloudflare Pages Functions + D1 生产系统（零第三方依赖）",
   "scripts": {
     "start": "node src/server.mjs",
     "build": "node tools/build-cloudflare.mjs",
+    "preview": "node ops/preview-server.mjs 8788",
+    "daily": "node ops/daily-agents/daily-run.mjs",
     "test": "node tests/smoke.mjs && node tests/verify-local.mjs && node tests/verify-cloudflare.mjs && node tests/verify-site-selfcheck.mjs && node tests/verify-member.mjs && node tests/verify-member-runtime.mjs && node tests/verify-seo.mjs && node --disable-warning=ExperimentalWarning tests/verify-member-api.mjs && node --disable-warning=ExperimentalWarning tests/verify-production.mjs && node --disable-warning=ExperimentalWarning tests/verify-settlement-concurrency.mjs",
     "test:production": "node --disable-warning=ExperimentalWarning tests/verify-production.mjs",
-    "test:concurrency": "node --disable-warning=ExperimentalWarning tests/verify-settlement-concurrency.mjs",
-    "check": "node tests/predeploy-check.mjs",
-    "check:ready": "node tests/readiness-check.mjs",
-    "check:ready:strict": "node tests/readiness-check.mjs --strict",
-    "verify:deploy": "node tests/verify-deployment.mjs"
+    "test:concurrency": "node --disable-warning=ExperimentalWarning tests/verify-settlement-concurrency.mjs"
   }
 }

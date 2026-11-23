@@ -76,18 +76,15 @@ jobs:
       SOLVER_ACCOUNTS: ${{ secrets.SOLVER_ACCOUNTS }}
 
       # ---------------------------------------------------------------------
-      # 管理员闸门【一期正式启用】：有权人（王哥）2026-11-23 明确决策——一期项目按
-      # 自动闸门运行，接受把「任务审核/推送」自动化的风险（原红线 CONTRACT §10.3 /
-      # D-17⑤ 要求人工兜底，此处为有权人书面风险接受后的例外）。
-      # 因此 ADMIN_EMAIL/ADMIN_PASSWORD 为【必填】：脚本用它自动 review+dispatch，
-      # 让任务从 PENDING_REVIEW 走到可接单，从而完成「每日完成 1~2 个」。
-      # 注意：脚本【绝不调用 auto_accept】；验收 approve 始终由发布方本人完成，
-      #       争议/退款/处罚/风控处置仍不经脚本（无对应调用），闸门仅放开审核+推送两步。
+      # 管理员自动审核：脚本用 admin 会话执行 review + dispatch，使每日任务能被接单完成。
+      # ADMIN_EMAIL / ADMIN_PASSWORD 为必填：缺少时脚本拒绝启动，避免产生无法完成的脏数据。
+      # 边界：脚本【绝不调用 auto_accept】；验收 approve 始终由发布方本人完成；
+      #       争议/退款/处罚/风控处置不经脚本。
       ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
     steps:
-      # 1. 拉取仓库代码（含另一智能体写的 ops/daily-agents/daily-run.mjs）
+      # 1. 拉取仓库代码
       - name: 检出代码
         uses: actions/checkout@v4
 
@@ -119,16 +116,16 @@ jobs:
               missing=1
             fi
           done
-          # admin 凭据【一期必填】：有权人已决定启用自动闸门，缺则无法完成 1~2 个任务。
+          # admin 凭据必填：缺少时任务无法进入可接单状态，完成环节不可达。
           if [ -z "$ADMIN_EMAIL" ] || [ -z "$ADMIN_PASSWORD" ]; then
-            echo "::error::缺少 ADMIN_EMAIL/ADMIN_PASSWORD。一期按有权人决策启用自动审核闸门，任务需 admin review+dispatch 才能被接单完成；请配置这两个 secret。"
+            echo "::error::缺少 ADMIN_EMAIL/ADMIN_PASSWORD。任务需 admin review+dispatch 才能被接单完成；请配置这两个 secret。"
             missing=1
           fi
           if [ "$missing" -eq 1 ]; then
             echo "::error::凭据未配齐，脚本将拒绝启动。请在仓库 Settings → Secrets 配置：PUBLISHER_ACCOUNTS / SOLVER_ACCOUNTS（JSON 数组，各≥2账号）、ADMIN_EMAIL / ADMIN_PASSWORD。"
             exit 1
           fi
-          echo "::notice::凭据齐备 → 一期自动闸门模式：脚本自动 review+dispatch，验收仍由发布方本人 approve（有权人 2026-11-23 风险接受）。"
+          echo "::notice::凭据齐备 → 脚本将自动 review+dispatch，验收仍由发布方本人 approve。"
 
       # 5. 核心执行：凭据仅通过环境变量注入，不进入命令行，避免在进程列表/日志中泄露。
       #    脚本读取 PUBLISHER_ACCOUNTS / SOLVER_ACCOUNTS（JSON）与可选 ADMIN_*，

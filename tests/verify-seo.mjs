@@ -80,9 +80,9 @@ async function main() {
     spawnSync(process.execPath, ['--check', join(OUT, 'seo.js')]).status === 0);
 
   const sm = read(join(OUT, 'sitemap.xml'));
-  check('VSX-16 sitemap 含主入口 + 法务页 + hreflang 交替链接',
+  check('VSX-16 sitemap 含主入口 + hreflang 交替链接',
     /<loc>https:\/\/sambon\.net\/<\/loc>/.test(sm) &&
-    /legal\.html/.test(sm) && /xhtml:link rel="alternate"/.test(sm));
+    /xhtml:link rel="alternate"/.test(sm));
   const rb = read(join(OUT, 'robots.txt'));
   check('VSX-17 robots 允许抓取 + 屏蔽 API/演示/操作台 + 指向 sitemap',
     /Allow: \//.test(rb) && /Disallow: \/api\//.test(rb) &&
@@ -97,24 +97,10 @@ async function main() {
       /Disallow: \/index\.html/.test(b) && /Disallow: \/demo/.test(b)),
     `${uaBlocks.length} 个具名 UA 段`);
 
-  // 审计回归：法务页 hreflang 落地一致性（?lang= 真正驱动语言 + x-default）
-  const legalHtml = read(join(OUT, 'legal.html'));
-  check('VSX-18c 法务页 index,follow + canonical + hreflang 三语（含 x-default）',
-    /name="robots" content="index, follow/.test(legalHtml) &&
-    /rel="canonical" href="https:\/\/sambon\.net\/legal\.html"/.test(legalHtml) &&
-    /hreflang="zh-CN"/.test(legalHtml) && /hreflang="en"/.test(legalHtml) &&
-    /hreflang="x-default"/.test(legalHtml));
-  const legalJs = read(join(OUT, 'legal-lang.js'));
-  check('VSX-18d 法务页 ?lang= 落地脚本存在且由 legal.html 同源加载（兼容 CSP）',
-    /<script src="\/legal-lang\.js">/.test(legalHtml) &&
-    /URLSearchParams\(location\.search\)\.get\('lang'\)/.test(legalJs) &&
-    /doc-lang-en/.test(legalJs) && /doc-lang-zh/.test(legalJs) &&
-    spawnSync(process.execPath, ['--check', join(OUT, 'legal-lang.js')]).status === 0);
 
   const headers = read(join(OUT, '_headers'));
-  check('VSX-19 seo.js/legal-lang.js/sitemap/robots 声明正确 MIME',
+  check('VSX-19 seo.js/sitemap/robots 声明正确 MIME',
     /\/seo\.js[\s\S]*?text\/javascript/.test(headers) &&
-    /\/legal-lang\.js[\s\S]*?text\/javascript/.test(headers) &&
     /\/sitemap\.xml[\s\S]*?application\/xml/.test(headers) &&
     /\/robots\.txt[\s\S]*?text\/plain/.test(headers));
   check('VSX-20 主入口 CSP 未因 SEO 弱化（script-src self）',

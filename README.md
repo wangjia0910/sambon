@@ -1,136 +1,451 @@
 # 三宝殿 · 悬赏互助平台
 
-> **一句话定位**：用大模型驱动的匹配与调度，把非标准化的悬赏任务，推送给最可能按时完成的人；用 SBC 积分体系度量贡献并给予平台内权益。（引自《三宝殿项目方案_v1.0.md》§1.1；项目初版以「规则引擎 + LLM 适配层」落地，不接真实大模型）
+> **无事不登三宝殿。**
 >
-> **主域**：`sambon.net`（品牌主站、管理后台、开放接口、白皮书与披露页）
->
-> **当前阶段（CONTRACT §11 D-17，2026-11-23）**：**一期已正式上线**；代码能力 17/17、多智能体端到端验收 98 项全绿、C-01 双花已修复。原 20 项外部合规证据闸门整体转入**二期**准入（当前 2/20，不阻塞一期）。**本站不宣称已通过合规审查、已备案或获得官方背书**；SBC 为平台内贡献积分，不可兑付、不可转让。
+> 三宝殿是一个悬赏互助平台：发布方悬赏、猎人接单、按时交付、验收结算。
+> 生产形态为 **Cloudflare Pages + Pages Functions + D1**，零第三方运行时依赖。
 
-## 本仓库是什么
+| 项 | 值 |
+|---|---|
+| 主域 | `sambon.net` |
+| 用户版入口 | `https://sambon.net/`（等价 `/app`） |
+| 运营台入口 | `https://sambon.net/product`（等价 `/production`） |
+| 运行时 | Cloudflare Pages（静态）+ Pages Functions（`/api/*`）+ D1（SQLite） |
+| Node 版本 | 18+（本地开发与测试；生产不需要 Node） |
+| 依赖 | **零第三方依赖**，无需 `npm install` |
 
-- 本仓库是 **《三宝殿》悬赏互助平台**：Cloudflare Pages Functions + D1 生产系统、Web 用户版与运营台、完整评审与验收文档。**一期已正式上线**（发布 → 审核 → 推送 → 接单 → 验收 → 结算 → 争议 → 裁定全链路可用，见 `docs/多智能体端到端测试报告.md`）；后续增强见二期。
-- **产品形态（本轮起收敛为 Web 单端）**：用户 2026-11-12 指令「只做 Web 版，在 Cloudflare 上线」；`sambon.net` Web 站为唯一交付形态 —— **Cloudflare Pages 生产系统（Pages Functions + D1）＋ L0 静态演示版 ＋ 同源本地 Node 原型**（生产系统见 `docs/12-生产系统架构与部署.md`，静态版见 `docs/09-Cloudflare部署指导.md`）。方案 v1.0 的「微信小程序 + APP 先行、P3 智能硬件」作为历史基线保留、不再列入本轮交付范围，差异登记于 `CONTRACT.md` §11 **D-10**，方案文档不改写；服务地域按 §11 **D-12** 定为**海外（中国境外）**，Cloudflare 全球边缘部署，两项中国境内备案不作为上线闸门（见 `docs/11`）；生产系统落地与上线通道见 §11 **D-13**。
-- **定位覆盖声明**：本仓库定位已整体**覆盖原命理项目定位**，由命理类项目改为悬赏互助平台；**本仓库不再包含任何命理、占卜、测算及相关内容**。
-- **协作基线**：`CONTRACT.md` **v0.2（阶段 C 定稿）**（三智能体协作契约，唯一共同基线）与 `三宝殿项目方案_v1.0.md`（v1.0 评审方案，只读基线）。术语、状态机、事件名、权重数值、接口路径一律以 `CONTRACT.md` v0.2 为准；与方案冲突时以方案为准并登记差异，口径裁决以 §11 裁决表为最终依据。
+---
 
-## SBC 性质（合规红线，先读这一段）
+## 一、平台能力
 
-**SBC（Sambon Credit）是平台内贡献积分凭证**，用于度量贡献并兑换平台内权益：
+### 1. 任务全流程
 
-| 是                             | 不是 / 不允许                                                                                                             |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| 平台内贡献积分凭证                     | **非加密资产、非证券、非支付工具**                                                                                                  |
-| 按「已有效完成任务」行为铸造、绑定真实 `task_id` | **不可兑付法币、不可转让、不可场外交易、不设二级市场、不承诺收益或增值**                                                                               |
-| 链下账本（权威）＋ 链上存证（校验）            | **链仅为存证**：许可链 / 联盟链按批次锚定「流水摘要 + Merkle 根 + 时间戳 + 账本版本号 + 上一批次哈希」，零 PII、零任务正文上链；项目初版仅做「本地 Merkle 摘要 + 可插拔锚定接口」演示，不接公链 |
+发布 → 审核 → 推送 → 接单 → 进行中 → 提交成果 → 验收结算 →（争议）→ 结案。
 
-> 完整合规口径见 [COMPLIANCE.md](COMPLIANCE.md) 与 `docs/03-合规基线与SBC白皮书要点.md`。
+九态状态机（`src/domain.mjs` 为唯一真源）：
 
-## 快速开始
+```
+DRAFT ──→ PENDING_REVIEW ──→ PUBLISHED ──→ DISPATCHING ──→ ACCEPTED
+              │                  │              │              │
+              ↓                  ↓              ↓              ↓
+           REJECTED          CANCELLED      EXPIRED        IN_PROGRESS
+                                                                │
+                                                    ┌───────────┼───────────┐
+                                                    ↓           ↓           ↓
+                                                SUBMITTED   EXPIRED     DISPUTED
+                                                    │                       │
+                                            ┌───────┼───────┐       ┌───────┼───────┐
+                                            ↓       ↓       ↓       ↓       ↓       ↓
+                                        SETTLED DISPUTED IN_PROGRESS SETTLED CANCELLED CLOSED
+                                            │   （驳回）                    │
+                                            ↓                               ↓
+                                          CLOSED                          CLOSED
+```
 
-- **运行环境**：Node.js **22+**；**零第三方依赖**（仅用 Node 内置模块，无需 `npm install`）。
-- **启动服务**：`node src/server.mjs`（默认端口 `8787`，可用 `PORT` 环境变量覆盖；未指定 host，Node 默认监听全网卡，日志中的 `127.0.0.1` 仅为显示文案；对外访问请置于反向代理之后）。
-- **访问操作台**：<http://localhost:8787> （等价 <http://127.0.0.1:8787> ；`GET /` 与 `/index.html` 均返回静态操作台 `web/index.html`）。
-- **接口规模**：与 `CONTRACT.md` §8 一致，共 **16 个接口** ＝ 15 个 `/api/*` 端点 ＋ 静态操作台 `GET /`；未登记路径一律 404。
-- **跑自检**：`node tests/smoke.mjs` —— 自行 spawn 随机空闲端口、轮询 `/api/health`、结束关闭子进程；以 **20 项断言**覆盖发布 → 审核 → 推送 → 接单 → 提交 → 验收 → 结算 → 争议 → 流水 → 事件回放 → 配置与个性化开关等核心链路（期望 `PASS 20 / FAIL 0`、退出码 0），并非逐接口逐一校验。
-- **阶段 C 新增断言覆盖范围**：事件名收敛与人工兜底（运行期事件类型 ⊆ 契约 §4 登记表）、未成年人 / 举报钩子占位、反向流水冲正、用户榜 `net_sbc` 计入口径、Merkle 载荷零 PII 扫描、成果正文 PII 脱敏、驳回任务下架、Top-K 分批参数。
-- **独立本地验证**：`node tests/verify-local.mjs` —— 主代理另行编写的 **32 项断言**（A–H 八组，不复用自检实现、基准取自 `CONTRACT.md` v0.2），覆盖白盒规则单测、端到端积分数值勾稽、并发抢单、个性化开关、争议人工兜底、合规红线、静态页、性能与重启重置；期望 `PASS 32 / FAIL 0`、退出码 0。完整报告见 `docs/06-本地测试验证报告.md`。
-- **上线准入自检**：`node tests/predeploy-check.mjs` —— 聚合上述两套测试与静态红线扫描（**12 项门禁**，含 Cloudflare 静态版一致性复跑），输出 **L0 在线演示预览**准入门禁与 **L1/L2** 判定（当前恒为 No-Go，除非 `docs/07` 九组清单真实勾选并附证据）；分层定义、部署手册与改造清单见 `docs/08-上线部署指导.md`。
-- **Cloudflare 静态 Web 版**：`node tools/build-cloudflare.mjs` 生成 `cloudflare/` 产物（Pages 直接上传或 Git 集成，输出目录 `cloudflare`）；`node tests/verify-cloudflare.mjs` 验证浏览器运行时与 Node 服务同序列口径一致（**14 项断言**）。静态版 `/api/*` 由页面内运行时计算，**不能用 curl 测 API**；线上站点可在浏览器控制台执行 `await import('/site-selfcheck.mjs').then(m => m.run())` 一键跑 10 项验收（详见 `docs/09` §3.2 / §5）。
-- **生产系统（D-13，本轮新增）**：`functions/api/[[path]].js` + `prod/lib/*` 为真实后端（会话 / CSRF / RBAC / D1 事务 / 幂等 / 账本哈希链 / GDPR），`prod/site/*` 为生产前端；`npm run build` 生成 `cloudflare/` 产物与 Functions 依赖副本，`npm run test:production` 跑 **117 项**独立回归（真实 SQL，见 `tests/verify-production.mjs`）。**上线 = `git push origin main` → Cloudflare Git 集成自动部署**；唯一一次性动作是在控制台绑定名为 `DB` 的 D1 数据库，未绑定时站点明确降级为演示模式并禁用写操作。完整部署、验收与边界见 `docs/12`。
-- **L0 / 生产两条通道并存**：`/` 重写到生产台 `prod.html`；`/index.html`、`/demo.html` 仍是浏览器内 mock 的 L0 演示台。二者互不干扰，既有回归（20/20、32/32、14/14、7/7、12/12）未破坏。
-- 自检通过后，任一 `task_id` 均可通过 `GET /api/events`（支持 `?task_id=`）完整回放「发布 → 推送批次与分数 → 接单 → 验收 → 积分流水 → 榜单变更」。
+非法迁移一律返回 `400 ILLEGAL_TRANSITION`，由服务端状态机强制校验。
 
-## 目录结构（按 CONTRACT §2 文件归属）
+### 2. 积分体系（SBC）
 
-> 说明：**阶段 A 并行产出 → 阶段 B 交叉评审 → 阶段 C 主代理裁决收敛 → 独立本地验证均已完成；最终口径以 `CONTRACT.md` v0.2 与 `docs/04-协作评审记录.md` 为准**。`docs/05-初版验收自检.md` 为阶段 C 验收自检报告（20 项断言全绿），`docs/06-本地测试验证报告.md` 为主代理独立验证报告（32 项断言全绿）；`review/` 下三份评审文件为**阶段 B 过程快照，保留原意见不改**，不作为最终口径依据。
+SBC 是**平台内贡献积分**，用于度量贡献并兑换平台内权益：不可兑付法币、不可转让、不可交易、无收益承诺、不构成资产/证券/电子货币。
 
-- **根目录**（产品 / 主代理 / 法务）
-  - `README.md` — 产品：项目初版总览（本文件）
-  - `CONTRACT.md` — 主代理整合：三智能体协作契约 v0.2（阶段 C 定稿，唯一共同基线）
-  - `三宝殿项目方案_v1.0.md` — 只读基线：v1.0 评审方案
-  - `COMPLIANCE.md` — 法务：合规声明
-  - `package.json` — 主代理整合：构建命令兜底（**零 dependencies**，`npm run build` 重建 `cloudflare/` 产物）
-  - `schema.sql` — 由 `prod/lib/schema.js` 导出的 D1 表结构（勿手改）
-  - `.gitignore` — 主代理整合
-- `src/`（研发，L0 原型）
-  - `src/domain.mjs` — 状态机、积分规则、推送打分（**领域口径唯一真源**，生产系统复用）
-  - `src/store.mjs` — 内存存储与事件流
-  - `src/server.mjs` — HTTP 服务入口（CONTRACT §8）
-  - `src/hash.mjs` — 零依赖 SHA-256（Node / 浏览器 / Workers 通用）
-- `functions/`（**生产后端，D-13**；Cloudflare Git 集成自动编译）
-  - `functions/api/[[path]].js` — Pages Functions catch-all 入口
-  - `prod/lib/api.js` — 41 个端点的编排、账本、事件、人工闸门
-  - `prod/lib/{notify,llm,jobs,observability,risk,security}.js` — V3 完全体模块（通知 / 可配置大模型 / 定时任务 / 指标 / 风控 / 账号安全）
-  - `prod/lib/{auth,db,response,schema}.js` — 认证 / D1 适配 / 响应 / 表结构真源
-  - `prod/lib/{domain,hash}.js` — 由根 `src/` 逐字节同步的**生成副本，勿手改**
-- `prod/site/`（**生产前端，D-13**）：`index.html` → `prod.html`、`app.js`、`styles.css`、`legal.html`；`prod/wrangler.toml` 为 Wrangler 模板
-- `web/index.html` — 研发：L0 静态操作台
-- `tests/smoke.mjs` — 研发：自检用例（**20 项断言**）
-- `tests/verify-local.mjs` — 主代理整合：独立本地验证脚本（**32 项断言**，自起停服务）
-- `tests/predeploy-check.mjs` — 主代理整合：L0 上线准入自检（12 项门禁）
-- `tests/verify-cloudflare.mjs` — 主代理整合：Cloudflare 静态版跨实现一致性验证（**14 项断言**）
-- `tests/verify-site-selfcheck.mjs` — 主代理整合：站点一键自检脚本的浏览器式运行时验证（**7 项断言**）
-- `tests/verify-production.mjs` — 主代理整合：**生产系统独立回归（117 项）**；`tests/d1-mock.js` 用 `node:sqlite` 模拟 D1、执行真实 SQL
-- `tests/readiness-check.mjs` — 主代理整合：**分期就绪门禁**（一期：代码 17/17 + 端到端验收 5/5 → READY；二期：外部 20 项证据当前 2/20 → PENDING，不阻塞一期）
-- `tools/`（主代理整合）
-  - `tools/build-cloudflare.mjs` — 生成 `cloudflare/` 产物（L0 八件套 + 生产前端 + `_redirects`）、同步 `prod/lib` 生成副本、导出 `schema.sql`
-  - `tools/cf-runtime.mjs` — 浏览器运行时源文件（mock req/res，调用共用 `handle()`）
-  - `tools/site-selfcheck.mjs` — 站点一键自检（部署后浏览器控制台 `import('/site-selfcheck.mjs')` 即用，10 项）
-- `cloudflare/`（**构建产物，勿直接改**，`src/` 子目录须与根 `src/` 逐字节一致）
-  - L0 八件套：`index.html`、`cf-runtime.mjs`、`site-selfcheck.mjs`、`_headers`、`src/domain|store|server|hash.mjs`
-  - 生产系统：`prod.html`、`app.js`、`styles.css`、`legal.html`、`_redirects`、`demo.html`（共 15 个文件）
-- `docs/`
-  - `docs/01-产品需求与路线图.md` — 产品：PRD（v0.3，阶段 C 同步契约 v0.2 裁决）
-  - `docs/02-技术架构与接口契约.md` — 研发
-  - `docs/03-合规基线与SBC白皮书要点.md` — 法务
-  - `docs/04-协作评审记录.md` — 主代理整合：阶段 C 汇总评审记录与最终口径
-  - `docs/05-初版验收自检.md` — 主代理整合：阶段 C 验收自检报告（20 项断言全绿）
-  - `docs/06-本地测试验证报告.md` — 主代理整合：独立本地验证报告（32 项断言全绿，含缺陷 D-01 修复与回归）
-  - `docs/07-上线检查清单.md` — 法务：九组上线检查 + G1–G7 闸门 + 回滚触发线
-  - `docs/08-上线部署指导.md` — 主代理整合：三层上线定义、L0 部署手册、V1–V8 阻断项、P0 改造清单
-  - `docs/09-Cloudflare部署指导.md` — 主代理整合：Web 单端形态、静态产物、三条部署路径、**Git 集成部署状态核验（§3.1）**、验收与回滚
-  - `docs/10-算法与区块链备案申报指导.md` — 主代理整合：**D-12 归档稿**（境内两项备案申报口径、D-11 时序裁决、材料清单与法定期限，仅在复评触发、决定进入境内市场时恢复适用）
-  - `docs/11-境外发布合规基线.md` — 主代理整合：**境外版生效基线**：地域适用判定与复评闸门、V2-O 六组上线前置、GDPR/ePrivacy/DSA/AI Act/CCPA 等目标市场义务与量化验收
-  - `docs/13-完全体能力与运营就绪.md` — 主代理整合：**V3 完全体（D-14）**：L2 待办逐项销账、20 项外部闸门、生产配置、定时任务接入、代码完全体 ≠ 运营许可
-  - `docs/12-生产系统架构与部署.md` — 主代理整合：**生产系统（D-13）**：Pages Functions + D1 架构、P0 改造对照、Git 自动部署与 D1 一次性绑定、接口与角色矩阵、安全合规设计、117 项回归与运维边界
-- `review/`（**阶段 B 过程快照，原始意见不改**）
-  - `review/product-review.md` — 产品交叉评审
-  - `review/engineering-review.md` — 研发交叉评审
-  - `review/legal-review.md` — 法务交叉评审
+| 规则 | 数值 | 说明 |
+|---|---|---|
+| 规则版本 | `sbc-rule-v1.0` | 账本写入时记录版本 |
+| 新账号初始额度 | 1000 SBC | 环境变量 `INITIAL_SBC` 可调 |
+| 服务费 | 悬赏额 × 5% | 发布时与赏金一并冻结 |
+| 质量奖励 | 赏金 × 2%，上限 50 | 评价 ≥ 4.5 分时发放给接单人 |
+| 已接单取消补偿 | 冻结额 × 10% | 补偿给接单人 |
+| 超时未完成 | 信用分 −5 | 只影响信用分，不扣 SBC |
 
-## 文档索引
+**资金闭环**：发布冻结 → 托管 → 验收转付。账本为只追加流水（`ledger_entries`），每次结算同时写「接单方入账 + 平台服务费入账」，哈希链串联，零 PII 上链。
 
-| 类别                       | 文档                                                                                 | 归属         |
-| ------------------------ | ---------------------------------------------------------------------------------- | ---------- |
-| 评审方案（只读基线）               | `三宝殿项目方案_v1.0.md`                                                                  | 基线         |
-| 协作契约（唯一共同基线）             | `CONTRACT.md` v0.2                                                                 | 主代理整合      |
-| PRD / 产品需求与路线图           | `docs/01-产品需求与路线图.md`                                                              | 产品         |
-| 技术架构与接口契约                | `docs/02-技术架构与接口契约.md`                                                             | 研发         |
-| 合规声明                     | `COMPLIANCE.md`                                                                    | 法务         |
-| 合规基线与 SBC 白皮书要点          | `docs/03-合规基线与SBC白皮书要点.md`                                                         | 法务         |
-| 上线检查清单                   | `docs/07-上线检查清单.md`                                                                | 法务         |
-| 协作评审记录（最终口径）             | `docs/04-协作评审记录.md`                                                                | 主代理整合      |
-| 交叉评审记录（阶段 B 过程快照，原始意见不改） | `review/product-review.md`、`review/engineering-review.md`、`review/legal-review.md` | 三方         |
-| 初版验收自检报告                 | `docs/05-初版验收自检.md`（20 项断言全绿）、`tests/smoke.mjs`                                    | 主代理整合 / 研发 |
-| 独立本地验证报告                 | `docs/06-本地测试验证报告.md`（32 项断言全绿）、`tests/verify-local.mjs`                              | 主代理整合      |
-| 上线部署指导                   | `docs/08-上线部署指导.md`（L0 / L1 / L2 三层准入口径与部署手册）                                     | 主代理整合      |
-| 上线准入自检                   | `tests/predeploy-check.mjs`（12 项门禁；L0 通过 ≠ L1/L2 通过）                                       | 主代理整合      |
-| 上线检查清单                   | `docs/07-上线检查清单.md`（九组可勾选项，当前 0/29，G6 不通过）                                       | 法务           |
-| Cloudflare Web 版部署指导       | `docs/09-Cloudflare部署指导.md`（静态产物、三条部署路径、B-1～B-8 验收、回滚）                          | 主代理整合      |
-| Cloudflare 静态版一致性验证      | `tests/verify-cloudflare.mjs`（14 项断言，浏览器运行时 vs Node 服务 15 组字段全一致）                  | 主代理整合      |
-| V3 完全体与运营就绪（D-14）      | `docs/13-完全体能力与运营就绪.md`（L2 待办销账、20 项外部闸门、配置与定时任务）                                 | 主代理整合      |
-| 生产系统架构与部署（D-13）        | `docs/12-生产系统架构与部署.md`（Functions + D1、自动部署、D1 绑定、验收与边界）                              | 主代理整合      |
-| 生产系统独立回归                  | `tests/verify-production.mjs`（117 项，真实 SQL / D1 mock）                                              | 主代理整合      |
-| 分期就绪门禁                   | `tests/readiness-check.mjs`（一期 17/17 + 验收 5/5 READY；二期 20 项外部证据 2/20 PENDING）                    | 主代理整合      |
-| 境外发布合规基线（生效）           | `docs/11-境外发布合规基线.md`（D-12 地域判定、V2-O 六组、复评触发条件、目标市场义务与验收）                      | 主代理整合      |
-| 境内备案申报指导（归档）           | `docs/10-算法与区块链备案申报指导.md`（V2-a / V2-b、D-11、13 条整改勾稽、法定期限表；仅在复评触发时恢复）        | 主代理整合      |
+**防双花**：`settlement_guards` 表以 `task_id` 为主键，结算/退款/关闭三条终局路径共用 `INSERT OR IGNORE` 原子抢锁。并发重复结算返回 `409 SETTLEMENT_CONFLICT`，余额只变动一次。
 
-## 状态与边界（项目初版 ≠ 生产系统）
+### 3. 智能推送
 
-- **不接**真实支付、**不接**真实大模型、**不接**公链；**不采集**真实 PII；**已交付可部署的生产系统代码（D-13），但 G1–G7 / V1–V8 / V2-O 未核销，不构成正式运营许可**。代码托管于 GitHub 仓库，**仅作版本管理，不等于发布或上线**；本轮已发布 **L0 在线演示预览链接**（虚构数据、无真实用户与资金、可逆可下线，远端验收 6/6，见 `docs/08` §2.4）；**Cloudflare Pages 静态 Web 版**同属 L0，产物在 `cloudflare/`（见 `docs/09`）；`wangjia0910/sambon` 已在 Cloudflare 完成 **Connect to Git** 连接，`main` 分支每次 push 自动触发部署，产物目录须为 `cloudflare`、构建命令留空（根 `package.json` 提供兜底）。二者**均不构成正式运营许可，不得表述为平台已上线**；按 **D-13**，Cloudflare 站点主入口已改为 Pages Functions + D1 生产系统（代码已自动部署，D1 绑定为一次性控制台动作），但其状态仍为「生产系统演示环境」，`docs/07` 仍 0/29、L1/L2 仍 No-Go；按 **D-14**（2026-11-13「继续开发成完全体」），代码侧已升级为 V3 完全体（117/117 回归、41 端点、19 张表、中英双语，见 `docs/13`），但**正式运营许可仍须 20 项外部证据核销，当前 0/20 → NOT READY**，代码 READY 不得表述为已上线；按 **D-14**（2026-11-13「继续开发成完全体」），代码侧已升级为 V3 完全体（117/117 回归、41 端点、19 张表、中英双语，见 `docs/13`），但**正式运营许可仍须 20 项外部证据核销，当前 0/20 → NOT READY**，代码 READY 不得表述为已上线；按契约 §11 **D-12**（用户 2026-11-12 指令「部署在 Cloudflare 无需备案，面向海外」），服务地域定为**中国境外（海外）**：算法规定 §2 / 区块链规定 §2 的适用范围均为「在中华人民共和国境内」，故**算法推荐服务备案、区块链信息服务备案、ICP 备案与配套境内安全评估报告不作为境外版上线闸门**；`docs/10` 与 D-11 归档为**境内市场触发式预案**（复评条件见 `docs/11` §1.3）。境外版仍以 **V2-O 境外发布合规基线六组**为 G6 一票否决项，当前 `docs/07` 0/29 未完成；法务结论维持「有条件通过、未触发一票否决」。准入门禁与操作见 `docs/08-上线部署指导.md`、`tests/predeploy-check.mjs`。 **【D-17 覆盖】** 上述历史沿革中「演示环境 / 0/20 NOT READY / 不得表述为已上线」为 D-14/D-15 时期口径；按 2026-11-23 D-17，一期已正式上线、20 项外部证据转二期（仍 2/20，不伪造、不宣称已通过审查）。以本段覆盖说明与 `CONTRACT.md` §11 D-17 为准。
-- 链相关能力仅做「本地 Merkle 摘要 + 可插拔锚定接口」演示，零 PII、零任务正文上链（CONTRACT §10）。
-- 结算、争议裁定、账号处罚保留**人工兜底**，模型不得直判；必须提供「关闭个性化推荐」开关，关闭后按时间 + 距离做中性排序；该开关初版为**进程级全局单例**（服务端强制），账号级按 `user_id` 隔离列 P1，初版不得宣称已实现账号级（CONTRACT v0.2 §11 D-06）。
-- **所有演示数据均为虚构样例**，不得出现真实个人信息；联系方式一律虚拟号占位，日志与事件脱敏。
-- 未成年人限制、违禁任务预检、举报入口与**目标市场发布合规基线（V2-O）**列为**上线一票否决项**（D-12 替换原两项境内备案口径）；初版仅演示其在产品流程中的位置，不替代真实核验与核销（CONTRACT §10）。V1–V8 本轮状态为「未上线、不触发」，不得表述为已通过（CONTRACT v0.2 §11）。
-- 本轮只跑通一条闭环；未实现的 P0 / P1 / P2 功能见 `docs/01-产品需求与路线图.md` §2「初版范围表」与 §7「范围外清单」。
-- 阶段 A / B / C 均已完成，并已通过主代理独立本地验证（研发自检 20/20 + 独立验证 32/32，详见 `docs/06-本地测试验证报告.md`）；该结论**仅表示原型可运行、口径一致与红线未破，不构成上线结论**。阶段 B 交叉评审为过程快照（见 `review/`），最终口径以 `CONTRACT.md` v0.2 与 `docs/04-协作评审记录.md` 为准；产品文档以 `docs/01-产品需求与路线图.md`（v0.3）为准。
+候选排序采用六项加权模型（`WEIGHT_VERSION = v1.0`，权重和恒为 1.00）：
+
+| 因子 | 权重 | 含义 |
+|---|---|---|
+| `P_accept` | 0.30 | 预计接单概率 |
+| `P_complete_on_time` | 0.35 | 预计按时完成概率 |
+| `C_notify` | −0.10 | 通知成本（减项） |
+| `R_risk` | −0.10 | 风险（减项） |
+| `V_fairness` | 0.08 | 公平性（新人/低曝光补偿） |
+| `B_supply` | 0.07 | 区域供需（供不应求时加速曝光） |
+
+- 等级/榜单加成封顶 **总分 5%**（`LEVEL_BOOST_CAP`）。
+- **硬过滤层先于打分**：风控命中一票拦截，不允许被高分覆盖。
+- 每次推送记录 `weight_version` 与 `algorithm_degraded`，可审计、可复现。
+- 大模型仅作适配层：未配置 `LLM_API_URL` 时自动降级为规则引擎，`algorithm_degraded=true`。
+
+### 4. 排行榜
+
+- **任务榜**：按热度与赏金加权。
+- **猎人榜**：按净贡献 SBC（`net_sbc`）排名，含等级、称号、奖牌。
+- 支持分页与 Top-K 分批。
+
+### 5. 人工闸门
+
+以下动作**必须人工确认**，服务端强制，不提供自动执行入口：
+
+| 动作 | 谁执行 |
+|---|---|
+| 任务审核（`review`） | 管理员 |
+| 任务推送（`dispatch`） | 管理员 |
+| 验收结算（`verify` approve） | **发布方本人** |
+| 争议裁定（`dispute` resolve） | 管理员 |
+| 风控处置（`risk/resolve`） | 管理员 |
+| 定时任务触发的超时工单 | 只生成工单，不自动验收/结算 |
+
+`model_decision` 字段恒为 `null`——模型不产生任何裁决。
+
+### 6. 其他能力
+
+- **通知**：站内通知 + Webhook 推送（未配置 Webhook 时标注 `queue_only`，不伪造已发送）。
+- **邮件验证**：可选强制（`EMAIL_VERIFICATION_REQUIRED=true`）。
+- **强口令**：可选强制（`ENFORCE_STRONG_PASSWORD=true`，≥12 位 + 3 类字符）。
+- **风控**：限流、异常行为标记、需人工处置。
+- **审计**：全量 `audit_log`，管理员可查。
+- **备份**：`GET /api/admin/backup` 导出快照；`POST /api/admin/anchor` 写账本锚点。
+- **双语**：中 / 英，服务端按 `locale` 生效，前端可切换。
+- **账号自服务**：数据导出（`GET /api/me/export`）、账号删除（`DELETE /api/me`，需输入 `DELETE` 二次确认）。
+- **成果脱敏**：提交正文强制 PII 脱敏（证件号优先匹配 + 数字边界兜底），落库前完成。
+
+---
+
+## 二、系统架构
+
+```
+                      ┌──────────────────────────────────────────┐
+  浏览器 ────────────→ │  Cloudflare Pages（静态资源）             │
+                      │  /            → member.html（用户版 SPA）  │
+                      │  /product     → prod.html（运营台）        │
+                      │  /demo        → index.html（L0 演示台）    │
+                      └───────────────┬──────────────────────────┘
+                                      │ /api/*（_routes.json 限定）
+                                      ↓
+                      ┌──────────────────────────────────────────┐
+                      │  Pages Functions                         │
+                      │  functions/api/[[path]].js               │
+                      │        ↓ dispatch()                      │
+                      │  prod/lib/api.js（40 个端点编排）          │
+                      │   ├─ auth.js      会话 / CSRF / RBAC     │
+                      │   ├─ domain.js    状态机 / 积分 / 打分    │
+                      │   ├─ db.js        D1 适配                │
+                      │   ├─ schema.js    20 张表结构真源         │
+                      │   ├─ risk.js      风控                   │
+                      │   ├─ notify.js    通知 / Webhook         │
+                      │   ├─ llm.js       大模型适配（可降级）     │
+                      │   ├─ jobs.js      定时作业                │
+                      │   ├─ security.js  口令 / 限流            │
+                      │   └─ observability.js 指标 / 日志        │
+                      └───────────────┬──────────────────────────┘
+                                      ↓ 绑定变量 DB
+                      ┌──────────────────────────────────────────┐
+                      │  Cloudflare D1（SQLite）· 20 张表         │
+                      └──────────────────────────────────────────┘
+```
+
+### 数据表（20）
+
+| 分类 | 表 |
+|---|---|
+| 账号与会话 | `users` `sessions` `email_verifications` `consents` |
+| 任务与派单 | `tasks` `dispatches` `dispatch_feedback` |
+| 资金与账本 | `ledger_entries` `settlement_guards` `backups` |
+| 事件与幂等 | `events` `idempotency` `meta` |
+| 治理与风控 | `reports` `audit_log` `rate_limits` `risk_flags` `metrics` |
+| 消息 | `notifications` |
+
+表结构唯一真源为 `prod/lib/schema.js`，`schema.sql` 由构建脚本导出，**勿手改**。
+
+### 安全设计
+
+- 会话：`sambon_sid` Cookie（httpOnly + Secure + SameSite）。
+- CSRF：所有写操作要求 `X-CSRF-Token`，令牌随会话签发。
+- 幂等：写操作携带 `event_id`，重复请求返回首次结果（`idempotency` 表）。
+- 权限：RBAC 三角色，越权返回 `403 FORBIDDEN`。
+- 响应头：严格 CSP（`default-src 'self'`，无内联脚本、无第三方来源）、`X-Frame-Options: DENY`、`Referrer-Policy: no-referrer`。
+- 限流：按端点与来源计数（`rate_limits`）。
+
+---
+
+## 三、目录结构
+
+```
+.
+├── README.md                    # 本文件
+├── package.json                 # 脚本入口（零依赖）
+├── schema.sql                   # D1 表结构（由 schema.js 生成，勿手改）
+│
+├── cloudflare/                  # Pages 构建产物（勿手改，由 npm run build 生成）
+│   ├── member.html|.js|.css     # 用户版
+│   ├── prod.html / app.js / styles.css   # 运营台
+│   ├── index.html / demo.html   # L0 演示台（浏览器内 mock）
+│   ├── seo.js / sitemap.xml / robots.txt
+│   ├── _headers / _redirects / _routes.json
+│   └── src/                     # L0 运行时（与 src/ 逐字节一致）
+│
+├── functions/api/[[path]].js    # Pages Functions 入口（/api/* → dispatch）
+│
+├── prod/
+│   ├── lib/                     # 后端核心
+│   │   ├── api.js               # 40 个端点编排、账本、事件、人工闸门
+│   │   ├── auth.js db.js response.js schema.js   # 基础设施
+│   │   ├── domain.js hash.js    # 由 src/ 生成的副本，勿手改
+│   │   └── notify.js llm.js jobs.js risk.js security.js observability.js
+│   ├── site/                    # 前端源（构建后进 cloudflare/）
+│   └── wrangler.toml            # Wrangler 模板（可选，本地联调/迁移用）
+│
+├── src/                         # 领域口径真源 + 本地原型
+│   ├── domain.mjs               # 状态机 / 积分 / 推送打分（唯一真源）
+│   ├── hash.mjs                 # 零依赖 SHA-256（Node/浏览器/Workers 通用）
+│   ├── store.mjs server.mjs     # L0 内存原型
+│
+├── web/index.html               # L0 静态演示台源
+├── tests/                       # 回归测试（292 项）
+├── tools/                       # 构建脚本
+│   └── build-cloudflare.mjs     # 生成 cloudflare/ + schema.sql + 同步副本
+│
+├── ops/
+│   ├── daily-agents/            # 每日多智能体运营脚本
+│   ├── cron/                    # 定时任务参考实现
+│   ├── multiagent-client.mjs    # 多智能体 HTTP 客户端
+│   └── preview-server.mjs       # 本地联调服务（内存 D1）
+│
+├── docs/使用手册.md              # 完整操作手册
+└── .github/workflows/daily-agents.yml   # 每日运营定时任务
+```
+
+**构建约定**：`prod/lib/domain.js`、`prod/lib/hash.js`、`cloudflare/src/*` 均为**生成副本**，由 `npm run build` 从 `src/` 逐字节同步。修改领域逻辑只改 `src/`，然后重新构建。
+
+---
+
+## 四、快速开始
+
+### 4.1 本地联调（推荐）
+
+```bash
+npm run preview          # 启动 http://127.0.0.1:8788
+```
+
+- 使用真实 `dispatch()` 与应用同构的内存 D1，页面与 API 行为与生产一致。
+- 内置管理员引导令牌 `preview-admin`，可直接创建管理员。
+- 数据存内存，**重启即清空**，仅用于开发联调。
+
+首次使用创建管理员：
+
+```bash
+curl -X POST http://127.0.0.1:8788/api/admin/bootstrap \
+  -H 'Content-Type: application/json' \
+  -d '{"bootstrap_token":"preview-admin","email":"admin@example.com","password":"Str0ng-Passw0rd!","display_name":"平台管理员"}'
+```
+
+### 4.2 本地原型（L0，零后端）
+
+```bash
+npm start                # http://127.0.0.1:8787
+```
+
+纯内存原型，用于快速验证领域规则，不涉及 D1。
+
+### 4.3 构建产物
+
+```bash
+npm run build            # 重建 cloudflare/ 与 schema.sql
+```
+
+### 4.4 跑测试
+
+```bash
+npm test                 # 全量 292 项（自检 → 独立验证 → 静态版 → SEO → 生产回归 → 并发）
+npm run test:production  # 仅生产系统 117 项（真实 SQL）
+npm run test:concurrency # 仅结算并发双花专项 12 项
+```
+
+---
+
+## 五、生产部署（Cloudflare）
+
+### 5.1 前置条件
+
+1. Cloudflare 账号，`sambon.net` 域名已接入。
+2. 仓库已 `Connect to Git`，构建配置：
+   - **构建命令**：留空（或 `npm run build`）
+   - **输出目录**：`cloudflare`
+3. D1 数据库已创建（`npx wrangler d1 create sanbaodian-db`）。
+
+### 5.2 部署流程
+
+```bash
+git push origin main     # Git 集成自动构建并部署
+```
+
+- 静态产物取自 `cloudflare/`。
+- `functions/` 由 Cloudflare 自动编译，`/api/*` 由 `_routes.json` 限定走 Functions，其余走静态通道。
+
+### 5.3 一次性绑定 D1（关键）
+
+Cloudflare 控制台 → Pages 项目 → **Settings → Functions → D1 database bindings**：
+
+| 变量名 | 数据库 |
+|---|---|
+| `DB` | `sanbaodian-db` |
+
+> 绑定变量名**必须是 `DB`**。未绑定时站点进入 `mode=demo`：可读、写操作返回 `503 WRITE_LOCKED`，不会静默失败。
+
+初始化表结构：
+
+```bash
+npx wrangler d1 execute sanbaodian-db --file=schema.sql --remote
+```
+
+### 5.4 创建首个管理员
+
+在 Pages 项目环境变量中临时设置 `ADMIN_BOOTSTRAP_TOKEN`（随机强字符串），部署后调用：
+
+```bash
+curl -X POST https://sambon.net/api/admin/bootstrap \
+  -H 'Content-Type: application/json' \
+  -d '{"bootstrap_token":"<你的引导令牌>","email":"<管理员邮箱>","password":"<≥12位强口令>","display_name":"平台管理员"}'
+```
+
+创建成功后**立即从环境变量移除** `ADMIN_BOOTSTRAP_TOKEN`（端点会自动返回 503，禁止重复引导）。
+
+### 5.5 环境变量（可选）
+
+在 Pages 项目 **Settings → Environment variables** 配置，密钥类请用密文保存。
+
+| 变量 | 作用 | 默认 |
+|---|---|---|
+| `INITIAL_SBC` | 新账号初始 SBC | `1000` |
+| `PBKDF2_ITERATIONS` | 口令派生轮数 | `120000` |
+| `EMAIL_VERIFICATION_REQUIRED` | `true` 时未验证账号限制发布/接单 | 不强制 |
+| `ENFORCE_STRONG_PASSWORD` | `true` 时强制 ≥12 位 + 3 类字符 | 不强制 |
+| `LLM_API_URL` / `LLM_API_KEY` / `LLM_MODEL` | 大模型适配层 | 不配置则规则降级 |
+| `NOTIFY_WEBHOOK_URL` / `NOTIFY_WEBHOOK_SECRET` | 通知 Webhook | 不配置则 `queue_only` |
+| `CRON_SECRET` | `/api/admin/cron` 的 `X-Cron-Secret` | 不配置则端点 503 |
+| `COOKIE_SECURE` | 仅本地 http 联调可设 `false` | 生产强制 Secure |
+| `RATE_LIMIT_DISABLED` | 仅本地回归使用 | 生产必须留空 |
+
+> `EMAIL_VERIFICATION_DEV_ECHO` 仅用于本地回归，**生产严禁设置**（会把验证令牌回显到响应）。
+
+### 5.6 上线验收
+
+```bash
+curl https://sambon.net/api/health
+```
+
+期望：
+
+```json
+{
+  "mode": "production",
+  "db": "d1",
+  "status": "healthy",
+  "version": "3.0.0",
+  "schema_version": "...",
+  "admin_bootstrap_available": false
+}
+```
+
+- `mode=production`、`db=d1` → D1 已正确绑定。
+- `admin_bootstrap_available=false` → 引导令牌已移除，符合预期。
+
+---
+
+## 六、账号与角色
+
+| 角色 | 能力 |
+|---|---|
+| **publisher（发布方）** | 发布任务、查看自己的任务、验收自己发布的任务、取消未接单任务、评价接单人、查看账本 |
+| **solver（接单人）** | 浏览大厅、接单、提交成果、发起争议、查看账本与排行榜 |
+| **admin（管理员）** | 审核任务、推送任务、处理争议、处置风控、查看审计/指标/备份、触发定时作业 |
+
+注册默认角色为 `publisher` / `solver`（按注册时选择）。管理员只能通过 `/api/admin/bootstrap` 创建首名，之后由已有管理员在运营台维护。
+
+---
+
+## 七、API 概览
+
+统一响应包络：`{ ok: boolean, data?: any, error?: { code, message } }`。
+
+**通用约定**：
+
+| 项 | 说明 |
+|---|---|
+| 会话 | `sambon_sid` Cookie（httpOnly，浏览器自动携带） |
+| CSRF | 写操作携带 `X-CSRF-Token`（登录/注册响应中的 `data.session.csrf_token`） |
+| 幂等 | 写操作携带 `event_id`，重复提交返回首次结果 |
+| 错误码 | `400` 参数/状态非法、`401` 未登录、`403` 越权、`404` 不存在、`409` 冲突、`429` 限流、`503` 降级 |
+
+| 分组 | 端点 |
+|---|---|
+| 系统 | `GET /api/health`、`GET /api/config`、`GET /api/events` |
+| 认证 | `POST /api/auth/register`、`POST /api/auth/login`、`POST /api/auth/logout`、`GET /api/auth/me`、`POST /api/auth/verify-email`、`POST /api/auth/resend-verification` |
+| 账号 | `GET /api/me/export`、`DELETE /api/me`、`POST /api/me/locale`、`GET /api/me/notifications`、`POST /api/me/notifications/read`、`POST /api/consents` |
+| 任务 | `POST /api/tasks`、`GET /api/tasks`、`POST /api/tasks/:id/review`、`POST /api/tasks/:id/dispatch`、`POST /api/tasks/:id/accept`、`POST /api/tasks/:id/submit`、`POST /api/tasks/:id/verify`、`POST /api/tasks/:id/dispute`、`POST /api/tasks/:id/cancel`、`POST /api/tasks/:id/feedback` |
+| 榜单与账本 | `GET /api/leaderboard/tasks`、`GET /api/leaderboard/users`、`GET /api/ledger/:user_id` |
+| 偏好与举报 | `POST /api/preferences/personalized`、`POST /api/reports` |
+| 运营管理 | `POST /api/admin/bootstrap`、`GET /api/admin/queue`、`GET /api/admin/metrics`、`GET /api/admin/audit`、`GET /api/admin/risk`、`POST /api/admin/risk/resolve`、`GET /api/admin/backup`、`POST /api/admin/anchor`、`POST /api/admin/cron`、`GET /api/admin/ops` |
+
+> SBC 资产化相关的 8 条路径固定返回 `404`，不接受任何形式的兑付、转让、交易请求。
+
+完整请求/响应示例见 [docs/使用手册.md](docs/使用手册.md) 第四章。
+
+---
+
+## 八、每日运营（多智能体）
+
+仓库内置每日运营能力：多个账号每日发布 10 个任务、完成 1–2 个，用于保持平台活跃与验证链路。
+
+```bash
+API_BASE=https://sambon.net \
+PUBLISHER_ACCOUNTS='[{"email":"..","password":".."}]' \
+SOLVER_ACCOUNTS='[{"email":"..","password":".."}]' \
+ADMIN_EMAIL=.. ADMIN_PASSWORD=.. \
+DAILY_PUBLISH_COUNT=10 DAILY_COMPLETE_COUNT=2 \
+npm run daily
+```
+
+- 云端定时：`.github/workflows/daily-agents.yml`，每日 UTC 01:00（北京 09:00）自动执行。
+- 凭据通过仓库 Secrets 注入，不写入代码。
+- 输出报告到 `ops/daily-agents/reports/YYYY-MM-DD.json`（已 gitignore）。
+- 详见 [docs/使用手册.md](docs/使用手册.md) 第七章。
+
+---
+
+## 九、运维
+
+| 场景 | 操作 |
+|---|---|
+| 健康检查 | `GET /api/health`，关注 `mode` / `db` / `status` |
+| 指标 | `GET /api/admin/metrics`（管理员） |
+| 审计 | `GET /api/admin/audit`（管理员） |
+| 风控工单 | `GET /api/admin/risk` → `POST /api/admin/risk/resolve`（人工处置） |
+| 备份 | `GET /api/admin/backup` 导出快照 |
+| 账本锚点 | `POST /api/admin/anchor` 写批次摘要 |
+| 定时作业 | `POST /api/admin/cron` + `X-Cron-Secret`（外部调度器调用） |
+| 降级排查 | `mode=demo` → 检查 D1 绑定变量名是否为 `DB` |
+| 写操作 503 | 同上，或 `WRITE_LOCKED`（未绑 D1） |
+
+**变更流程**：修改 `src/`（领域）或 `prod/`（编排）→ `npm run build` → `npm test` 全绿 → 提交推送。
+
+---
+
+## 十、开发约定
+
+1. **领域口径唯一真源是 `src/domain.mjs`**；`prod/lib/domain.js`、`cloudflare/src/domain.mjs` 是生成副本，不得手改。
+2. **表结构唯一真源是 `prod/lib/schema.js`**；`schema.sql` 由构建导出。
+3. 改完 `prod/site/` 或 `src/` 必须 `npm run build`，否则 `cloudflare/` 产物落后（生产回归 P-64/P-65/P-66 会失败）。
+4. 测试全绿是提交前提（`npm test` 退出码 0）。
+5. 不新增第三方运行时依赖——生产环境仅允许 Cloudflare 平台能力与标准 Web API。
+
+---
+
+## 十一、许可与声明
+
+- SBC 为平台内贡献积分，不构成任何形式的金融资产、支付工具或投资标的。
+- 平台不承诺具体可用性、响应时间或 SLA 指标。
+- 结算、争议、审核、处罚、风控处置均保留人工确认环节，模型不产生裁决。

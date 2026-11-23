@@ -1,7 +1,7 @@
 /**
  * 《三宝殿》初版原型 · HTTP 路由与编排层（server.mjs）
  *
- * 职责：严格实现 CONTRACT.md §8 全部接口；统一 {ok,data,error}；非法状态迁移明确错误；
+ * 职责：严格实现 业务规范.md §8 全部接口；统一 {ok,data,error}；非法状态迁移明确错误；
  *       所有写接口接受可选 event_id 并保证幂等；编排发布→审核→推送→接单→提交→验收
  *       →结算→榜单/账本/事件回放；/api/config 与个性化开关（服务端强制）；静态托管操作台。
  * 约束：仅 node: 内置模块；内存存储；PORT 可覆盖（默认 8787）。
@@ -122,7 +122,7 @@ function taskView(task) {
     compliance: task.compliance ?? null,
     created_at: task.created_at,
     settlement: task.settlement ?? null,
-    // 成果预览为脱敏后文本；原始正文从不存入内存（CONTRACT §10.2）
+    // 成果预览为脱敏后文本；原始正文从不存入内存（业务规范 §10.2）
     result_preview: task.result ? task.result.text : null,
     result_pii_redacted: task.result ? task.result.pii_redacted : false,
   };
@@ -155,7 +155,7 @@ function settleTask(task, { rating = 0, auto = false, eventId = null, trigger = 
   }
 
   // 阶段 C 主代理裁决（路径 A）：不采用 SettlementRequested —— 该事件不在
-  // CONTRACT §4 登记集合内，运行期事件名须全部收敛到契约登记集合。
+  // 业务规范 §4 登记集合内，运行期事件名须全部收敛到契约登记集合。
   // 结算仍由 C 编排、A 记账，人工/规则兜底，模型不直判（下方为纯规则记账）。
   const entries = store.postLegs({
     event_id: ledgerEventId(eventId),
@@ -233,7 +233,7 @@ function neutralTaskOrder(tasks) {
 }
 
 // ---------------------------------------------------------------------------
-// 接口实现（CONTRACT §8）
+// 接口实现（业务规范 §8）
 // ---------------------------------------------------------------------------
 
 function hHealth() {
@@ -263,14 +263,14 @@ function createTaskImpl(body) {
   if (!publisher) return R.fail('UNKNOWN_PUBLISHER', '发布方不存在（演示用户见 /api/config）');
   if (publisher.role !== 'publisher') return R.fail('INVALID_ROLE', '该演示用户不是发布方角色');
 
-  // 一票否决：违禁任务预检先于冻结与推送
+  // 硬拦截：违禁任务预检先于冻结与推送
   const check = compliancePrecheck(body.title, body.description, body.acceptance_criteria);
   if (!check.pass) {
     appendEventSafe('RiskBlocked', { reason_code: 'BANNED_WORDS', hits: check.hits }, null, body.event_id, 'risk');
     return R.fail('COMPLIANCE_BLOCKED', `合规预检未通过：命中违禁词 ${check.hits.join('、')}`, 422);
   }
 
-  // CONTRACT §10.5 / docs/03 §4：未成年人限制准入钩子（布尔占位，零 PII 采集）
+  // 业务规范 §10.5 / 规范文档 §4：未成年人限制准入钩子（布尔占位，零 PII 采集）
   const minorHook = minorRestrictionHook(body);
   if (!minorHook.passed) {
     appendEventSafe('RiskBlocked', {
@@ -585,7 +585,7 @@ function hSubmit(body, [id]) {
       return R.fail('ILLEGAL_TRANSITION', `非法状态迁移：${task.state} → SUBMITTED`);
     }
     task.state = 'SUBMITTED';
-    // 成果正文先做 PII 脱敏再落内存，原始明文不存储（CONTRACT §10.2）
+    // 成果正文先做 PII 脱敏再落内存，原始明文不存储（业务规范 §10.2）
     const safeResult = sanitizeSubmissionText(body.content ?? '演示成果（虚构）');
     task.result = {
       text: safeResult.text,
@@ -791,7 +791,7 @@ function hPreferences(body) {
 }
 
 // ---------------------------------------------------------------------------
-// 路由表（CONTRACT §8 全部接口；未登记路径一律 404）
+// 路由表（业务规范 §8 全部接口；未登记路径一律 404）
 // ---------------------------------------------------------------------------
 
 const ROUTES = [

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>三宝殿 · 初版闭环操作台（演示）</title>
+<title>三宝殿 · 本地自检台</title>
 <style>
   :root {
     --bg: #f6f8fb; --card: #ffffff; --ink: #1f2933; --muted: #6b7785;
@@ -133,7 +133,7 @@
 </head>
 <body>
 <header>
-  <h1>三宝殿 · 初版闭环操作台 <small>sambon.net · 最小闭环原型（演示数据全部虚构）</small></h1>
+  <h1>三宝殿 · 本地自检台 <small>sambon.net · 本地原型（数据全部虚构）</small></h1>
   <div class="badges" id="badges"><span class="badge">配置加载中…</span></div>
 </header>
 
@@ -353,12 +353,12 @@ async function loadConfig() {
   $('hooksHint').textContent =
     '未成年人限制钩子：' + (h.minor_restriction_hook ? '已保留（占位）' : '缺失') +
     '；举报入口钩子：' + (h.report_entry_hook ? '已保留（占位）' : '缺失') +
-    '。二者为上线一票否决项 V8 的占位，不采集真实身份信息。';
+    '。该入口仅保留占位，不采集真实身份信息。';
 }
 
 $('btnReport').onclick = () => {
-  logLine('dim', '举报入口（占位）：§8 无独立举报端点，本轮仅保留入口钩子；真实举报与 24h 处置为上线一票否决项 V8。');
-  alert('举报入口（演示占位）\n\n本轮不新增 CONTRACT §8 之外的接口，也不采集任何真实个人信息。\n真实举报通道与 24h 处置流程列为上线一票否决项（V8），由客户端与运营后台在上线前实现。');
+  logLine('dim', '举报入口（占位）：当前仅保留入口钩子，实际举报走站内 /api/reports。');
+  alert('举报入口（占位）\n\n该入口仅作占位，不采集真实个人信息；实际举报请通过站内举报功能提交。');
 };
 
 // ---------- 1 发布 ----------

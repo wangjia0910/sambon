@@ -185,11 +185,11 @@ async function main() {
     admin.call('POST', `/api/tasks/${taskD}/dispute`, { action: 'resolve', resolution: 'refund_publisher', event_id: eid('D-refund') }),
   ]);
   const okD = [d1, d2].filter((r) => r.status === 200).length;
-  check('CD-01 付接单人与退发布方并发只有一个成功', okD === 1,
+  check('C 付接单人与退发布方并发只有一个成功', okD === 1,
     `status=[${d1.status},${d2.status}] codes=[${d1.error?.code},${d2.error?.code}]`);
   const settleLinesD = raw._query("SELECT account FROM ledger_entries WHERE task_id = ? AND memo LIKE 'settle:%'", [taskD]);
   const refundLinesD = raw._query("SELECT account FROM ledger_entries WHERE task_id = ? AND memo LIKE 'refund:%'", [taskD]);
-  check('CD-02 不存在「既付接单人又退发布方」',
+  check('C 不存在「既付接单人又退发布方」',
     !(settleLinesD.length > 0 && refundLinesD.length > 0),
     `settle=${settleLinesD.length} refund=${refundLinesD.length}`);
 

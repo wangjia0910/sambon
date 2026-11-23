@@ -33,7 +33,7 @@ database_name = "sanbaodian-db"
 # RATE_LIMIT_DISABLED    = 仅本地回归使用，生产必须留空
 # COOKIE_SECURE          = 仅本地 http 联调可设 false，生产必须留空（强制 Secure）
 #
-# ---- V3 完全体（D-14，详见 docs/13 §4）----
+# ---- 扩展能力（通知 / 大模型 / 定时任务 / 风控）----
 # LLM_API_URL            = OpenAI-compatible chat/completions 端点；不配则规则降级
 # LLM_API_KEY            = 模型密钥（密文）；不配则 algorithm_degraded=true
 # LLM_MODEL              = 模型名，默认 gpt-4o-mini

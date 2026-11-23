@@ -4,7 +4,7 @@
  * 职责：内存状态、幂等集合、不可变事件日志、不可变积分流水、五账本科目、
  *       node:crypto 流水 Merkle 摘要（LedgerAnchored 演示）、dry_run 不落库。
  * 约束：进程重启数据重置；零第三方依赖；零 PII、零任务正文写入流水/锚定摘要。
- * 口径来源：CONTRACT.md §4/§5/§10 与方案 §4.1.4、§5.2。
+ * 口径来源：业务规范.md §4/§5/§10 与方案 §4.1.4、§5.2。
  */
 
 import { sha256Hex, uuid } from './hash.mjs';
@@ -490,7 +490,7 @@ export class MemoryStore {
   }
 
   /**
-   * 反向流水冲正（CONTRACT §5 记账铁律 / docs/03 §4 §10.1 代码层必须项）。
+   * 反向流水冲正（业务规范 §5 记账铁律 / 规范文档 §4 §10.1 代码层必须项）。
    * 不删改原流水，按原 legs 逐条取反生成只追加的新流水，并复用 postLegs 的守恒校验与哈希链。
    * originalEventId 对应的原流水保持不可变；reversalEventId 为独立幂等键。
    */
@@ -669,11 +669,11 @@ export class MemoryStore {
         manual_arbitration_required: true,
         zero_pii_on_chain: true,
         zero_task_text_on_chain: true,
-        // CONTRACT §10.5：未成年人限制 / 举报入口钩子只保留占位，不新增 §8 之外的路径
+        // 业务规范 §10.5：未成年人限制 / 举报入口钩子只保留占位，不新增 §8 之外的路径
         minor_restriction_hook: true,
         report_entry_hook: true,
         hooks_pii_free: true,
-        hooks_note: '未成年人限制与举报入口仅保留钩子占位；真实实名核验与举报 24h 处置为上线一票否决项 V8，本轮不伪装已交付',
+        hooks_note: '未成年人限制与举报入口仅保留钩子占位；真实实名核验与举报处置尚未接入',
       },
       chain: {
         mode: 'local-merkle-demo',

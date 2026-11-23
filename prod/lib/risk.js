@@ -4,7 +4,7 @@
  * 职责：发布行为 / 登录失败的风险标记，写 risk_flags 供 admin 人工处置。
  * 红线：
  *   - blocked 恒 false：绝不自动拦截任务、不自动处罚、不改任务状态（登录锁定仅为会话保护）。
- *   - 违禁词一票否决由 api.js 的 compliancePrecheck 负责，本模块只做提示。
+ *   - 违禁词硬拦截由 api.js 的 compliancePrecheck 负责，本模块只做提示。
  *   - detail_json 只存 flag / score / 计数，零正文、零 PII。
  *   - resolveFlag 必须由人工显式调用，模块内绝不自动调用。
  * 降级策略：查询异常返回安全默认值（空 flags / locked:false / 空数组 / updated:false）。

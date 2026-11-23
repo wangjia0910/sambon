@@ -7,7 +7,7 @@
  *   - 编排与持久化重写：内存单例 → D1 事务；进程级开关 → 账号级开关；
  *     无鉴权 → 会话 / CSRF / RBAC；无留痕 → 账本哈希链 + 事件流 + 人工闸门审计。
  *
- * 红线（CONTRACT §10，任何端点不得违背）：
+ * 红线（业务规范 §10，任何端点不得违背）：
  *   1. 无 SBC 转让 / 交易 / 兑付 / 收益类接口；未登记路径一律 404。
  *   2. 不存明文手机号 / 证件号；联系方式虚拟号；成果正文先脱敏再落库；事件 payload 白名单。
  *   3. 结算、争议裁定、任务审核、账号处罚保留人工兜底，模型不直判。
@@ -34,7 +34,7 @@ import {
 } from './auth.js';
 import { ok, fail, errorResponse, ApiFailure } from './response.js';
 import { SCHEMA_VERSION } from './schema.js';
-// V3 完全体模块（D-14）：通知 / 大模型 / 定时任务 / 可观测 / 风控 / 账号安全
+// V3 完全体模块（）：通知 / 大模型 / 定时任务 / 可观测 / 风控 / 账号安全
 import * as notify from './notify.js';
 import * as llm from './llm.js';
 import * as jobs from './jobs.js';
@@ -43,18 +43,18 @@ import * as risk from './risk.js';
 import * as sec from './security.js';
 
 const SERVICE = 'sambon-production';
-const VERSION = 'v3.0.0';   // D-14 完全体：通知 / LLM / cron / 运维 / 灾备 / i18n
+const VERSION = 'v3.0.0';   //  完全体：通知 / LLM / cron / 运维 / 灾备 / i18n
 const INITIAL_SBC_DEFAULT = 1000;      // 平台内贡献积分初始额度，非资产、不可兑付
 const MAX_BODY_BYTES = 1024 * 1024;
 
-/** CONTRACT §4 事件集合 + 生产系统扩展（docs/12 §4 登记） */
+/** 业务规范 §4 事件集合 + 生产系统扩展（规范文档 §4 登记） */
 export const CONTRACT_EVENTS = Object.freeze([
   'TaskPublished', 'TaskUpdated', 'RiskBlocked', 'CreditFrozen', 'CreditChanged',
   'CreditTransferred', 'RankUpdated', 'DispatchRequested', 'DispatchScored',
   'DispatchSent', 'TaskAccepted', 'TaskSubmitted', 'TaskVerified', 'TaskDelisted',
   'DisputeOpened', 'DisputeResolved', 'SettlementCompleted', 'PreferenceChanged',
 ]);
-// D-13 扩展 + D-14 完全体扩展；契约 §4 原始 18 类一字未改
+//  扩展 +  完全体扩展；契约 §4 原始 18 类一字未改
 export const PROD_EVENTS = Object.freeze([
   ...CONTRACT_EVENTS, 'ReportFiled',
   'TaskCancelled', 'DispatchExposed', 'DispatchIgnored', 'EmailVerified',
@@ -72,7 +72,7 @@ const EVENT_KEY_WHITELIST = new Set([
   'model_decision', 'note', 'personalized_enabled', 'enforcement',
   'neutral_sort_rule', 'escrow_total', 'quality_bonus', 'auto_verified',
   'hits', 'category', 'channel',
-  // D-14 新增（只放枚举值 / 计数 / 布尔，绝不承载正文或 PII）
+  //  新增（只放枚举值 / 计数 / 布尔，绝不承载正文或 PII）
   'cancel_reason', 'kind', 'flag', 'score', 'feature', 'locale', 'entry_count',
   'pii_redacted', 'pii_on_chain', 'anchor', 'root', 'job', 'counts', 'feedback',
 ]);
@@ -410,7 +410,7 @@ async function settleTaskCommitted(db, row, { rating = 0, auto = false, eventId 
   });
   let stats = {};
   try { stats = JSON.parse(solver.stats_json || '{}'); } catch { stats = {}; }
-  // net_sbc 只累加赏金本金；质量奖励属生态激励，不进用户榜分（D-03）
+  // net_sbc 只累加赏金本金；质量奖励属生态激励，不进用户榜分（）
   stats.net_sbc = round2(Number(stats.net_sbc ?? 0) + bounty);
   stats.completed_count = Number(stats.completed_count ?? 0) + 1;
   stats.total_count = Number(stats.total_count ?? 0) + 1;
@@ -534,7 +534,7 @@ function configData(env, db, session) {
       risk: true, backup: true, anchor: true, i18n: true,
       concurrent_cas: true, dispatch_feedback: true, task_cancel: true,
     },
-    capabilities_note: 'V3 完全体：代码能力已完备；正式运营许可须外部动作核销（docs/13）。',
+    capabilities_note: 'V3 完全体：代码能力已完备；正式运营许可须外部动作核销（规范文档）。',
   };
 }
 
@@ -1332,7 +1332,7 @@ async function hDeleteMe(c) {
 }
 
 // ---------------------------------------------------------------------------
-// V3 完全体端点（D-14）
+// V3 完全体端点（）
 // 邮箱验证 / 通知中心 / 客户端埋点回执 / 任务撤回 / 管理员运维与灾备 / 定时任务
 //
 // 共同红线：
@@ -1435,7 +1435,7 @@ async function hLocale(c) {
   return { data: { locale, enforcement: 'server_side' } };
 }
 
-/** 任务撤回（D-09 P1）：PENDING_REVIEW→REJECTED，PUBLISHED/DISPATCHING→CANCELLED */
+/** 任务撤回（ P1）：PENDING_REVIEW→REJECTED，PUBLISHED/DISPATCHING→CANCELLED */
 async function hCancel(c) {
   const u = requireUser(c.session);
   assertCsrf(c.request, c.session);
@@ -1464,7 +1464,7 @@ async function hCancel(c) {
           ], statements,
         });
       } else {
-        // 未托管撤回：冻结全额原路退回（含 5% 服务费，D-04）
+        // 未托管撤回：冻结全额原路退回（含 5% 服务费，）
         await postLegs(c.db, {
           eventId: evt, taskId: row.task_id, memo: 'cancel:未托管撤回，冻结全额退回（含服务费）',
           legs: [
@@ -1492,7 +1492,7 @@ async function hCancel(c) {
   });
 }
 
-/** 客户端曝光 / 忽略回执（D-07 P1）：只记录，不改变推送名单与排序 */
+/** 客户端曝光 / 忽略回执（ P1）：只记录，不改变推送名单与排序 */
 async function hFeedback(c) {
   const u = requireRole(c.session, ['solver']);
   assertCsrf(c.request, c.session);
@@ -1692,7 +1692,7 @@ async function hAdminOps(c) {
       anchor,
       readiness: {
         code_capabilities_complete: true,
-        note: '代码能力已完备；正式运营许可仍须外部动作核销，见 docs/13 与 tests/readiness-check.mjs',
+        note: '代码能力已完备；正式运营许可仍须外部动作核销，见 规范文档 与 tests/readiness-check.mjs',
       },
     },
   };
@@ -1733,7 +1733,7 @@ const ROUTES = [
   ['POST', /^\/api\/reports$/, hReports],
   ['GET', /^\/api\/me\/export$/, hExport],
   ['DELETE', /^\/api\/me$/, hDeleteMe],
-  // ---- D-14 完全体新增端点 ----
+  // ----  完全体新增端点 ----
   ['POST', /^\/api\/auth\/verify-email$/, hVerifyEmail],
   ['POST', /^\/api\/auth\/resend-verification$/, hResendVerification],
   ['GET', /^\/api\/me\/notifications$/, hNotifications],

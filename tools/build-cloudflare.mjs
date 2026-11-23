@@ -11,7 +11,7 @@
  *     访问 /index.html 或 /demo.html 进入；/api/* 由页面内运行时计算，不发真实请求。
  *
  *  ② L1 生产系统（本轮新增）
- *     prod/site/* → cloudflare/（prod.html / app.js / styles.css / legal.html）
+ *     prod/site/* → cloudflare/（prod.html / app.js / styles.css / member.html 等）
  *     src/domain.mjs、src/hash.mjs → prod/lib/（Pages Functions 打包依赖）
  *     cloudflare/_redirects 把 `/` 重写到 /prod.html，使站点主入口为生产系统。
  *     生产前端走同源真实 fetch → functions/api/[[path]].js → D1 持久化。
@@ -91,10 +91,6 @@ const HEADERS = `# Cloudflare Pages 响应头：确保 ESM 模块以正确 MIME 
   Content-Type: text/javascript; charset=utf-8
   X-Content-Type-Options: nosniff
 
-/legal-lang.js
-  Content-Type: text/javascript; charset=utf-8
-  X-Content-Type-Options: nosniff
-
 /member.css
   Content-Type: text/css; charset=utf-8
   X-Content-Type-Options: nosniff
@@ -109,17 +105,13 @@ const HEADERS = `# Cloudflare Pages 响应头：确保 ESM 模块以正确 MIME 
   Cache-Control: no-store
   X-Content-Type-Options: nosniff
 
-# 生产页 CSP：禁止内联脚本 / 第三方来源；legal.html 有内联 <style>，故 style 允许 unsafe-inline。
+# 生产页 CSP：禁止内联脚本 / 第三方来源；style 允许 unsafe-inline（页面含内联样式）。
 # L0 演示页（/index.html、/demo.html）带内联引导层，不套用此 CSP，避免破坏既有演示。
 /
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
 
 /prod.html
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
-
-/legal.html
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
 
@@ -187,7 +179,7 @@ for (const f of SRC_FILES) {
 writeFileSync(join(OUT, '_headers'), HEADERS, 'utf8');
 
 // ---- ② 生产系统前端 ----
-const SITE_FILES = ['index.html', 'app.js', 'styles.css', 'legal.html', 'legal-lang.js', 'member.html', 'member.js', 'member.css', 'seo.js', 'sitemap.xml', 'robots.txt'];
+const SITE_FILES = ['index.html', 'app.js', 'styles.css', 'member.html', 'member.js', 'member.css', 'seo.js', 'sitemap.xml', 'robots.txt'];
 for (const f of SITE_FILES) {
   const src = join(SITE, f);
   if (!existsSync(src)) throw new Error(`缺少生产前端文件：prod/site/${f}`);
@@ -211,7 +203,7 @@ writeFileSync(join(ROOT, 'schema.sql'), SCHEMA_SQL, 'utf8');
 const files = [
   'index.html', 'cf-runtime.mjs', 'site-selfcheck.mjs', '_headers',
   ...SRC_FILES.map((f) => `src/${f}`),
-  'prod.html', 'app.js', 'styles.css', 'legal.html', 'legal-lang.js', 'member.html', 'member.js', 'member.css',
+  'prod.html', 'app.js', 'styles.css', 'member.html', 'member.js', 'member.css',
   'seo.js', 'sitemap.xml', 'robots.txt',
   '_redirects', '_routes.json', 'demo.html',
 ];

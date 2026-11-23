@@ -3,7 +3,7 @@
  *
  * 职责：状态机、积分规则、推送打分、榜单口径、LLM 适配层、合规预检。
  * 约束：纯函数、无副作用、不 import 任何外部模块（只用语言内置能力）。
- * 口径来源：CONTRACT.md §3/§5/§6/§7/§10 与《三宝殿项目方案_v1.0.md》。
+ * 口径来源：业务规范.md §3/§5/§6/§7/§10 与项目方案。
  * 所有演示数据均为虚构样例。
  */
 
@@ -26,7 +26,7 @@ function quantile(sorted, p) {
 }
 
 /**
- * 类目内 P5–P95 截断 + min-max 归一化（CONTRACT §6 / 方案 §3.3、§4.2.2）。
+ * 类目内 P5–P95 截断 + min-max 归一化（业务规范 §6 / 方案 §3.3、§4.2.2）。
  * 全组同值时返回 0.5 中性值，避免 0 分导致排序失真。
  */
 export function normalizeInCategory(values) {
@@ -41,7 +41,7 @@ export function normalizeInCategory(values) {
 }
 
 // ---------------------------------------------------------------------------
-// 1. 任务状态机（CONTRACT §3，唯一事实源在 C 任务管理系统）
+// 1. 任务状态机（业务规范 §3，唯一事实源在 C 任务管理系统）
 // ---------------------------------------------------------------------------
 
 export const STATE_MACHINE = Object.freeze({
@@ -78,7 +78,7 @@ export function isTerminal(state) {
 }
 
 // ---------------------------------------------------------------------------
-// 2. 积分规则（CONTRACT §5 / 方案 §4.1.4）
+// 2. 积分规则（业务规范 §5 / 方案 §4.1.4）
 // ---------------------------------------------------------------------------
 
 export const RULE_VERSION = 'sbc-rule-v1.0';
@@ -133,7 +133,7 @@ export function timeoutCreditPenalty() {
   return { rule_version: RULE_VERSION, credit_delta: TIMEOUT_CREDIT_PENALTY };
 }
 
-/** 五个账本科目（CONTRACT §5 / 方案 §5.2） */
+/** 五个账本科目（业务规范 §5 / 方案 §5.2） */
 export const SUBJECTS = Object.freeze({
   AVAILABLE: 'available',
   FROZEN: 'frozen',
@@ -143,7 +143,7 @@ export const SUBJECTS = Object.freeze({
 });
 
 // ---------------------------------------------------------------------------
-// 3. 推送打分 Score(t,u)（CONTRACT §6 / 方案 §3.3）
+// 3. 推送打分 Score(t,u)（业务规范 §6 / 方案 §3.3）
 // ---------------------------------------------------------------------------
 
 export const WEIGHT_VERSION = 'v1.0';
@@ -332,7 +332,7 @@ function buildBatches(selected, batchSize, expandTo, expand) {
 }
 
 /**
- * 中性排序（关闭个性化推荐后，服务端强制生效，CONTRACT §10.4）。
+ * 中性排序（关闭个性化推荐后，服务端强制生效，业务规范 §10.4）。
  * 只按「时间 + 距离」，不使用任何个性化因子，不产出个性化 reason_codes。
  */
 export function neutralCandidates(task, users, ctx = {}) {
@@ -377,7 +377,7 @@ export function neutralCandidates(task, users, ctx = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// 4. 榜单口径（CONTRACT §7 / 方案 §4.1.5、§4.2.2）
+// 4. 榜单口径（业务规范 §7 / 方案 §4.1.5、§4.2.2）
 // ---------------------------------------------------------------------------
 
 export const RANK_WEIGHT_VERSION = 'v1.0';
@@ -456,7 +456,7 @@ export function rankTasks(tasks, ctx = {}) {
 }
 
 /**
- * 用户积分榜：四维加权（CONTRACT §7）。
+ * 用户积分榜：四维加权（业务规范 §7）。
  * 仅「已验收通过任务的净获得 SBC」计入；补偿/邀请/活动/争议中一律不计入（由 store 聚合保证）。
  */
 export function rankUsers(userStats, ctx = {}) {
@@ -501,7 +501,7 @@ export function rankUsers(userStats, ctx = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// 5. LLM 适配层（CONTRACT §6 / 方案 §3.4）：只留三个可替换接口
+// 5. LLM 适配层（业务规范 §6 / 方案 §3.4）：只留三个可替换接口
 //    初版一律返回「规则化兜底结果 + degraded:true」；
 //    不决定最终推送名单、不决定积分结算、不裁定争议（人工兜底）。
 // ---------------------------------------------------------------------------
@@ -569,7 +569,7 @@ export function summarizeDispute(dispute) {
 }
 
 // ---------------------------------------------------------------------------
-// 6. 合规预检与虚拟号占位（CONTRACT §10.2 / §10.7 / 方案 §6.4）
+// 6. 合规预检与虚拟号占位（业务规范 §10.2 / §10.7 / 方案 §6.4）
 // ---------------------------------------------------------------------------
 
 /** 违禁词（仅用于发布预检，非用户输入采集项） */
@@ -601,7 +601,7 @@ export function sanitizeContact(_raw) {
   };
 }
 
-/** 发布合规预检：命中违禁词即拦截（一票否决，先于冻结与推送） */
+/** 发布合规预检：命中违禁词即拦截（先于冻结与推送） */
 export function compliancePrecheck(...texts) {
   const joined = texts.filter(Boolean).map(String).join(' \n ');
   const hits = BANNED_WORDS.filter((w) => joined.includes(w));
@@ -615,7 +615,7 @@ export function compliancePrecheck(...texts) {
 }
 
 /**
- * 成果正文 PII 脱敏（CONTRACT §10.2 / PRD US-06 验收条件③）。
+ * 成果正文 PII 脱敏（业务规范 §10.2 / PRD US-06 验收条件③）。
  * 只返回脱敏后文本，绝不把原始明文（手机号/身份证号）写入内存任务对象。
  */
 export function sanitizeSubmissionText(text) {
@@ -641,14 +641,14 @@ export function sanitizeSubmissionText(text) {
 }
 
 // ---------------------------------------------------------------------------
-// 7. 上线一票否决项的「钩子占位」（CONTRACT §10.5 / docs/03 §4）
-//    初版只保留可扩展钩子、布尔占位与可回放留痕，不新增 §8 之外的 HTTP 路径，
-//    不采集任何真实身份信息；真实核验与处置流程为上线一票否决项（V8），不伪装已交付。
+// 7. 准入钩子占位
+//    仅保留可扩展钩子、布尔占位与可回放留痕，不新增额外 HTTP 路径，
+//    不采集任何真实身份信息；真实核验与处置流程尚未接入。
 // ---------------------------------------------------------------------------
 
 /**
  * 未成年人限制准入钩子：只读取布尔准入结论占位，绝不接收/存储生日、证件号、真实姓名。
- * 真实实名核验由客户端与模块 A 在上线前实现（V8）。
+ * 真实实名核验由客户端与模块 A 实现。
  */
 export function minorRestrictionHook(input = {}) {
   const blocked = input.minor_blocked === true;
@@ -659,18 +659,18 @@ export function minorRestrictionHook(input = {}) {
     passed: !blocked,
     reason_code: blocked ? 'MINOR_RESTRICTION_BLOCKED' : 'ADULT_VERIFIED_PLACEHOLDER',
     pii_collected: false,
-    note: '初版仅保留准入钩子与布尔占位；不采集生日/证件/真实姓名，真实实名核验为上线一票否决项（V8）',
+    note: '仅保留准入钩子与布尔占位；不采集生日/证件/真实姓名，真实实名核验尚未接入',
   };
 }
 
-/** 举报入口钩子：§8 无独立举报端点，初版只保留入口占位与运营处置留痕位置 */
+/** 举报入口钩子：只保留入口占位与运营处置留痕位置 */
 export function reportEntryHook() {
   return {
     hook: 'report_entry',
     hook_version: 'report-entry-hook-v0.1',
     enabled: true,
-    endpoint: null, // 严守 CONTRACT §8 接口清单，不新增路径
+    endpoint: null, // 不新增路径
     entry_points: ['操作台任务详情/榜单条目入口占位', '运营处置留痕（事件流可回放）'],
-    note: '初版仅保留入口钩子；举报 24h 处置率 100% 为上线一票否决项（V8），不伪装已交付',
+    note: '仅保留入口钩子；举报 24h 处置率指标尚未接入',
   };
 }

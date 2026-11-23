@@ -2,7 +2,7 @@
  * 《三宝殿》初版 · 主代理独立本地验证脚本（tests/verify-local.mjs）
  *
  * 与 tests/smoke.mjs（研发自检）相互独立：本脚本由整合方编写，基准取自
- * CONTRACT.md v0.2 / 三宝殿项目方案_v1.0.md，不复用自检的断言实现。
+ * 业务规范.md v0.2 / 三宝殿项目方案_v1.0.md，不复用自检的断言实现。
  *
  * 覆盖：白盒规则单测 → HTTP 端到端数值勾稽 → 状态机/幂等/并发 →
  *       个性化开关 → 争议人工兜底 → 合规红线 → 静态页 → 性能 → 重启重置。
@@ -19,7 +19,7 @@ import * as D from '../src/domain.mjs';
 
 const SERVER_PATH = fileURLToPath(new URL('../src/server.mjs', import.meta.url));
 
-// 验收基准：CONTRACT.md v0.2 §4 登记事件集合（独立于实现硬编码）
+// 验收基准：业务规范.md v0.2 §4 登记事件集合（独立于实现硬编码）
 const CONTRACT_EVENTS = new Set([
   'TaskPublished', 'TaskUpdated', 'CreditFrozen', 'CreditTransferred', 'CreditChanged',
   'DispatchRequested', 'DispatchScored', 'DispatchSent', 'TaskAccepted',
@@ -28,7 +28,7 @@ const CONTRACT_EVENTS = new Set([
   'TaskDelisted', 'LedgerAnchored', 'RiskBlocked', 'PreferenceChanged',
 ]);
 
-// 键名严格照 CONTRACT §6/§7 与 domain.mjs 导出的符号（大小写敏感）
+// 键名严格照 业务规范 §6/§7 与 domain.mjs 导出的符号（大小写敏感）
 const DISPATCH_W = { P_accept: 0.30, P_complete_on_time: 0.35, C_notify: 0.10, R_risk: 0.10, V_fairness: 0.08, B_supply: 0.07 };
 const TASK_W = { value: 0.25, urgency: 0.20, feasibility: 0.20, publisher_credit: 0.15, heat: 0.10, quality: 0.10 };
 const USER_W = { net_sbc: 0.55, completed_count: 0.20, weighted_rating: 0.15, on_time_rate: 0.10 };

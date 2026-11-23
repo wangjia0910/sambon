@@ -18,10 +18,6 @@ Thumbs.db
 .env
 .env.*
 
-# 正式运营就绪证据（含人工签字与内部路径，不入库；模板 ops/readiness.template.json 入库）
-ops/readiness.json
-# 线上部署核验报告（含实时响应快照，本地留存不入库）
-ops/deployment-verification.json
 # 一次性生产密钥本地留存（绝不入库；用完建议轮换）
 ops/*.secret.txt
 # 每日多智能体互动的运行时报告（含账号邮箱，本地留存不入库）

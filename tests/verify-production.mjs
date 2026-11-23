@@ -181,7 +181,7 @@ async function main() {
       title: '刷单任务', description: '帮忙刷单', category: 'general', bounty: 10,
       acceptance_criteria: '完成刷单', event_id: eid('banned'),
     });
-    check('P-23 违禁词一票否决 422', banned.status === 422 && banned.error?.code === 'COMPLIANCE_BLOCKED');
+    check('P-23 违禁词硬拦截 422', banned.status === 422 && banned.error?.code === 'COMPLIANCE_BLOCKED');
   }
 
   // ------------------------------------------------------------------ 5. 端到端闭环
@@ -228,7 +228,7 @@ async function main() {
       { decision: 'approve', rating: 5, event_id: eid('verify') });
     const st = ver.data?.settlement;
     check('P-34 验收通过 → SETTLED', ver.status === 200 && ver.data?.task?.state === 'SETTLED');
-    check('P-35 结算口径 200 / 10 / 4 / 204（D-01～D-04）',
+    check('P-35 结算口径 200 / 10 / 4 / 204（～）',
       st?.bounty === 200 && st?.service_fee === 10 && st?.quality_bonus?.amount === 4 && st?.solver_credit === 204);
     const double = await pub.call('POST', `/api/tasks/${taskId}/verify`, { decision: 'approve', rating: 5 });
     check('P-36 已结算任务不可重复结算（状态机阻断）',
@@ -329,7 +329,7 @@ async function main() {
   }
 
   // ------------------------------------------------------------------ 9. 账号级个性化
-  console.log('\n[9] 账号级「关闭个性化推荐」（修正 D-06 全局单例）');
+  console.log('\n[9] 账号级「关闭个性化推荐」（修正  全局单例）');
   {
     const off = await sol.call('POST', '/api/preferences/personalized', { enabled: false, event_id: eid('pref-off') });
     check('P-52 关闭成功且标记账号级', off.status === 200 && off.data?.account_level === true && off.data?.personalized_enabled === false);
@@ -398,7 +398,7 @@ async function main() {
       sha('prod/lib/hash.js') === sha('src/hash.mjs'));
     check('P-66 根目录 schema.sql 由 schema.js 生成且一致', read('schema.sql') === SCHEMA_SQL);
     const need = ['cloudflare/prod.html', 'cloudflare/app.js', 'cloudflare/styles.css',
-      'cloudflare/legal.html', 'cloudflare/_redirects', 'cloudflare/_routes.json',
+      'cloudflare/_redirects', 'cloudflare/_routes.json',
       'cloudflare/index.html', 'cloudflare/cf-runtime.mjs', 'functions/api/[[path]].js'];
     check('P-67 生产前端 + Functions 入口 + L0 产物齐备', need.every((p) => existsSync(resolve(ROOT, p))));
     check('P-68 _redirects 把主入口指向生产系统、保留 L0 演示入口',
@@ -431,7 +431,7 @@ async function main() {
       routes.version === 1 && routes.include.length === 1 && routes.include[0] === '/api/*');
   }
 
-  // ================================================================== V3 完全体（D-14）
+  // ================================================================== V3 完全体（）
   // 独立环境，避免与 [1]～[12] 的限流 / 擦除 / 结算状态互相干扰。
   const v3env = makeEnv({ EMAIL_VERIFICATION_DEV_ECHO: 'true', CRON_SECRET: 'test-cron-secret' });
   const va = new Client(); va.env = v3env.env;
@@ -560,7 +560,7 @@ async function main() {
 
     const fb = await vs.call('POST', `/api/tasks/${reviewTaskId}/feedback`, { kind: 'EXPOSED', event_id: eid('fb-exposed') });
     const evs = await vp.call('GET', `/api/events?task_id=${reviewTaskId}`);
-    check('P-91 曝光回执 201 且写入 DispatchExposed（D-07 P1 落地）',
+    check('P-91 曝光回执 201 且写入 DispatchExposed（ P1 落地）',
       fb.status === 201 && (evs.data?.events || []).some((e) => e.type === 'DispatchExposed'));
     const fbig = await vs.call('POST', `/api/tasks/${reviewTaskId}/feedback`, { kind: 'IGNORED', event_id: eid('fb-ignored') });
     check('P-92 忽略回执同样可记录', fbig.status === 201);

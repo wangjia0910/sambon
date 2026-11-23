@@ -232,7 +232,7 @@ async function main() {
   const fail = results.length - pass;
   console.log(`\n=== 结果：PASS ${pass} / FAIL ${fail} / 共 ${results.length} 项 ===`);
   if (fail) console.log('失败项：' + results.filter((r) => !r.ok).map((r) => r.name).join(' | '));
-  console.log('结论：仅证明 Cloudflare 静态版与本地原型口径一致、可离线运行；不构成上线许可（V1–V8 未触发）。');
+  console.log('结论：Cloudflare 静态版与本地原型口径一致、可离线运行。');
   process.exit(fail === 0 ? 0 : 1);
 }
 

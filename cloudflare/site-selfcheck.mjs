@@ -6,7 +6,7 @@
  *
  * 原理：静态版的 /api/* 由页面引导层在浏览器内计算，不会到达 Cloudflare 边缘；
  *      因此本脚本能真实检验「线上页面 + 线上运行时」是否完整，而不只是看首页 200。
- * 边界：仅验证演示预览口径一致，不构成上线许可（V1–V8 未触发）。
+ * 边界：验证线上静态版与本地原型的口径一致性。
  */
 
 const CONTRACT_EVENTS = new Set([
@@ -158,6 +158,6 @@ export async function run() {
     console.log(`%c三宝殿站点自检：PASS ${pass} / FAIL ${fail} / 共 ${results.length} 项`,
       `color:${fail ? '#c00' : '#080'};font-weight:bold`);
   } catch { /* 控制台不可用也不影响返回值 */ }
-  console.log('结论：全绿仅表示线上静态版与本地原型口径一致；不构成上线许可（V1–V8 未触发）。');
+  console.log('结论：线上静态版与本地原型口径一致。');
   return summary;
 }

@@ -55,8 +55,8 @@ async function main() {
   check('VM-09 页面仅加载同源 member.js / member.css，无内联脚本与 CDN',
     /src="\/member\.js"/.test(html) && /href="\/member\.css"/.test(html) &&
     !/<script(?![^>]*src=)[^>]*>/.test(html) && !/https?:\/\/(cdn|unpkg|jsdelivr)/i.test(html));
-  check('VM-10 默认英文 + 含中文切换入口 + 法务/账本声明',
-    /lang="en"/.test(html) && /data-action="toggle-locale"/.test(html) && /legal\.html/.test(html));
+  check('VM-10 默认英文 + 含中文切换入口',
+    /lang="en"/.test(html) && /data-action="toggle-locale"/.test(html));
 
   const js = read(join(OUT, 'member.js'));
   check('VM-11 无 node: / Buffer / process 依赖（浏览器 ESM 可运行）',
