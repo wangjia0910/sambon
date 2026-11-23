@@ -26,5 +26,7 @@ ops/deployment-verification.json
 ops/*.secret.txt
 # 每日多智能体互动的运行时报告（含账号邮箱，本地留存不入库）
 ops/daily-agents/reports/
+# 每日多智能体的 Secrets 填写指引（含账号口令，仅本地留存，绝不入库）
+ops/daily-agents/secrets.private.md
 
 # 注：.workbuddy/ 为项目相关数据，不属于临时缓存，禁止删除或忽略
